@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airport Run Tracker</title>
-        <!-- Makes the web app capable of running in full-screen mode -->
+
+    <!-- Full-screen PWA meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    
-    <!-- Sets the style of the status bar (time, battery, etc.) to blend with your app's header -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Sets the name for the app icon on the home screen -->
     <meta name="apple-mobile-web-app-title" content="Run Tracker">
-   
+
+    <!-- Link to your custom home screen icon -->
+    <link rel="apple-touch-icon" href="icon.PNG">
+    
     <style>
         * {
             margin: 0;
@@ -671,7 +671,6 @@
             updateExpensesTable();
             updateSummary();
 
-            // BUG FIX 2: Listen for changes that affect the rate calculation
             document.getElementById('vehicleType').addEventListener('change', updateRateDisplay);
             document.getElementById('customPickup').addEventListener('input', updateRateDisplay);
             document.getElementById('customDropoff').addEventListener('input', updateRateDisplay);
@@ -734,7 +733,6 @@
                         alert('Please enter customer name');
                         return false;
                     }
-                    // BUG FIX 1: Removed mandatory company check.
                     if (company === 'Other' && !customCompany) {
                         alert('Please enter company name');
                         return false;
@@ -775,7 +773,6 @@
                         return false;
                     }
                     
-                    // BUG FIX 2: Removed stale rate calculation call from here.
                     return true;
                     
                 case 5:
@@ -810,7 +807,6 @@
             document.getElementById('paymentMethod').value = '';
             document.getElementById('gratuityOverride').value = '';
             
-            // RESET the rate display
             document.getElementById('autoRate').innerHTML = 'Rate will be calculated automatically';
             document.getElementById('autoRate').style.color = '#27ae60';
         }
@@ -833,7 +829,6 @@
             } else {
                 customPickup.style.display = 'none';
             }
-            // BUG FIX 2: Call rate update on change
             updateRateDisplay();
         });
         
@@ -844,7 +839,6 @@
             } else {
                 customDropoff.style.display = 'none';
             }
-            // BUG FIX 2: Call rate update on change
             updateRateDisplay();
         });
         
@@ -870,7 +864,6 @@
                 
                 if (checkbox.checked) {
                     options.style.display = 'block';
-                    // Set Staples custom 407 rate if applicable
                     if (company === 'Staples' && companyDefaults['Staples'].isCustom) {
                         document.getElementById('toll407').value = companyDefaults['Staples'].custom407;
                     } else {
@@ -930,7 +923,6 @@
             const gratuityOverride = runData.gratuityOverride;
             const baseRateOverride = runData.baseRateOverride;
             
-            // Calculate base rate - Check for Staples custom rate first
             let baseRate = 0;
             if (baseRateOverride !== undefined && baseRateOverride !== null) {
                 baseRate = parseFloat(baseRateOverride);
@@ -946,7 +938,6 @@
                 }
             }
             
-            // Calculate airport fee - No fee for Airport BB
             let airportFee = 0;
             const isFromAirport = pickup.includes('Airport');
             if (isFromAirport && !pickup.includes('Airport BB')) {
@@ -955,13 +946,11 @@
             
             const waitingFee = waitingIncrements * 25;
             
-            // Calculate 407 toll - Use Staples custom rate if applicable
             let finalToll407 = toll407Amount;
             if (use407 && company === 'Staples' && companyDefaults['Staples'].isCustom) {
                 finalToll407 = companyDefaults['Staples'].custom407;
             }
             
-            // Calculate gratuity
             let gratuity = 0;
             if (gratuityOverride !== undefined && gratuityOverride !== null && gratuityOverride !== '') {
                 gratuity = parseFloat(gratuityOverride);
@@ -1037,7 +1026,6 @@
         }
         
         function submitRun() {
-            // Validate payment method is selected
             if (!document.getElementById('paymentMethod').value) {
                 alert('Please select a payment method');
                 return;
@@ -1049,17 +1037,6 @@
                 document.getElementById('customPickup').value : document.getElementById('pickupLocation').value;
             const dropoff = document.getElementById('dropoffLocation').value === 'Other' ?
                 document.getElementById('customDropoff').value : document.getElementById('dropoffLocation').value;
-            
-            console.log('Submitting run data:', {
-                customerName: document.getElementById('customerName').value,
-                company: company,
-                vehicleType: document.getElementById('vehicleType').value,
-                passengers: parseInt(document.getElementById('passengerCount').textContent),
-                date: document.getElementById('runDate').value,
-                pickup: pickup,
-                dropoff: dropoff,
-                paymentMethod: document.getElementById('paymentMethod').value
-            });
             
             const runData = {
                 customerName: document.getElementById('customerName').value.trim(),
@@ -1079,16 +1056,13 @@
                 paymentMethod: document.getElementById('paymentMethod').value
             };
             
-            // Final validation
             if (!runData.customerName || !runData.vehicleType || 
                 !runData.date || !runData.pickup || !runData.dropoff || !runData.paymentMethod) {
                 alert('Please fill in all required fields');
-                console.log('Missing required fields:', runData);
                 return;
             }
             
             const totals = calculateRunTotals(runData);
-            console.log('Calculated totals:', totals);
             
             const run = {
                 id: Date.now(),
@@ -1113,19 +1087,15 @@
                 myCommission: totals.myCommission
             };
             
-            console.log('Final run object:', run);
-            
             try {
                 runs.push(run);
                 localStorage.setItem('airportRuns', JSON.stringify(runs));
-                console.log('Run saved to localStorage. Total runs:', runs.length);
                 
                 updateRunsTable();
                 updateSummary();
                 
                 alert('Run added successfully!');
                 
-                // Switch to View Runs tab to show the new entry
                 document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 
@@ -1458,7 +1428,6 @@
                 });
             }
             
-            // BUG FIX 3: Replaced `\\n` with `\n` for proper newlines.
             let csvContent = `Airport Run Tracker - ${periodText}\n\n`;
             
             csvContent += 'Customer,Company,Vehicle,Passengers,Date,Pickup,Dropoff,Rate,407,Airport Fee,Waiting,Payment,Gratuity,Total,My Commission\n';
