@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
     <style>
         * {
@@ -159,7 +159,9 @@
             gap: 8px;
         }
 
-        .form-row-3 {
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.form-row-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 6px;
@@ -387,7 +389,7 @@
                         <input type="date" id="checkoutDate">
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="form-row-2">
                     <div class="currency-input">
                         <label>USD Cost</label>
                         <span class="currency-prefix">$</span>
@@ -464,7 +466,7 @@
                     <label>Location</label>
                     <input type="text" id="expenseLocation" placeholder="Where was this expense?">
                 </div>
-                <div class="form-row">
+                <div class="form-row-2">
                     <div class="currency-input">
                         <label>USD Cost</label>
                         <span class="currency-prefix">$</span>
