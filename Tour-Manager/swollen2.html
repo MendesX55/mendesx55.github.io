@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            min-height: 100vh;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+            margin-bottom: 5px;
+        }
+
+        .artist-logos {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 35px;
+            background: linear-gradient(45deg, #000, #333);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 9px;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px 15px 0 0;
+            margin: 10px 10px 0 10px;
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+            border-bottom: 3px solid #ffd700;
+        }
+
+        .tab-content {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            margin: 0 10px 10px 10px;
+            border-radius: 0 0 15px 15px;
+            padding: 15px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .form-section h3 {
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            border-bottom: 1px solid rgba(255,215,0,0.3);
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-prefix {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .currency-input input {
+            padding: 10px !important;
+            font-size: 16px !important;
+            height: 42px !important;
+    
+            padding-left: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 11px;
+            width: auto;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 11px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            word-break: break-word;
+        }
+
+        .data-table th {
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .route-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .route-info {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .route-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.8em;
+        }
+
+        .venue-sales {
+            background: rgba(0,255,0,0.1);
+            border: 1px solid rgba(0,255,0,0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .approx-cad {
+            color: #aaa;
+            font-size: 11px;
+            font-style: italic;
+        }
+
+        .manual-cad {
+            color: #ffb3ba;
+            font-weight: bold;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 15px 0;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #ffd700;
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        .export-section {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .summary-box {
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+    
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.currency-input input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    height: 42px;
+    box-sizing: border-box;
+}
+
+
+/* Uniform input heights */
+input[type="date"],
+input[type="time"],
+input[type="number"],
+select {
+    height: 42px !important;
+    font-size: 16px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎤 TOUR MANAGER 🎤</h1>
+        <div class="artist-logos">
+            <div class="logo-placeholder">SEAN PAUL</div>
+            <div class="logo-placeholder">WIZ KHALIFA</div>
+            <div class="logo-placeholder">DABABY</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="showTab('input')">INPUT</button>
+            <button class="tab-btn" onclick="showTab('hotels')">HOTELS</button>
+            <button class="tab-btn" onclick="showTab('expenses')">EXPENSES</button>
+            <button class="tab-btn" onclick="showTab('routes')">ROUTES</button>
+            <button class="tab-btn" onclick="showTab('venues')">VENUES</button>
+        </div>
+
+        <!-- INPUT TAB -->
+        <div id="input" class="tab-content active">
+            <!-- Hotel Input Section -->
+            <div class="form-section">
+                <h3>🏨 Hotel Confirmations</h3>
+                <div class="form-group">
+                    <label>Hotel Name</label>
+                    <input type="text" id="hotelName" placeholder="Hotel name">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="hotelAddress" placeholder="Full address">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Check-in</label>
+                        <input type="date" id="checkinDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Check-out</label>
+                        <input type="date" id="checkoutDate">
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="currency-input">
+                        <label>USD Cost</label>
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="hotelCostUSD" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="currency-input">
+                        <label>Manual CAD</label>
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="hotelCostCAD" placeholder="0.00" step="0.01">
+                    </div>
+                </div>
+                <button class="btn" onclick="addHotel()">Add Hotel</button>
+            </div>
+
+            <!-- Venue Input Section -->
+            <div class="form-section">
+                <h3>🎵 Venue Information</h3>
+                <div class="form-group">
+                    <label>Venue Name</label>
+                    <input type="text" id="venueName" placeholder="Venue name">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="venueAddress" placeholder="Full address">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Show Date</label>
+                        <input type="date" id="showDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Show Time</label>
+                        <input type="time" id="showTime">
+                    </div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Start Inventory</label>
+                        <input type="number" id="startInventory" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>End Inventory</label>
+                        <input type="number" id="endInventory" placeholder="0">
+                    </div>
+                    
+<div class="form-group currency-input">
+    <label>Sales (CAD)</label>
+    <span class="currency-prefix">$</span>
+    <input type="number" id="totalSales" placeholder="0.00" step="0.01" style="width: 100%;">
+</div>
+
+                </div>
+                <button class="btn" onclick="addVenue()">Add Venue</button>
+            </div>
+
+            <!-- Expense Input Section -->
+            <div class="form-section">
+                <h3>💰 Expenses</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="expenseType">
+                            <option value="gas">Gas</option>
+                            <option value="food">Food</option>
+                            <option value="tolls">Tolls</option>
+                            <option value="parking">Parking</option>
+                            <option value="misc">Miscellaneous</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="expenseDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="expenseLocation" placeholder="Where was this expense?">
+                </div>
+                <div class="form-row-2">
+                    <div class="currency-input">
+                        <label>USD Cost</label>
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="expenseAmountUSD" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="currency-input">
+                        <label>Manual CAD</label>
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="expenseAmountCAD" placeholder="0.00" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="expenseNotes" rows="2" placeholder="Additional notes"></textarea>
+                </div>
+                <button class="btn" onclick="addExpense()">Add Expense</button>
+            </div>
+        </div>
+
+        <!-- HOTELS TAB -->
+        <div id="hotels" class="tab-content">
+            <div class="summary-box">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="hotelCountStat">0</div>
+                        <div class="stat-label">Total Hotels</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="hotelCostStat">$0</div>
+                        <div class="stat-label">Total Cost</div>
+                    </div>
+                </div>
+            </div>
+            <table class="data-table" id="hotelsTable">
+                <thead>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Dates</th>
+                        <th>USD</th>
+                        <th>CAD</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="hotelsBody"></tbody>
+            </table>
+        </div>
+
+        <!-- EXPENSES TAB -->
+        <div id="expenses" class="tab-content">
+            <div class="summary-box">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="expenseCountStat">0</div>
+                        <div class="stat-label">Total Expenses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="expenseCostStat">$0</div>
+                        <div class="stat-label">Total Cost</div>
+                    </div>
+                </div>
+            </div>
+            <table class="data-table" id="expensesTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>USD</th>
+                        <th>CAD</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expensesBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ROUTES TAB -->
+        <div id="routes" class="tab-content">
+            <div class="summary-box">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDistanceStat">0 km</div>
+                        <div class="stat-label">Total Distance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalTimeStat">0h</div>
+                        <div class="stat-label">Drive Time</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="generateRoutes()">🗺️ Generate Route Plan</button>
+            <div id="routesList"></div>
+        </div>
+
+        <!-- VENUES TAB -->
+        <div id="venues" class="tab-content">
+            <div class="summary-box">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="venueCountStat">0</div>
+                        <div class="stat-label">Total Shows</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="venueSalesStat">$0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                </div>
+            </div>
+            <div id="venuesList"></div>
+            
+            <div class="section-divider"></div>
+            
+            <!-- Sales & Inventory Placeholder -->
+            <div class="venue-sales">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">📊 Sales & Inventory Tracker</h3>
+                <p style="font-size: 12px; color: #ccc;">
+                    Advanced sales tracking, inventory management, and revenue analytics will be added here.
+                    Features will include:
+                </p>
+                <ul style="font-size: 11px; color: #aaa; margin: 8px 0; padding-left: 15px;">
+                    <li>Real-time inventory counting</li>
+                    <li>Sales per venue analytics</li>
+                    <li>Product performance tracking</li>
+                    <li>Revenue forecasting</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let tourData = {
+            hotels: [],
+            venues: [],
+            expenses: [],
+            routes: []
+        };
+
+        // Load data from localStorage
+        window.onload = function() {
+            const savedData = localStorage.getItem('tourData');
+            if (savedData) {
+                tourData = JSON.parse(savedData);
+                updateAllDisplays();
+            }
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = today;
+        };
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('tourData', JSON.stringify(tourData));
+        }
+
+        // Show tab
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Update displays when switching tabs
+            updateAllDisplays();
+        }
+
+        // Add hotel
+        function addHotel() {
+            const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0;
+            const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0;
+            const approxCAD = usdCost * 1.35;
+
+            const hotel = {
+                id: Date.now(),
+                name: document.getElementById('hotelName').value,
+                address: document.getElementById('hotelAddress').value,
+                checkin: document.getElementById('checkinDate').value,
+                checkout: document.getElementById('checkoutDate').value,
+                costUSD: usdCost,
+                costCAD: cadCost,
+                approxCAD: approxCAD,
+                type: 'hotel'
+            };
+
+            if (hotel.name && hotel.address && hotel.checkin) {
+                tourData.hotels.push(hotel);
+                saveData();
+                updateAllDisplays();
+                clearHotelForm();
+                alert('Hotel added successfully!');
+            } else {
+                alert('Please fill in hotel name, address, and check-in date');
+            }
+        }
+
+        // Add venue
+        function addVenue() {
+            const venue = {
+                id: Date.now(),
+                name: document.getElementById('venueName').value,
+                address: document.getElementById('venueAddress').value,
+                date: document.getElementById('showDate').value,
+                time: document.getElementById('showTime').value,
+                startInventory: parseInt(document.getElementById('startInventory').value) || 0,
+                endInventory: parseInt(document.getElementById('endInventory').value) || 0,
+                totalSales: parseFloat(document.getElementById('totalSales').value) || 0,
+                type: 'venue'
+            };
+
+            if (venue.name && venue.address && venue.date) {
+                tourData.venues.push(venue);
+                saveData();
+                updateAllDisplays();
+                clearVenueForm();
+                alert('Venue added successfully!');
+            } else {
+                alert('Please fill in venue name, address, and show date');
+            }
+        }
+
+        // Add expense
+        function addExpense() {
+            const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0;
+            const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0;
+            const approxCAD = usdCost * 1.35;
+
+            const expense = {
+                id: Date.now(),
+                type: document.getElementById('expenseType').value,
+                date: document.getElementById('expenseDate').value,
+                location: document.getElementById('expenseLocation').value,
+                amountUSD: usdCost,
+                amountCAD: cadCost,
+                approxCAD: approxCAD,
+                notes: document.getElementById('expenseNotes').value,
+                category: 'expense'
+            };
+
+            if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) {
+                tourData.expenses.push(expense);
+                saveData();
+                updateAllDisplays();
+                clearExpenseForm();
+                alert('Expense added successfully!');
+            } else {
+                alert('Please enter date and amount');
+            }
+        }
+
+        // Generate routes
+        function generateRoutes() {
+            const routesList = document.getElementById('routesList');
+            routesList.innerHTML = '';
+            
+            // Combine and sort all locations by date
+            const allLocations = [
+                ...tourData.hotels.map(h => ({
+                    ...h, 
+                    sortDate: h.checkin, 
+                    displayType: 'Hotel Check-in',
+                    displayName: h.name
+                })),
+                ...tourData.hotels.map(h => ({
+                    ...h, 
+                    sortDate: h.checkout, 
+                    displayType: 'Hotel Check-out',
+                    displayName: h.name
+                })),
+                ...tourData.venues.map(v => ({
+                    ...v, 
+                    sortDate: v.date, 
+                    displayType: 'Venue',
+                    displayName: v.name
+                }))
+            ].filter(item => item.sortDate);
+
+            // Sort by date
+            allLocations.sort((a, b) => new Date(a.sortDate) - new Date(b.sortDate));
+
+            // Generate route segments
+            for (let i = 0; i < allLocations.length - 1; i++) {
+                const from = allLocations[i];
+                const to = allLocations[i + 1];
+                
+                // Simulate route calculation
+                const distance = Math.floor(Math.random() * 400) + 50;
+                const time = Math.floor((distance / 80) * 60);
+                const gasStops = Math.floor(distance / 150) + (distance > 150 ? 1 : 0);
+                const estimatedGas = Math.ceil((distance / 100) * 8 * 1.8);
+
+                const routeDiv = document.createElement('div');
+                routeDiv.className = 'route-item';
+                routeDiv.innerHTML = `
+                    <div class="route-header">
+                        <span class="drag-handle">⋮⋮</span>
+                        <strong>${from.sortDate} → ${to.sortDate}</strong>
+                        <button class="btn btn-small" onclick="editRoute(${i})">Edit</button>
+                    </div>
+                    <div class="route-info">
+                        <strong>FROM:</strong> ${from.displayType} - ${from.displayName}<br>
+                        <strong>TO:</strong> ${to.displayType} - ${to.displayName}<br>
+                        <strong>Distance:</strong> ${distance} km | <strong>Time:</strong> ${Math.floor(time/60)}h ${time%60}m<br>
+                        <strong>Gas Stops:</strong> ${gasStops} | <strong>Est. Gas:</strong> $${estimatedGas} CAD
+                    </div>
+                    <div class="route-controls">
+                        <button class="btn btn-small" onclick="moveRouteUp(${i})">↑</button>
+                        <button class="btn btn-small" onclick="moveRouteDown(${i})">↓</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteRoute(${i})">Delete</button>
+                    </div>
+                `;
+                routesList.appendChild(routeDiv);
+            }
+
+            // Update total stats
+            const totalDistance = allLocations.length > 1 ? 
+                (allLocations.length - 1) * (Math.floor(Math.random() * 400) + 50) : 0;
+            const totalTime = Math.floor(totalDistance / 80);
+            
+            document.getElementById('totalDistanceStat').textContent = totalDistance + ' km';
+            document.getElementById('totalTimeStat').textContent = totalTime + 'h';
+        }
+
+        // Route manipulation functions
+        function editRoute(index) {
+            alert('Route editing interface would open here. You can modify stops, gas stations, and timing.');
+        }
+
+        function moveRouteUp(index) {
+            // Route reordering logic would go here
+            alert('Moving route up...');
+        }
+
+        function moveRouteDown(index) {
+            // Route reordering logic would go here
+            alert('Moving route down...');
+        }
+
+        function deleteRoute(index) {
+            if (confirm('Delete this route segment?')) {
+                // Route deletion logic
+                generateRoutes();
+            }
+        }
+
+        // Update all displays
+        function updateAllDisplays() {
+            updateHotelsDisplay();
+            updateExpensesDisplay();
+            updateVenuesDisplay();
+        }
+
+        // Update hotels display
+        function updateHotelsDisplay() {
+            const tbody = document.getElementById('hotelsBody');
+            tbody.innerHTML = '';
+
+            let totalUSD = 0;
+            let totalCAD = 0;
+
+            tourData.hotels.forEach(hotel => {
+                totalUSD += hotel.costUSD;
+                totalCAD += hotel.costCAD || hotel.approxCAD;
+
+                const row = tbody.insertRow();
+                const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : hotel.approxCAD;
+                const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad';
+                
+                row.innerHTML = `
+                    <td>${hotel.name.substring(0, 20)}${hotel.name.length > 20 ? '...' : ''}</td>
+                    <td>${hotel.checkin}<br><small>${hotel.checkout}</small></td>
+                    <td>${hotel.costUSD.toFixed(0)}</td>
+                    <td class="${cadClass}">${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</td>
+                    <td><button class="btn btn-small btn-danger" onclick="deleteItem('hotel', ${hotel.id})">×</button></td>
+                `;
+            });
+
+            document.getElementById('hotelCountStat').textContent = tourData.hotels.length;
+            document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0);
+        }
+
+        // Update expenses display
+        function updateExpensesDisplay() {
+            const tbody = document.getElementById('expensesBody');
+            tbody.innerHTML = '';
+
+            let totalUSD = 0;
+            let totalCAD = 0;
+
+            // Sort expenses by date
+            const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedExpenses.forEach(expense => {
+                totalUSD += expense.amountUSD;
+                totalCAD += expense.amountCAD || expense.approxCAD;
+
+                const row = tbody.insertRow();
+                const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : expense.approxCAD;
+                const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad';
+                
+                row.innerHTML = `
+                    <td>${expense.date}</td>
+                    <td>${expense.type}</td>
+                    <td>${(expense.location || 'N/A').substring(0, 15)}${(expense.location || '').length > 15 ? '...' : ''}</td>
+                    <td>${expense.amountUSD.toFixed(0)}</td>
+                    <td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td>
+                    <td><button class="btn btn-small btn-danger" onclick="deleteItem('expense', ${expense.id})">×</button></td>
+                `;
+            });
+
+            document.getElementById('expenseCountStat').textContent = tourData.expenses.length;
+            document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
+        }
+
+        // Update venues display
+        function updateVenuesDisplay() {
+            const venuesList = document.getElementById('venuesList');
+            venuesList.innerHTML = '';
+
+            let totalSales = 0;
+
+            // Sort venues by date
+            const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedVenues.forEach(venue => {
+                totalSales += venue.totalSales;
+                const soldItems = venue.startInventory - venue.endInventory;
+
+                const venueDiv = document.createElement('div');
+                venueDiv.className = 'route-item';
+                venueDiv.innerHTML = `
+                    <div class="route-header">
+                        <strong>${venue.date} - ${venue.name}</strong>
+                        <button class="btn btn-small btn-danger" onclick="deleteItem('venue', ${venue.id})">×</button>
+                    </div>
+                    <div class="route-info">
+                        <strong>Address:</strong> ${venue.address}<br>
+                        <strong>Show Time:</strong> ${venue.time}<br>
+                        <strong>Inventory:</strong> Start: ${venue.startInventory} | End: ${venue.endInventory} | Sold: ${soldItems}<br>
+                        <strong>Sales:</strong> ${venue.totalSales.toLocaleString()} CAD
+                    </div>
+                `;
+                venuesList.appendChild(venueDiv);
+            });
+
+            document.getElementById('venueCountStat').textContent = tourData.venues.length;
+            document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
+        }
+
+        // Delete item
+        function deleteItem(type, id) {
+            if (confirm(`Delete this ${type}?`)) {
+                if (type === 'hotel') {
+                    tourData.hotels = tourData.hotels.filter(h => h.id !== id);
+                } else if (type === 'venue') {
+                    tourData.venues = tourData.venues.filter(v => v.id !== id);
+                } else if (type === 'expense') {
+                    tourData.expenses = tourData.expenses.filter(e => e.id !== id);
+                }
+                saveData();
+                updateAllDisplays();
+            }
+        }
+
+        // Clear forms
+        function clearHotelForm() {
+            document.getElementById('hotelName').value = '';
+            document.getElementById('hotelAddress').value = '';
+            document.getElementById('checkinDate').value = '';
+            document.getElementById('checkoutDate').value = '';
+            document.getElementById('hotelCostUSD').value = '';
+            document.getElementById('hotelCostCAD').value = '';
+        }
+
+        function clearVenueForm() {
+            document.getElementById('venueName').value = '';
+            document.getElementById('venueAddress').value = '';
+            document.getElementById('showDate').value = '';
+            document.getElementById('showTime').value = '';
+            document.getElementById('startInventory').value = '';
+            document.getElementById('endInventory').value = '';
+            document.getElementById('totalSales').value = '';
+        }
+
+        function clearExpenseForm() {
+            document.getElementById('expenseAmountUSD').value = '';
+            document.getElementById('expenseAmountCAD').value = '';
+            document.getElementById('expenseLocation').value = '';
+            document.getElementById('expenseNotes').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = today;
+        }
+
+        // Auto-calculate approximate CAD when USD is entered
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hotel USD to CAD approximation
+            document.getElementById('hotelCostUSD').addEventListener('input', function() {
+                if (this.value && !document.getElementById('hotelCostCAD').value) {
+                    const approx = (parseFloat(this.value) * 1.35).toFixed(2);
+                    document.getElementById('hotelCostCAD').placeholder = `≈ ${approx} CAD`;
+                }
+            });
+
+            // Expense USD to CAD approximation
+            document.getElementById('expenseAmountUSD').addEventListener('input', function() {
+                if (this.value && !document.getElementById('expenseAmountCAD').value) {
+                    const approx = (parseFloat(this.value) * 1.35).toFixed(2);
+                    document.getElementById('expenseAmountCAD').placeholder = `≈ ${approx} CAD`;
+                }
+            });
+        });
+
+        // Export functionality (can be added to any tab)
+        function exportTourData() {
+            const allData = {
+                hotels: tourData.hotels,
+                venues: tourData.venues,
+                expenses: tourData.expenses,
+                summary: {
+                    totalHotels: tourData.hotels.length,
+                    totalVenues: tourData.venues.length,
+                    totalExpenses: tourData.expenses.length,
+                    totalSales: tourData.venues.reduce((sum, v) => sum + v.totalSales, 0),
+                    totalCosts: {
+                        hotels: tourData.hotels.reduce((sum, h) => sum + (h.costCAD || h.approxCAD), 0),
+                        expenses: tourData.expenses.reduce((sum, e) => sum + (e.amountCAD || e.approxCAD), 0)
+                    }
+                }
+            };
+
+            // Create CSV format
+            const csvData = [
+                ['Type', 'Date', 'Name/Location', 'USD Cost', 'CAD Cost', 'Notes'],
+                ...tourData.hotels.map(h => [
+                    'Hotel',
+                    h.checkin,
+                    h.name,
+                    h.costUSD,
+                    h.costCAD || h.approxCAD,
+                    `${h.address} | Check-out: ${h.checkout}`
+                ]),
+                ...tourData.venues.map(v => [
+                    'Venue',
+                    v.date,
+                    v.name,
+                    0,
+                    v.totalSales,
+                    `${v.address} | Time: ${v.time} | Sold: ${v.startInventory - v.endInventory}`
+                ]),
+                ...tourData.expenses.map(e => [
+                    'Expense - ' + e.type,
+                    e.date,
+                    e.location,
+                    e.amountUSD,
+                    e.amountCAD || e.approxCAD,
+                    e.notes
+                ])
+            ];
+
+            const csv = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tour-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Add export button to each tab (call this in any tab)
+        function addExportButton(tabId) {
+            const tab = document.getElementById(tabId);
+            if (!tab.querySelector('.export-section')) {
+                const exportDiv = document.createElement('div');
+                exportDiv.className = 'export-section';
+                exportDiv.innerHTML = '<button class="btn" onclick="exportTourData()">📊 Export All Data</button>';
+                tab.appendChild(exportDiv);
+            }
+        }
+
+        // Add export buttons to all tabs
+        setTimeout(() => {
+            addExportButton('hotels');
+            addExportButton('expenses');
+            addExportButton('routes');
+            addExportButton('venues');
+        }, 500);
+    </script>
+</body>
+</html>
