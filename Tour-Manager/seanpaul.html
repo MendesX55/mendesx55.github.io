@@ -453,15 +453,22 @@
             justify-content: center;
             font-weight: bold;
             margin-right: 10px;
+            flex-shrink: 0; /* Prevents the number from shrinking */
         }
 
         .route-step select {
-            flex: 1;
+            flex-grow: 1; /* Allow it to grow to fill available space */
+            flex-shrink: 1; /* Allow it to shrink when space is limited */
+            min-width: 0; /* Critical for allowing shrinking below content size */
             padding: 8px;
             border-radius: 6px;
             border: none;
             background: rgba(255,255,255,0.9);
             color: #000;
+            /* NEW properties to handle long text */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Uniform input heights */
@@ -709,7 +716,7 @@
 <select id="routeSelect0" onchange="updateRouteSelects()">
 <option value="">-- Select Starting Point --</option>
 </select>
-<input type="date" id="routeDate0" style="margin-left: 10px; width: 120px; padding: 4px; font-size: 12px;" placeholder="Date">
+<input type="date" id="routeDate0" style="margin-left: 10px; width: 120px; padding: 4px; font-size: 12px; flex-shrink: 0;" placeholder="Date">
 </div>
 </div>
 <button class="btn" onclick="generateCustomRoute()">🛣️ Generate Full Tour Route</button>
@@ -743,7 +750,7 @@
 <div id="hotelModal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<span class="close" onclick="closeModal('hotelModal')">&times;</span>
+<span class="close" onclick="closeModal('hotelModal')">×</span>
 <div>Edit Hotel Details</div>
 </div>
 <div id="hotelEditForm">
@@ -791,7 +798,7 @@
 <div id="venueModal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<span class="close" onclick="closeModal('venueModal')">&times;</span>
+<span class="close" onclick="closeModal('venueModal')">×</span>
 <div>Edit Venue Details</div>
 </div>
 <div id="venueEditForm">
@@ -1003,18 +1010,88 @@
             }
         }
 
-        // Update route selects with available locations
+        // ---- ROUTE FUNCTIONS ----
+
+        function updateStopCounter() {
+            const counterElement = document.getElementById('routeStopCount');
+            if (counterElement) {
+                counterElement.textContent = `Stops: ${routeStopCounter} / Unlimited`;
+            }
+        }
+        
+        function addRouteStop() {
+            const routeStepsContainer = document.getElementById('routeSteps');
+            const newIndex = routeStopCounter;
+
+            const newStep = document.createElement('div');
+            newStep.className = 'route-step';
+            newStep.id = `routeStep${newIndex}`;
+            newStep.innerHTML = `
+                <div class="route-step-number">${newIndex + 1}</div>
+                <select id="routeSelect${newIndex}" onchange="updateRouteSelects()">
+                    <option value="">-- Select Next Stop --</option>
+                </select>
+                <input type="date" id="routeDate${newIndex}" style="margin-left: 10px; width: 120px; padding: 4px; font-size: 12px; flex-shrink: 0;" placeholder="Date">
+            `;
+
+            routeStepsContainer.appendChild(newStep);
+            routeStopCounter++;
+            updateStopCounter();
+            updateRouteSelects();
+        }
+
+        function removeRouteStop() {
+            if (routeStopCounter <= 1) {
+                alert("Cannot remove the starting point.");
+                return;
+            }
+
+            const routeStepsContainer = document.getElementById('routeSteps');
+            const lastStep = routeStepsContainer.lastElementChild;
+            if (lastStep && lastStep.id !== 'routeStep0') {
+                routeStepsContainer.removeChild(lastStep);
+                routeStopCounter--;
+                updateStopCounter();
+            }
+        }
+
+        function clearAllStops() {
+            const routeStepsContainer = document.getElementById('routeSteps');
+            while (routeStepsContainer.children.length > 1) {
+                routeStepsContainer.removeChild(routeStepsContainer.lastChild);
+            }
+            // Reset the first one
+            document.getElementById('routeSelect0').value = '';
+            document.getElementById('routeDate0').value = '';
+            routeStopCounter = 1;
+            updateStopCounter();
+            document.getElementById('routeResults').innerHTML = '';
+        }
+
+        function autoFillRoute() {
+            alert('Auto-fill functionality is not yet implemented.');
+            // This is a placeholder for future functionality
+        }
+
         function updateRouteSelects() {
             const allLocations = [
                 ...tourData.hotels.map(h => ({ id: h.id, name: h.name, type: 'Hotel' })),
                 ...tourData.venues.map(v => ({ id: v.id, name: v.name, type: 'Venue' }))
             ];
-
-            for (let i = 0; i < 5; i++) {
+            
+            for (let i = 0; i < routeStopCounter; i++) {
                 const select = document.getElementById(`routeSelect${i}`);
                 if (select) {
                     const currentValue = select.value;
-                    select.innerHTML = `<option value="">-- Select ${i === 0 ? 'Starting Point' : i === 4 ? 'Final Stop' : 'Next Stop'} --</option>`;
+                    
+                    let placeholderText = '-- Select Next Stop --';
+                    if (i === 0) {
+                        placeholderText = '-- Select Starting Point --';
+                    } else if (i === routeStopCounter -1) {
+                         placeholderText = '-- Select Final Stop --';
+                    }
+
+                    select.innerHTML = `<option value="">${placeholderText}</option>`;
                     
                     allLocations.forEach(location => {
                         const option = document.createElement('option');
@@ -1028,12 +1105,11 @@
             }
         }
 
-        // Generate custom route
         function generateCustomRoute() {
             const selectedStops = [];
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < routeStopCounter; i++) {
                 const select = document.getElementById(`routeSelect${i}`);
-                if (select.value) {
+                if (select && select.value) {
                     selectedStops.push(select.value);
                 }
             }
@@ -1054,7 +1130,6 @@
                 const fromStop = getLocationDetails(selectedStops[i]);
                 const toStop = getLocationDetails(selectedStops[i + 1]);
                 
-                // Simulate route calculation
                 const distance = Math.floor(Math.random() * 400) + 50;
                 const time = Math.floor((distance / 80) * 60);
                 const gasCost = Math.ceil((distance / 100) * 8 * 1.8);
@@ -1080,11 +1155,9 @@
                 routeResults.appendChild(routeSegment);
             }
 
-            // Update totals
             document.getElementById('totalDistanceStat').textContent = totalDistance + ' km';
             document.getElementById('totalTimeStat').textContent = Math.floor(totalTime/60) + 'h ' + (totalTime%60) + 'm';
 
-            // Add summary
             const summary = document.createElement('div');
             summary.className = 'summary-box';
             summary.innerHTML = `
@@ -1111,7 +1184,6 @@
             routeResults.appendChild(summary);
         }
 
-        // Get location details from ID
         function getLocationDetails(locationId) {
             const [type, id] = locationId.split(':');
             const numId = parseInt(id);
@@ -1124,8 +1196,9 @@
                 return { type: 'Venue', name: venue.name, address: venue.address };
             }
         }
+        
+        // ---- MODAL & DISPLAY FUNCTIONS ----
 
-        // Open hotel edit modal
         function openHotelModal(hotelId) {
             const hotel = tourData.hotels.find(h => h.id === hotelId);
             if (!hotel) return;
@@ -1142,7 +1215,6 @@
             document.getElementById('hotelModal').style.display = 'block';
         }
 
-        // Open venue edit modal
         function openVenueModal(venueId) {
             const venue = tourData.venues.find(v => v.id === venueId);
             if (!venue) return;
@@ -1160,13 +1232,11 @@
             document.getElementById('venueModal').style.display = 'block';
         }
 
-        // Close modal
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
             currentEditId = null;
         }
 
-        // Save hotel edit
         function saveHotelEdit() {
             const hotel = tourData.hotels.find(h => h.id === currentEditId);
             if (!hotel) return;
@@ -1187,7 +1257,6 @@
             alert('Hotel updated successfully!');
         }
 
-        // Save venue edit
         function saveVenueEdit() {
             const venue = tourData.venues.find(v => v.id === currentEditId);
             if (!venue) return;
@@ -1208,7 +1277,6 @@
             alert('Venue updated successfully!');
         }
 
-        // Delete hotel
         function deleteHotel() {
             if (confirm('Are you sure you want to delete this hotel?')) {
                 tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId);
@@ -1219,7 +1287,6 @@
             }
         }
 
-        // Delete venue
         function deleteVenue() {
             if (confirm('Are you sure you want to delete this venue?')) {
                 tourData.venues = tourData.venues.filter(v => v.id !== currentEditId);
@@ -1230,19 +1297,16 @@
             }
         }
 
-        // Update all displays
         function updateAllDisplays() {
             updateHotelsDisplay();
             updateExpensesDisplay();
             updateVenuesDisplay();
         }
 
-        // Update hotels display with date sorting and clickable cards
         function updateHotelsDisplay() {
             const hotelsList = document.getElementById('hotelsList');
             hotelsList.innerHTML = '';
 
-            // Sort hotels by check-in date
             const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin));
 
             let totalUSD = 0;
@@ -1279,7 +1343,6 @@
             document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0);
         }
 
-        // Update expenses display
         function updateExpensesDisplay() {
             const tbody = document.getElementById('expensesBody');
             tbody.innerHTML = '';
@@ -1287,7 +1350,6 @@
             let totalUSD = 0;
             let totalCAD = 0;
 
-            // Sort expenses by date
             const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             sortedExpenses.forEach(expense => {
@@ -1312,12 +1374,10 @@
             document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
         }
 
-        // Update venues display with clickable cards
         function updateVenuesDisplay() {
             const venuesList = document.getElementById('venuesList');
             venuesList.innerHTML = '';
 
-            // Sort venues by date
             const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let totalSales = 0;
@@ -1353,7 +1413,6 @@
             document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
         }
 
-        // Delete item
         function deleteItem(type, id) {
             if (confirm(`Delete this ${type}?`)) {
                 if (type === 'hotel') {
@@ -1369,7 +1428,6 @@
             }
         }
 
-        // Clear forms
         function clearHotelForm() {
             document.getElementById('hotelName').value = '';
             document.getElementById('hotelAddress').value = '';
@@ -1400,11 +1458,9 @@
             document.getElementById('expenseDate').value = today;
         }
 
-        // Auto-calculate approximate CAD when USD is entered
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, setting up event listeners...');
             
-            // Hotel USD to CAD approximation
             const hotelUSDInput = document.getElementById('hotelCostUSD');
             if (hotelUSDInput) {
                 hotelUSDInput.addEventListener('input', function() {
@@ -1416,7 +1472,6 @@
                 });
             }
 
-            // Expense USD to CAD approximation
             const expenseUSDInput = document.getElementById('expenseAmountUSD');
             if (expenseUSDInput) {
                 expenseUSDInput.addEventListener('input', function() {
@@ -1431,7 +1486,6 @@
             console.log('Event listeners set up successfully');
         });
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const hotelModal = document.getElementById('hotelModal');
             const venueModal = document.getElementById('venueModal');
@@ -1443,7 +1497,6 @@
             }
         }
 
-        // Export functionality
         function exportTourData() {
             const allData = {
                 hotels: tourData.hotels,
@@ -1461,7 +1514,6 @@
                 }
             };
 
-            // Create CSV format
             const csvData = [
                 ['Type', 'Date', 'Name/Location', 'USD Cost', 'CAD Cost', 'Notes'],
                 ...tourData.hotels.map(h => [
