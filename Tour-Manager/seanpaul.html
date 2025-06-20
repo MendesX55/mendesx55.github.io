@@ -1,14 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
-    <style>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<link href="icon.png" rel="apple-touch-icon"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -377,262 +377,247 @@ select {
 </style>
 </head>
 <body>
-
-    <div style="padding: 10px 20px;">
-        <a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
-    </div>
-    
-    <div class="header">
-        <h1>🎤 TOUR MANAGER 🎤</h1>
-        <div class="artist-logos">
-            <div class="logo-placeholder">SEAN PAUL</div>
-            <div class="logo-placeholder">WIZ KHALIFA</div>
-            <div class="logo-placeholder">DABABY</div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="showTab('input')">INPUT</button>
-            <button class="tab-btn" onclick="showTab('hotels')">HOTELS</button>
-            <button class="tab-btn" onclick="showTab('expenses')">EXPENSES</button>
-            <button class="tab-btn" onclick="showTab('routes')">ROUTES</button>
-            <button class="tab-btn" onclick="showTab('venues')">VENUES</button>
-        </div>
-
-        <!-- INPUT TAB -->
-        <div id="input" class="tab-content active">
-            <!-- Hotel Input Section -->
-            <div class="form-section">
-                <h3>🏨 Hotel Confirmations</h3>
-                <div class="form-group">
-                    <label>Hotel Name</label>
-                    <input type="text" id="hotelName" placeholder="Hotel name">
-                </div>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" id="hotelAddress" placeholder="Full address">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Check-in</label>
-                        <input type="date" id="checkinDate">
-                    </div>
-                    <div class="form-group">
-                        <label>Check-out</label>
-                        <input type="date" id="checkoutDate">
-                    </div>
-                </div>
-                <div class="form-row-2">
-                    <div class="currency-input">
-                        <label>USD Cost</label>
-                        <span class="currency-prefix">$</span>
-                        <input type="number" id="hotelCostUSD" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="currency-input">
-                        <label>Manual CAD</label>
-                        <span class="currency-prefix">$</span>
-                        <input type="number" id="hotelCostCAD" placeholder="0.00" step="0.01">
-                    </div>
-                </div>
-                <button class="btn" onclick="addHotel()">Add Hotel</button>
-            </div>
-
-            <!-- Venue Input Section -->
-            <div class="form-section">
-                <h3>🎵 Venue Information</h3>
-                <div class="form-group">
-                    <label>Venue Name</label>
-                    <input type="text" id="venueName" placeholder="Venue name">
-                </div>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" id="venueAddress" placeholder="Full address">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Show Date</label>
-                        <input type="date" id="showDate">
-                    </div>
-                    <div class="form-group">
-                        <label>Show Time</label>
-                        <input type="time" id="showTime">
-                    </div>
-                </div>
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Start Inventory</label>
-                        <input type="number" id="startInventory" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label>End Inventory</label>
-                        <input type="number" id="endInventory" placeholder="0">
-                    </div>
-                    
-<div class="form-group currency-input">
-    <label>Sales (CAD)</label>
-    <span class="currency-prefix">$</span>
-    <input type="number" id="totalSales" placeholder="0.00" step="0.01" style="width: 100%;">
+<div style="padding: 10px 20px;">
+<a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
-
-                </div>
-                <button class="btn" onclick="addVenue()">Add Venue</button>
-            </div>
-
-            <!-- Expense Input Section -->
-            <div class="form-section">
-                <h3>💰 Expenses</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Type</label>
-                        <select id="expenseType">
-                            <option value="gas">Gas</option>
-                            <option value="food">Food</option>
-                            <option value="tolls">Tolls</option>
-                            <option value="parking">Parking</option>
-                            <option value="misc">Miscellaneous</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Date</label>
-                        <input type="date" id="expenseDate">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" id="expenseLocation" placeholder="Where was this expense?">
-                </div>
-                <div class="form-row-2">
-                    <div class="currency-input">
-                        <label>USD Cost</label>
-                        <span class="currency-prefix">$</span>
-                        <input type="number" id="expenseAmountUSD" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="currency-input">
-                        <label>Manual CAD</label>
-                        <span class="currency-prefix">$</span>
-                        <input type="number" id="expenseAmountCAD" placeholder="0.00" step="0.01">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Notes</label>
-                    <textarea id="expenseNotes" rows="2" placeholder="Additional notes"></textarea>
-                </div>
-                <button class="btn" onclick="addExpense()">Add Expense</button>
-            </div>
-        </div>
-
-        <!-- HOTELS TAB -->
-        <div id="hotels" class="tab-content">
-            <div class="summary-box">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="hotelCountStat">0</div>
-                        <div class="stat-label">Total Hotels</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="hotelCostStat">$0</div>
-                        <div class="stat-label">Total Cost</div>
-                    </div>
-                </div>
-            </div>
-            <table class="data-table" id="hotelsTable">
-                <thead>
-                    <tr>
-                        <th>Hotel</th>
-                        <th>Dates</th>
-                        <th>USD</th>
-                        <th>CAD</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="hotelsBody"></tbody>
-            </table>
-        </div>
-
-        <!-- EXPENSES TAB -->
-        <div id="expenses" class="tab-content">
-            <div class="summary-box">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="expenseCountStat">0</div>
-                        <div class="stat-label">Total Expenses</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="expenseCostStat">$0</div>
-                        <div class="stat-label">Total Cost</div>
-                    </div>
-                </div>
-            </div>
-            <table class="data-table" id="expensesTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Location</th>
-                        <th>USD</th>
-                        <th>CAD</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="expensesBody"></tbody>
-            </table>
-        </div>
-
-        <!-- ROUTES TAB -->
-        <div id="routes" class="tab-content">
-            <div class="summary-box">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalDistanceStat">0 km</div>
-                        <div class="stat-label">Total Distance</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalTimeStat">0h</div>
-                        <div class="stat-label">Drive Time</div>
-                    </div>
-                </div>
-            </div>
-            <button class="btn" onclick="generateRoutes()">🗺️ Generate Route Plan</button>
-            <div id="routesList"></div>
-        </div>
-
-        <!-- VENUES TAB -->
-        <div id="venues" class="tab-content">
-            <div class="summary-box">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="venueCountStat">0</div>
-                        <div class="stat-label">Total Shows</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="venueSalesStat">$0</div>
-                        <div class="stat-label">Total Sales</div>
-                    </div>
-                </div>
-            </div>
-            <div id="venuesList"></div>
-            
-            <div class="section-divider"></div>
-            
-            <!-- Sales & Inventory Placeholder -->
-            <div class="venue-sales">
-                <h3 style="color: #4CAF50; margin-bottom: 10px;">📊 Sales & Inventory Tracker</h3>
-                <p style="font-size: 12px; color: #ccc;">
+<div class="header">
+<h1>🎤 TOUR MANAGER 🎤</h1>
+<div class="artist-logos">
+<div class="logo-placeholder">SEAN PAUL</div>
+<div class="logo-placeholder">WIZ KHALIFA</div>
+<div class="logo-placeholder">DABABY</div>
+</div>
+</div>
+<div class="container">
+<div class="tab-navigation">
+<button class="tab-btn active" onclick="showTab('input')">INPUT</button>
+<button class="tab-btn" onclick="showTab('hotels')">HOTELS</button>
+<button class="tab-btn" onclick="showTab('expenses')">EXPENSES</button>
+<button class="tab-btn" onclick="showTab('routes')">ROUTES</button>
+<button class="tab-btn" onclick="showTab('venues')">VENUES</button>
+</div>
+<!-- INPUT TAB -->
+<div class="tab-content active" id="input">
+<!-- Hotel Input Section -->
+<div class="form-section">
+<h3>🏨 Hotel Confirmations</h3>
+<div class="form-group">
+<label>Hotel Name</label>
+<input id="hotelName" placeholder="Hotel name" type="text"/>
+</div>
+<div class="form-group">
+<label>Address</label>
+<input id="hotelAddress" placeholder="Full address" type="text"/>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Check-in</label>
+<input id="checkinDate" type="date"/>
+</div>
+<div class="form-group">
+<label>Check-out</label>
+<input id="checkoutDate" type="date"/>
+</div>
+</div>
+<div class="form-row-2">
+<div class="currency-input">
+<label>USD Cost</label>
+<span class="currency-prefix">$</span>
+<input id="hotelCostUSD" placeholder="0.00" step="0.01" type="number"/>
+</div>
+<div class="currency-input">
+<label>Manual CAD</label>
+<span class="currency-prefix">$</span>
+<input id="hotelCostCAD" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</div>
+<button class="btn" onclick="addHotel()">Add Hotel</button>
+</div>
+<!-- Venue Input Section -->
+<div class="form-section">
+<h3>🎵 Venue Information</h3>
+<div class="form-group">
+<label>Venue Name</label>
+<input id="venueName" placeholder="Venue name" type="text"/>
+</div>
+<div class="form-group">
+<label>Address</label>
+<input id="venueAddress" placeholder="Full address" type="text"/>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Show Date</label>
+<input id="showDate" type="date"/>
+</div>
+<div class="form-group">
+<label>Show Time</label>
+<input id="showTime" type="time"/>
+</div>
+</div>
+<div class="form-row-3">
+<div class="form-group">
+<label>Start Inventory</label>
+<input id="startInventory" placeholder="0" type="number"/>
+</div>
+<div class="form-group">
+<label>End Inventory</label>
+<input id="endInventory" placeholder="0" type="number"/>
+</div>
+<div class="form-group currency-input">
+<label>Sales (CAD)</label>
+<span class="currency-prefix">$</span>
+<input id="totalSales" placeholder="0.00" step="0.01" style="width: 100%;" type="number"/>
+</div>
+</div>
+<button class="btn" onclick="addVenue()">Add Venue</button>
+</div>
+<!-- Expense Input Section -->
+<div class="form-section">
+<h3>💰 Expenses</h3>
+<div class="form-row">
+<div class="form-group">
+<label>Type</label>
+<select id="expenseType">
+<option value="gas">Gas</option>
+<option value="food">Food</option>
+<option value="tolls">Tolls</option>
+<option value="parking">Parking</option>
+<option value="misc">Miscellaneous</option>
+</select>
+</div>
+<div class="form-group">
+<label>Date</label>
+<input id="expenseDate" type="date"/>
+</div>
+</div>
+<div class="form-group">
+<label>Location</label>
+<input id="expenseLocation" placeholder="Where was this expense?" type="text"/>
+</div>
+<div class="form-row-2">
+<div class="currency-input">
+<label>USD Cost</label>
+<span class="currency-prefix">$</span>
+<input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/>
+</div>
+<div class="currency-input">
+<label>Manual CAD</label>
+<span class="currency-prefix">$</span>
+<input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</div>
+<div class="form-group">
+<label>Notes</label>
+<textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea>
+</div>
+<button class="btn" onclick="addExpense()">Add Expense</button>
+</div>
+</div>
+<!-- HOTELS TAB -->
+<div class="tab-content" id="hotels">
+<div class="summary-box">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value" id="hotelCountStat">0</div>
+<div class="stat-label">Total Hotels</div>
+</div>
+<div class="stat-card">
+<div class="stat-value" id="hotelCostStat">$0</div>
+<div class="stat-label">Total Cost</div>
+</div>
+</div>
+</div>
+<table class="data-table" id="hotelsTable">
+<thead>
+<tr>
+<th>Hotel</th>
+<th>Dates</th>
+<th>USD</th>
+<th>CAD</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="hotelsBody"></tbody>
+</table>
+</div>
+<!-- EXPENSES TAB -->
+<div class="tab-content" id="expenses">
+<div class="summary-box">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value" id="expenseCountStat">0</div>
+<div class="stat-label">Total Expenses</div>
+</div>
+<div class="stat-card">
+<div class="stat-value" id="expenseCostStat">$0</div>
+<div class="stat-label">Total Cost</div>
+</div>
+</div>
+</div>
+<table class="data-table" id="expensesTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Type</th>
+<th>Location</th>
+<th>USD</th>
+<th>CAD</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="expensesBody"></tbody>
+</table>
+</div>
+<!-- ROUTES TAB -->
+<div class="tab-content" id="routes">
+<div class="summary-box">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value" id="totalDistanceStat">0 km</div>
+<div class="stat-label">Total Distance</div>
+</div>
+<div class="stat-card">
+<div class="stat-value" id="totalTimeStat">0h</div>
+<div class="stat-label">Drive Time</div>
+</div>
+</div>
+</div>
+<button class="btn" onclick="generateRoutes()">🗺️ Generate Route Plan</button>
+<div id="routesList"></div>
+</div>
+<!-- VENUES TAB -->
+<div class="tab-content" id="venues">
+<div class="summary-box">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value" id="venueCountStat">0</div>
+<div class="stat-label">Total Shows</div>
+</div>
+<div class="stat-card">
+<div class="stat-value" id="venueSalesStat">$0</div>
+<div class="stat-label">Total Sales</div>
+</div>
+</div>
+</div>
+<div id="venuesList"></div>
+<div class="section-divider"></div>
+<!-- Sales & Inventory Placeholder -->
+<div class="venue-sales">
+<h3 style="color: #4CAF50; margin-bottom: 10px;">📊 Sales &amp; Inventory Tracker</h3>
+<p style="font-size: 12px; color: #ccc;">
                     Advanced sales tracking, inventory management, and revenue analytics will be added here.
                     Features will include:
                 </p>
-                <ul style="font-size: 11px; color: #aaa; margin: 8px 0; padding-left: 15px;">
-                    <li>Real-time inventory counting</li>
-                    <li>Sales per venue analytics</li>
-                    <li>Product performance tracking</li>
-                    <li>Revenue forecasting</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<ul style="font-size: 11px; color: #aaa; margin: 8px 0; padding-left: 15px;">
+<li>Real-time inventory counting</li>
+<li>Sales per venue analytics</li>
+<li>Product performance tracking</li>
+<li>Revenue forecasting</li>
+</ul>
+</div>
+</div>
+</div>
+<script>
         // Data storage
         let tourData = {
             hotels: [],
@@ -1096,7 +1081,6 @@ select {
             addExportButton('venues');
         }, 500);
     </script>
-
 <script>
 // Parse and re-render sorted hotel list by check-in date
 function renderSortedHotels() {
@@ -1176,6 +1160,101 @@ window.addEventListener('DOMContentLoaded', () => {
     renderRouteOptions();
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function sortHotels() {
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+    hotels.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+    localStorage.setItem("hotelData", JSON.stringify(hotels));
+  }
 
-</body>
+  function renderHotels() {
+    const list = document.getElementById("hotel-list");
+    if (!list) return;
+    list.innerHTML = "";
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+
+    hotels.forEach((hotel, i) => {
+      const card = document.createElement("div");
+      card.className = "hotel-card";
+      card.innerHTML = `
+        <div><strong>${hotel.name}</strong></div>
+        <div>${hotel.checkIn} → ${hotel.checkOut}</div>
+        <div>USD: $${hotel.usd} | CAD: $${hotel.cad}</div>
+        <textarea onchange="saveHotelNote(${i}, this.value)" placeholder="Notes / Confirmation #">${hotel.notes || ""}</textarea>
+        <hr />
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  window.saveHotelNote = function(index, note) {
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+    if (hotels[index]) {
+      hotels[index].notes = note;
+      localStorage.setItem("hotelData", JSON.stringify(hotels));
+    }
+  }
+
+  function renderVenues() {
+    const list = document.getElementById("venue-list");
+    if (!list) return;
+    list.innerHTML = "";
+    let venues = JSON.parse(localStorage.getItem("venueData") || "[]");
+
+    venues.forEach((venue, i) => {
+      const card = document.createElement("div");
+      card.className = "venue-card";
+      card.innerHTML = `
+        <div><strong>${venue.name}</strong></div>
+        <div>${venue.date} at ${venue.showtime}</div>
+        <div>Sales: $${venue.sales} | In: ${venue.inventoryStart} → Out: ${venue.inventoryEnd}</div>
+        <textarea onchange="saveVenueNote(${i}, this.value)" placeholder="Notes">${venue.notes || ""}</textarea>
+        <hr />
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  window.saveVenueNote = function(index, note) {
+    let venues = JSON.parse(localStorage.getItem("venueData") || "[]");
+    if (venues[index]) {
+      venues[index].notes = note;
+      localStorage.setItem("venueData", JSON.stringify(venues));
+    }
+  }
+
+  function renderRoutes() {
+    const container = document.getElementById("route-manual");
+    if (!container) return;
+    container.innerHTML = "";
+
+    let items = [...JSON.parse(localStorage.getItem("hotelData") || "[]"), ...JSON.parse(localStorage.getItem("venueData") || "[]")];
+    for (let i = 0; i < 5; i++) {
+      let select = document.createElement("select");
+      select.innerHTML = '<option value="">-- Select Stop --</option>';
+      items.forEach(obj => {
+        let opt = document.createElement("option");
+        opt.value = obj.name;
+        opt.textContent = obj.name;
+        select.appendChild(opt);
+      });
+      container.appendChild(select);
+    }
+
+    let btn = document.createElement("button");
+    btn.textContent = "Build Route";
+    btn.onclick = () => {
+      let route = Array.from(container.querySelectorAll("select")).map(s => s.value).filter(Boolean);
+      alert("Route built:\n" + route.join(" → "));
+    };
+    container.appendChild(btn);
+  }
+
+  sortHotels();
+  renderHotels();
+  renderVenues();
+  renderRoutes();
+});
+</script></body>
 </html>
