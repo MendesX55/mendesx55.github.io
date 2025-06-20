@@ -1256,5 +1256,101 @@ document.addEventListener('DOMContentLoaded', function () {
   renderVenues();
   renderRoutes();
 });
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  function sortHotels() {
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+    hotels.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+    localStorage.setItem("hotelData", JSON.stringify(hotels));
+  }
+
+  function renderHotels() {
+    const list = document.getElementById("hotel-list");
+    if (!list) return;
+    list.innerHTML = "";
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+
+    hotels.forEach((hotel, i) => {
+      const card = document.createElement("div");
+      card.className = "hotel-card";
+      card.innerHTML = `
+        <div><strong>${hotel.name}</strong></div>
+        <div>${hotel.checkIn} → ${hotel.checkOut}</div>
+        <div>USD: $${hotel.usd} | CAD: $${hotel.cad}</div>
+        <textarea onchange="saveHotelNote(${i}, this.value)" placeholder="Notes / Confirmation #">${hotel.notes || ""}</textarea>
+        <hr />
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  window.saveHotelNote = function(index, note) {
+    let hotels = JSON.parse(localStorage.getItem("hotelData") || "[]");
+    if (hotels[index]) {
+      hotels[index].notes = note;
+      localStorage.setItem("hotelData", JSON.stringify(hotels));
+    }
+  }
+
+  function renderVenues() {
+    const list = document.getElementById("venue-list");
+    if (!list) return;
+    list.innerHTML = "";
+    let venues = JSON.parse(localStorage.getItem("venueData") || "[]");
+
+    venues.forEach((venue, i) => {
+      const card = document.createElement("div");
+      card.className = "venue-card";
+      card.innerHTML = `
+        <div><strong>${venue.name}</strong></div>
+        <div>${venue.date} at ${venue.showtime}</div>
+        <div>Sales: $${venue.sales} | In: ${venue.inventoryStart} → Out: ${venue.inventoryEnd}</div>
+        <textarea onchange="saveVenueNote(${i}, this.value)" placeholder="Notes">${venue.notes || ""}</textarea>
+        <hr />
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  window.saveVenueNote = function(index, note) {
+    let venues = JSON.parse(localStorage.getItem("venueData") || "[]");
+    if (venues[index]) {
+      venues[index].notes = note;
+      localStorage.setItem("venueData", JSON.stringify(venues));
+    }
+  }
+
+  function renderRoutes() {
+    const container = document.getElementById("route-manual");
+    if (!container) return;
+    container.innerHTML = "";
+
+    let items = [...JSON.parse(localStorage.getItem("hotelData") || "[]"), ...JSON.parse(localStorage.getItem("venueData") || "[]")];
+    for (let i = 0; i < 5; i++) {
+      let select = document.createElement("select");
+      select.innerHTML = '<option value="">-- Select Stop --</option>';
+      items.forEach(obj => {
+        let opt = document.createElement("option");
+        opt.value = obj.name;
+        opt.textContent = obj.name;
+        select.appendChild(opt);
+      });
+      container.appendChild(select);
+    }
+
+    let btn = document.createElement("button");
+    btn.textContent = "Build Route";
+    btn.onclick = () => {
+      let route = Array.from(container.querySelectorAll("select")).map(s => s.value).filter(Boolean);
+      alert("Route built:\n" + route.join(" → "));
+    };
+    container.appendChild(btn);
+  }
+
+  sortHotels();
+  renderHotels();
+  renderVenues();
+  renderRoutes();
+});
 </script></body>
 </html>
