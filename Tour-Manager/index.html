@@ -12,8 +12,6 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-            background: url('icon.png') no-repeat center center fixed;
-            background-size: 45%;
             background-color: #111;
             color: white;
             display: flex;
@@ -22,36 +20,47 @@
             justify-content: center;
             height: 100vh;
             padding: 20px;
-            box-sizing: border-box;
+            background-image: url('icon.png');
+            background-repeat: no-repeat;
+            background-size: 60%;
+            background-position: center 20px;
         }
-        h1 {
-            font-size: 1.5em;
-            margin-bottom: 30px;
-            text-align: center;
+
+        .overlay {
+            margin-top: 280px;
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
+
         .btn {
             background: linear-gradient(45deg, #ff6b35, #f7931e);
             color: white;
             border: none;
             padding: 14px 24px;
-            margin: 12px 0;
             border-radius: 10px;
             font-size: 1em;
             cursor: pointer;
-            width: 100%;
-            max-width: 350px;
             font-weight: bold;
             text-align: center;
         }
+
+        .btn.swollen {
+            background: linear-gradient(45deg, #555, #333);
+        }
+
         .btn:active {
             transform: scale(0.98);
         }
     </style>
 </head>
 <body>
-    <h1>🎤 International Touring Agency</h1>
-    <a class="btn" href="seanpaul.html">Sean Paul – Good Vibes Tour 2025<br>🗓 July 6–27</a>
-    <a class="btn" href="swollen1.html">Swollen Members – Bury the Hatchet I<br>🗓 Aug 16–31</a>
-    <a class="btn" href="swollen2.html">Swollen Members – Bury the Hatchet II<br>🗓 Sep (TBA)</a>
+    <div class="overlay">
+        <a class="btn" href="seanpaul.html">Sean Paul – Good Vibes Tour 2025<br>🗓 July 6–27</a>
+        <a class="btn swollen" href="swollen1.html">Swollen Members – Bury the Hatchet I<br>🗓 Aug 16–31</a>
+        <a class="btn swollen" href="swollen2.html">Swollen Members – Bury the Hatchet II<br>🗓 Sep (TBA)</a>
+    </div>
 </body>
 </html>
