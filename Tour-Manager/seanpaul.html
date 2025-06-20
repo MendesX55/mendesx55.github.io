@@ -453,19 +453,18 @@
             justify-content: center;
             font-weight: bold;
             margin-right: 10px;
-            flex-shrink: 0; /* Prevents the number from shrinking */
+            flex-shrink: 0; 
         }
 
         .route-step select {
-            flex-grow: 1; /* Allow it to grow to fill available space */
-            flex-shrink: 1; /* Allow it to shrink when space is limited */
-            min-width: 0; /* Critical for allowing shrinking below content size */
+            flex-grow: 1; 
+            flex-shrink: 1; 
+            min-width: 0; 
             padding: 8px;
             border-radius: 6px;
             border: none;
             background: rgba(255,255,255,0.9);
             color: #000;
-            /* NEW properties to handle long text */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -750,7 +749,7 @@
 <div id="hotelModal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<span class="close" onclick="closeModal('hotelModal')">×</span>
+<span class="close" onclick="closeModal('hotelModal')">&times;</span>
 <div>Edit Hotel Details</div>
 </div>
 <div id="hotelEditForm">
@@ -798,7 +797,7 @@
 <div id="venueModal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<span class="close" onclick="closeModal('venueModal')">×</span>
+<span class="close" onclick="closeModal('venueModal')">&times;</span>
 <div>Edit Venue Details</div>
 </div>
 <div id="venueEditForm">
@@ -846,6 +845,9 @@
 </div>
 
 <script>
+        // API Key is now embedded directly
+        const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc';
+
         // Data storage
         let tourData = {
             hotels: [],
@@ -859,7 +861,6 @@
 
         // Load data from localStorage
         window.onload = function() {
-            console.log('Window loaded, initializing...');
             const savedData = localStorage.getItem('tourData');
             if (savedData) {
                 tourData = JSON.parse(savedData);
@@ -867,13 +868,11 @@
             }
             updateRouteSelects();
             updateStopCounter();
-            // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
             const expenseDateField = document.getElementById('expenseDate');
             if (expenseDateField) {
                 expenseDateField.value = today;
             }
-            console.log('Initialization complete');
         };
 
         // Save data to localStorage
@@ -883,24 +882,17 @@
 
         // Show tab
         function showTab(tabName) {
-            console.log('Switching to tab:', tabName);
-            // Hide all tabs
             const tabs = document.querySelectorAll('.tab-content');
             const buttons = document.querySelectorAll('.tab-btn');
             
             tabs.forEach(tab => tab.classList.remove('active'));
             buttons.forEach(btn => btn.classList.remove('active'));
             
-            // Show selected tab
             const targetTab = document.getElementById(tabName);
             if (targetTab) {
                 targetTab.classList.add('active');
-                console.log('Tab activated:', tabName);
-            } else {
-                console.error('Tab not found:', tabName);
             }
             
-            // Find and activate the correct button by checking onclick attribute
             buttons.forEach(btn => {
                 const onclick = btn.getAttribute('onclick');
                 if (onclick && onclick.includes(`'${tabName}'`)) {
@@ -908,7 +900,6 @@
                 }
             });
             
-            // Update displays when switching tabs
             updateAllDisplays();
             if (typeof updateRouteSelects === 'function') {
                 updateRouteSelects();
@@ -917,7 +908,6 @@
 
         // Add hotel
         function addHotel() {
-            console.log('Adding hotel...');
             const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0;
             const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0;
             const approxCAD = usdCost * 1.35;
@@ -939,20 +929,16 @@
                 tourData.hotels.push(hotel);
                 saveData();
                 updateAllDisplays();
-                if (typeof updateRouteSelects === 'function') {
-                    updateRouteSelects();
-                }
+                updateRouteSelects();
                 clearHotelForm();
                 alert('Hotel added successfully!');
-                console.log('Hotel added:', hotel);
             } else {
-                alert('Please fill in hotel name, address, and check-in date');
+                alert('Please fill in hotel name, full address, and check-in date');
             }
         }
 
         // Add venue
         function addVenue() {
-            console.log('Adding venue...');
             const venue = {
                 id: Date.now(),
                 name: document.getElementById('venueName').value || '',
@@ -970,14 +956,11 @@
                 tourData.venues.push(venue);
                 saveData();
                 updateAllDisplays();
-                if (typeof updateRouteSelects === 'function') {
-                    updateRouteSelects();
-                }
+                updateRouteSelects();
                 clearVenueForm();
                 alert('Venue added successfully!');
-                console.log('Venue added:', venue);
             } else {
-                alert('Please fill in venue name, address, and show date');
+                alert('Please fill in venue name, full address, and show date');
             }
         }
 
@@ -1060,7 +1043,6 @@
             while (routeStepsContainer.children.length > 1) {
                 routeStepsContainer.removeChild(routeStepsContainer.lastChild);
             }
-            // Reset the first one
             document.getElementById('routeSelect0').value = '';
             document.getElementById('routeDate0').value = '';
             routeStopCounter = 1;
@@ -1070,7 +1052,6 @@
 
         function autoFillRoute() {
             alert('Auto-fill functionality is not yet implemented.');
-            // This is a placeholder for future functionality
         }
 
         function updateRouteSelects() {
@@ -1083,14 +1064,7 @@
                 const select = document.getElementById(`routeSelect${i}`);
                 if (select) {
                     const currentValue = select.value;
-                    
-                    let placeholderText = '-- Select Next Stop --';
-                    if (i === 0) {
-                        placeholderText = '-- Select Starting Point --';
-                    } else if (i === routeStopCounter -1) {
-                         placeholderText = '-- Select Final Stop --';
-                    }
-
+                    let placeholderText = (i === 0) ? '-- Select Starting Point --' : '-- Select Next Stop --';
                     select.innerHTML = `<option value="">${placeholderText}</option>`;
                     
                     allLocations.forEach(location => {
@@ -1105,7 +1079,7 @@
             }
         }
 
-        function generateCustomRoute() {
+        async function generateCustomRoute() {
             const selectedStops = [];
             for (let i = 0; i < routeStopCounter; i++) {
                 const select = document.getElementById(`routeSelect${i}`);
@@ -1115,73 +1089,103 @@
             }
 
             if (selectedStops.length < 2) {
-                alert('Please select at least 2 stops to create a route');
+                alert('Please select at least 2 stops to create a route.');
                 return;
             }
 
             const routeResults = document.getElementById('routeResults');
-            routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>';
+            routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generating Real Route...</h3>';
 
-            let totalDistance = 0;
-            let totalTime = 0;
-            let totalGasCost = 0;
+            let totalDistanceKM = 0;
+            let totalTimeSecs = 0;
 
-            for (let i = 0; i < selectedStops.length - 1; i++) {
-                const fromStop = getLocationDetails(selectedStops[i]);
-                const toStop = getLocationDetails(selectedStops[i + 1]);
-                
-                const distance = Math.floor(Math.random() * 400) + 50;
-                const time = Math.floor((distance / 80) * 60);
-                const gasCost = Math.ceil((distance / 100) * 8 * 1.8);
-                const gasStops = Math.floor(distance / 150) + (distance > 150 ? 1 : 0);
+            try {
+                for (let i = 0; i < selectedStops.length - 1; i++) {
+                    const fromStop = getLocationDetails(selectedStops[i]);
+                    const toStop = getLocationDetails(selectedStops[i + 1]);
 
-                totalDistance += distance;
-                totalTime += time;
-                totalGasCost += gasCost;
+                    // **FIXED:** Added units=metric to the request
+                    const googleApiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(fromStop.address)}&destination=${encodeURIComponent(toStop.address)}&departure_time=now&units=metric&key=${GOOGLE_MAPS_API_KEY}`;
+                    
+                    // **FIXED:** Switched to a more reliable proxy service
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(googleApiUrl)}`;
+                    
+                    const response = await fetch(proxyUrl);
+                    
+                    if (!response.ok) {
+                         throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
 
-                const routeSegment = document.createElement('div');
-                routeSegment.className = 'route-item';
-                routeSegment.innerHTML = `
-                    <div class="route-header">
-                        <strong>Segment ${i + 1}: ${fromStop.name} → ${toStop.name}</strong>
-                    </div>
-                    <div class="route-info">
-                        <strong>FROM:</strong> ${fromStop.type} - ${fromStop.name}<br>
-                        <strong>TO:</strong> ${toStop.type} - ${toStop.name}<br>
-                        <strong>Distance:</strong> ${distance} km | <strong>Time:</strong> ${Math.floor(time/60)}h ${time%60}m<br>
-                        <strong>Gas Stops:</strong> ${gasStops} | <strong>Est. Gas:</strong> ${gasCost} CAD
+                    const data = await response.json();
+
+                    if (data.status !== 'OK') {
+                        throw new Error(`Google Maps API error: ${data.status}. ${data.error_message || ''}`);
+                    }
+                    
+                    const leg = data.routes[0].legs[0];
+                    const distanceText = leg.distance.text;
+                    const distanceValue = leg.distance.value / 1000; // in km
+                    const durationText = leg.duration_in_traffic.text;
+                    const durationValue = leg.duration_in_traffic.value; // in seconds
+
+                    totalDistanceKM += distanceValue;
+                    totalTimeSecs += durationValue;
+
+                    const gasCost = Math.ceil((distanceValue / 100) * 8.5 * 1.75);
+
+                    const routeSegment = document.createElement('div');
+                    routeSegment.className = 'route-item';
+                    routeSegment.innerHTML = `
+                        <div class="route-header">
+                            <strong>Segment ${i + 1}: ${fromStop.name} → ${toStop.name}</strong>
+                        </div>
+                        <div class="route-info">
+                            <strong>FROM:</strong> ${fromStop.address}<br>
+                            <strong>TO:</strong> ${toStop.address}<br>
+                            <strong>Distance:</strong> ${distanceText} | <strong>Time (in traffic):</strong> ${durationText}<br>
+                            <strong>Est. Gas:</strong> ${gasCost} CAD
+                        </div>
+                    `;
+                    if (i === 0) routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; // Clear "Generating..."
+                    routeResults.appendChild(routeSegment);
+                }
+
+                const totalHours = Math.floor(totalTimeSecs / 3600);
+                const totalMinutes = Math.floor((totalTimeSecs % 3600) / 60);
+                const totalGasCost = Math.ceil((totalDistanceKM / 100) * 8.5 * 1.75);
+
+                document.getElementById('totalDistanceStat').textContent = `${totalDistanceKM.toFixed(0)} km`;
+                document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
+
+                const summary = document.createElement('div');
+                summary.className = 'summary-box';
+                summary.innerHTML = `
+                    <h3 style="color: #ffd700; text-align: center;">Route Summary</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${totalDistanceKM.toFixed(0)} km</div>
+                            <div class="stat-label">Total Distance</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalHours}h ${totalMinutes}m</div>
+                            <div class="stat-label">Total Drive Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalGasCost}</div>
+                            <div class="stat-label">Est. Gas Cost</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${selectedStops.length}</div>
+                            <div class="stat-label">Total Stops</div>
+                        </div>
                     </div>
                 `;
-                routeResults.appendChild(routeSegment);
+                routeResults.appendChild(summary);
+
+            } catch (error) {
+                routeResults.innerHTML = `<div class="route-item" style="border-color: #e74c3c;"><strong>Error:</strong> Could not fetch route data. <br><small>${error.message}</small><br><small>This can be a proxy issue or an invalid address. Try again in a moment.</small></div>`;
+                console.error("Route generation failed:", error);
             }
-
-            document.getElementById('totalDistanceStat').textContent = totalDistance + ' km';
-            document.getElementById('totalTimeStat').textContent = Math.floor(totalTime/60) + 'h ' + (totalTime%60) + 'm';
-
-            const summary = document.createElement('div');
-            summary.className = 'summary-box';
-            summary.innerHTML = `
-                <h3 style="color: #ffd700; text-align: center;">Route Summary</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">${totalDistance} km</div>
-                        <div class="stat-label">Total Distance</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${Math.floor(totalTime/60)}h ${totalTime%60}m</div>
-                        <div class="stat-label">Total Drive Time</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${totalGasCost}</div>
-                        <div class="stat-label">Est. Gas Cost</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${selectedStops.length}</div>
-                        <div class="stat-label">Total Stops</div>
-                    </div>
-                </div>
-            `;
-            routeResults.appendChild(summary);
         }
 
         function getLocationDetails(locationId) {
@@ -1190,10 +1194,10 @@
             
             if (type === 'Hotel') {
                 const hotel = tourData.hotels.find(h => h.id === numId);
-                return { type: 'Hotel', name: hotel.name, address: hotel.address };
+                return hotel ? { ...hotel } : { type: 'Hotel', name: 'N/A', address: 'N/A' };
             } else {
                 const venue = tourData.venues.find(v => v.id === numId);
-                return { type: 'Venue', name: venue.name, address: venue.address };
+                return venue ? { ...venue } : { type: 'Venue', name: 'N/A', address: 'N/A' };
             }
         }
         
@@ -1459,8 +1463,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, setting up event listeners...');
-            
             const hotelUSDInput = document.getElementById('hotelCostUSD');
             if (hotelUSDInput) {
                 hotelUSDInput.addEventListener('input', function() {
@@ -1482,8 +1484,6 @@
                     }
                 });
             }
-            
-            console.log('Event listeners set up successfully');
         });
 
         window.onclick = function(event) {
@@ -1495,61 +1495,6 @@
             if (event.target === venueModal) {
                 closeModal('venueModal');
             }
-        }
-
-        function exportTourData() {
-            const allData = {
-                hotels: tourData.hotels,
-                venues: tourData.venues,
-                expenses: tourData.expenses,
-                summary: {
-                    totalHotels: tourData.hotels.length,
-                    totalVenues: tourData.venues.length,
-                    totalExpenses: tourData.expenses.length,
-                    totalSales: tourData.venues.reduce((sum, v) => sum + v.totalSales, 0),
-                    totalCosts: {
-                        hotels: tourData.hotels.reduce((sum, h) => sum + (h.costCAD || h.approxCAD), 0),
-                        expenses: tourData.expenses.reduce((sum, e) => sum + (e.amountCAD || e.approxCAD), 0)
-                    }
-                }
-            };
-
-            const csvData = [
-                ['Type', 'Date', 'Name/Location', 'USD Cost', 'CAD Cost', 'Notes'],
-                ...tourData.hotels.map(h => [
-                    'Hotel',
-                    h.checkin,
-                    h.name,
-                    h.costUSD,
-                    h.costCAD || h.approxCAD,
-                    `${h.address} | Check-out: ${h.checkout} | Notes: ${h.notes || 'N/A'}`
-                ]),
-                ...tourData.venues.map(v => [
-                    'Venue',
-                    v.date,
-                    v.name,
-                    0,
-                    v.totalSales,
-                    `${v.address} | Time: ${v.time} | Sold: ${v.startInventory - v.endInventory} | Notes: ${v.notes || 'N/A'}`
-                ]),
-                ...tourData.expenses.map(e => [
-                    'Expense - ' + e.type,
-                    e.date,
-                    e.location,
-                    e.amountUSD,
-                    e.amountCAD || e.approxCAD,
-                    e.notes
-                ])
-            ];
-
-            const csv = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `tour-data-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
