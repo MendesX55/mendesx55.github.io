@@ -840,7 +840,7 @@
             });
 
             document.getElementById('hotelCountStat').textContent = tourData.hotels.length;
-            document.getElementById('hotelCostStat').textContent = ' + totalCAD.toFixed(0);
+            document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0);
         }
 
         // Update expenses display
@@ -873,7 +873,7 @@
             });
 
             document.getElementById('expenseCountStat').textContent = tourData.expenses.length;
-            document.getElementById('expenseCostStat').textContent = ' + totalCAD.toFixed(0);
+            document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
         }
 
         // Update venues display
@@ -908,7 +908,7 @@
             });
 
             document.getElementById('venueCountStat').textContent = tourData.venues.length;
-            document.getElementById('venueSalesStat').textContent = ' + totalSales.toLocaleString();
+            document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
         }
 
         // Delete item
