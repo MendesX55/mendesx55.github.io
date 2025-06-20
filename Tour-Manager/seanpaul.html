@@ -1098,39 +1098,83 @@ select {
     </script>
 
 <script>
-// Sort hotels by check-in date
-function sortHotelsByDate(hotels) {
-    return hotels.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+// Parse and re-render sorted hotel list by check-in date
+function renderSortedHotels() {
+    const data = JSON.parse(localStorage.getItem('hotelData')) || [];
+    const sorted = data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+    const container = document.getElementById('hotelList');
+    if (!container) return;
+
+    container.innerHTML = '';
+    sorted.forEach((hotel, index) => {
+        const card = document.createElement('div');
+        card.className = 'hotel-card';
+        card.style = "margin:10px 0; background:#222; padding:10px; border-radius:10px;";
+        card.innerHTML = `
+            <strong>${hotel.name}</strong><br>
+            <span>${hotel.checkIn} → ${hotel.checkOut}</span><br>
+            <span>USD: $${hotel.usd} | CAD: $${hotel.cad}</span><br>
+            <textarea placeholder="Notes / Confirmation" style="width:100%; margin-top:8px;" onchange="updateHotelNote(${index}, this.value)">${hotel.notes || ''}</textarea>
+        `;
+        container.appendChild(card);
+    });
 }
 
-// Expand/edit hotel cards (placeholder)
-function expandHotelCard(id) {
-    const card = document.getElementById("hotel-" + id);
-    if (card.classList.contains("expanded")) {
-        card.classList.remove("expanded");
-    } else {
-        card.classList.add("expanded");
+// Save hotel notes back to localStorage
+function updateHotelNote(index, value) {
+    const data = JSON.parse(localStorage.getItem('hotelData')) || [];
+    if (data[index]) {
+        data[index].notes = value;
+        localStorage.setItem('hotelData', JSON.stringify(data));
     }
 }
 
-// Expand/edit venue cards (placeholder)
-function expandVenueCard(id) {
-    const card = document.getElementById("venue-" + id);
-    if (card.classList.contains("expanded")) {
-        card.classList.remove("expanded");
-    } else {
-        card.classList.add("expanded");
+// Routes logic - builds from dropdowns
+function renderRouteOptions() {
+    const data = [
+        ...(JSON.parse(localStorage.getItem('hotelData')) || []),
+        ...(JSON.parse(localStorage.getItem('venueData')) || [])
+    ];
+    const selectArea = document.getElementById('routeSelectArea');
+    if (!selectArea) return;
+
+    selectArea.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+        const select = document.createElement('select');
+        select.className = 'route-select';
+        select.style = 'margin: 8px; padding: 8px; width: 100%;';
+        const def = document.createElement('option');
+        def.value = '';
+        def.text = '-- Select Stop --';
+        select.appendChild(def);
+
+        data.forEach(entry => {
+            const option = document.createElement('option');
+            option.value = entry.name;
+            option.text = entry.name;
+            select.appendChild(option);
+        });
+
+        selectArea.appendChild(select);
     }
+
+    const btn = document.createElement('button');
+    btn.textContent = "Build Route";
+    btn.style = "margin:10px;padding:10px;width:100%;background:#f7931e;color:#fff;border:none;border-radius:8px;";
+    btn.onclick = () => {
+        const sequence = [...document.querySelectorAll('.route-select')]
+            .map(sel => sel.value)
+            .filter(val => val);
+        alert("Route created: " + sequence.join(" → "));
+    };
+    selectArea.appendChild(btn);
 }
 
-// Route Builder Logic (manual dropdown input)
-function buildRoute() {
-    const selectedStops = [...document.querySelectorAll('.route-select')]
-        .map(select => select.value)
-        .filter(val => val);
-    console.log("Building route from:", selectedStops);
-    // simulate distance/time/cost calc here
-}
+// Initialize all upgrades after DOM loads
+window.addEventListener('DOMContentLoaded', () => {
+    renderSortedHotels();
+    renderRouteOptions();
+});
 </script>
 
 </body>
