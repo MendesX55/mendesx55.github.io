@@ -1096,5 +1096,42 @@ select {
             addExportButton('venues');
         }, 500);
     </script>
+
+<script>
+// Sort hotels by check-in date
+function sortHotelsByDate(hotels) {
+    return hotels.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+}
+
+// Expand/edit hotel cards (placeholder)
+function expandHotelCard(id) {
+    const card = document.getElementById("hotel-" + id);
+    if (card.classList.contains("expanded")) {
+        card.classList.remove("expanded");
+    } else {
+        card.classList.add("expanded");
+    }
+}
+
+// Expand/edit venue cards (placeholder)
+function expandVenueCard(id) {
+    const card = document.getElementById("venue-" + id);
+    if (card.classList.contains("expanded")) {
+        card.classList.remove("expanded");
+    } else {
+        card.classList.add("expanded");
+    }
+}
+
+// Route Builder Logic (manual dropdown input)
+function buildRoute() {
+    const selectedStops = [...document.querySelectorAll('.route-select')]
+        .map(select => select.value)
+        .filter(val => val);
+    console.log("Building route from:", selectedStops);
+    // simulate distance/time/cost calc here
+}
+</script>
+
 </body>
 </html>
