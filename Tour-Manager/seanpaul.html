@@ -36,6 +36,8 @@
         .btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
         .route-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #87CEEB; }
         .route-item.show-day { border-left-color: #4CAF50; }
+        .route-item.cached { border-left-color: #4CAF50; }
+        .route-item.error { border-left-color: #e74c3c; }
         .stats-grid { display: grid; gap: 8px; margin-bottom: 15px; }
         .stats-grid-2-col { grid-template-columns: 1fr 1fr; }
         .stats-grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
@@ -73,12 +75,10 @@
         .checkbox-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; }
         .checkbox-item input { width: 20px; height: 20px; margin-right: 10px; }
         /* Calendar Styles */
-        #calendar-container { padding-top: 15px; }
         #calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
         #month-year { font-size: 1.2em; font-weight: bold; }
-        #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-name { font-weight: bold; text-align: center; font-size: 0.8em; color: #ffd700; padding-bottom: 5px; }
+        #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .calendar-day { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); min-height: 80px; border-radius: 8px; padding: 5px; font-size: 0.8em; cursor: pointer; transition: background-color 0.3s; }
         .calendar-day:hover { background: rgba(255,215,0,0.2); }
         .calendar-day.other-month { background: rgba(0,0,0,0.1); color: #666; }
@@ -116,10 +116,10 @@
         <div id="month-year"></div>
         <button onclick="nextMonth()">Next ►</button>
     </div>
-    <div id="calendar-days-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #ffd700; font-size: 0.8em; padding-bottom: 5px;">
+    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #ffd700; font-size: 0.8em; padding-bottom: 5px;">
         <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
     </div>
-    <div id="calendar"></div>
+    <div id="calendar-grid"></div>
 </div>
 
 <!-- VENUES TAB -->
@@ -212,11 +212,9 @@
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
-    // --- HELPER FUNCTIONS ---
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
 
-    // --- INITIALIZATION ---
     window.onload = function() {
         const savedData = localStorage.getItem('tourData');
         if (savedData) { 
@@ -226,12 +224,10 @@
         }
         loadRoutePlannerState();
         updateAllDisplays();
-        renderCalendar();
         showTab('calendar');
         document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
     };
 
-    // --- DATA & UI MANAGEMENT ---
     function saveData() { localStorage.setItem('tourData', JSON.stringify(tourData)); }
     
     function showTab(tabName) {
@@ -241,15 +237,12 @@
         const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`);
         if (activeButton) activeButton.classList.add('active');
         if (tabName === 'calendar') renderCalendar();
-        updateAllDisplays();
     }
     
-    // --- ADDING DATA ---
     function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); updateAllDisplays(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
     function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); updateAllDisplays(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
     function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); updateAllDisplays(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
 
-    // --- ROUTE PLANNER FUNCTIONS ---
     function saveRoutePlannerState() {
         tourData.routePlannerState = Array.from({ length: routeStopCounter }, (_, i) => {
             const select = document.getElementById(`routeSelect${i}`);
@@ -339,7 +332,6 @@
         arrow.classList.toggle('collapsed');
     }
 
-    // --- ROUTE GENERATION LOGIC ---
     async function generateCustomRoute() {
         if (isGeneratingRoute) { alert('Route generation is already in progress...'); return; }
         isGeneratingRoute = true;
@@ -380,9 +372,9 @@
                 const stopsForDay = dailySegments[date];
                 try {
                     const dayRouteData = await processDayRoute(date, stopsForDay);
-                    grandTotalDistanceKM += dayRouteData.totalDistance;
-                    grandTotalTimeSecs += dayRouteData.totalTime;
-                    grandTotalGas += dayRouteData.totalGas;
+                    grandTotalDistanceKM += dayRouteData.totalDistance || 0;
+                    grandTotalTimeSecs += dayRouteData.totalTime || 0;
+                    grandTotalGas += dayRouteData.totalGas || 0;
                     renderDayRoute(date, dayRouteData, processedDays + 1);
                 } catch (dayError) {
                     renderErrorDay(date, processedDays + 1, dayError.message);
@@ -419,6 +411,14 @@
         if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 86400000)) {
             let cachedData = tourData.routeCache[cacheKey].data;
             cachedData.isCached = true;
+            // **THE FIX:** Ensure totalGas exists when returning from cache
+            if (typeof cachedData.totalGas === 'undefined') {
+                 cachedData.totalGas = 0;
+                 cachedData.legs.forEach(leg => {
+                    const legKm = leg.distance.value / 1000;
+                    cachedData.totalGas += (legKm / 100) * 8.5 * 1.75 * 1.20;
+                 });
+            }
             return cachedData;
         }
 
@@ -455,7 +455,7 @@
         
         const daySummary = document.createElement('div');
         daySummary.className = 'day-summary-box';
-        daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value">$${dayData.totalGas.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`;
+        daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value">$${(dayData.totalGas || 0).toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`;
         routeResults.appendChild(daySummary);
         
         dayData.legs.forEach((leg, index) => {
@@ -478,39 +478,31 @@
         routeResults.appendChild(errorSummary);
     }
     
-    // --- CALENDAR FUNCTIONS ---
     function renderCalendar() {
-        const calendarEl = document.getElementById('calendar');
+        const calendarEl = document.getElementById('calendar-grid');
         const monthYearEl = document.getElementById('month-year');
+        if (!calendarEl || !monthYearEl) return;
         calendarEl.innerHTML = '';
         const firstDay = new Date(currentYear, currentMonth, 1).getDay();
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         
         monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`;
         
-        for (let i = 0; i < firstDay; i++) {
-            calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`;
-        }
+        for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; }
 
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`;
-            
             const events = getEventsForDate(dateStr);
             let eventIcons = '';
             if (events.isVenue) eventIcons += '🎵';
             if (events.isTravel) eventIcons += '🚗';
-            if (events.isLongDrive) eventIcons += '😢';
-            else if (events.isShortDrive) eventIcons += '😃';
+            if (events.isLongDrive) eventIcons += '😢'; else if (events.isShortDrive) eventIcons += '😃';
             if (events.isHotel) eventIcons += '🏨';
-            
             dayHtml += `<div class="day-events">${eventIcons}</div>`;
-            
-            // Custom notes
             if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`;
             if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`;
-            if (day % 10 === 0) dayHtml += `<div class="day-note">Keep it up!</div>`;
-
+            if (day % 10 === 0 && !events.isVenue && !events.isHotel && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`;
             dayHtml += '</div>';
             calendarEl.innerHTML += dayHtml;
         }
@@ -519,31 +511,25 @@
     function getEventsForDate(dateStr) {
         let isVenue = tourData.venues.some(v => v.date === dateStr);
         let isHotel = tourData.hotels.some(h => dateStr >= h.checkin && dateStr <= h.checkout);
-        let driveDuration = 0;
-        let isTravel = false;
-
+        let driveDuration = 0, isTravel = false;
+        const stopsForDay = [];
         for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
-            if(tourData.routePlannerState[i].dateValue === dateStr) {
+             if(tourData.routePlannerState[i].dateValue === dateStr) {
                 isTravel = true;
-                const from = getLocationDetails(tourData.routePlannerState[i].selectValue);
-                const to = getLocationDetails(tourData.routePlannerState[i+1].selectValue);
-                const cacheKey = `${dateStr}_${from.address}|${to.address}`; // Simplified for check
-                 // A more complex check would be needed for multi-leg days, but this is a good approximation
+                if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue));
+                stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue));
             }
         }
-        // This part would be more accurate if we re-fetched from cache, but for icons this is ok
-        // For simplicity, we just check if it's a travel day. A full implementation would sum durations.
-        // Let's fake long/short for demo
-        if (isTravel && new Date(dateStr).getDay() % 2 === 0) driveDuration = 5 * 3600; // Fake long drive
-        if (isTravel && new Date(dateStr).getDay() % 3 === 0) driveDuration = 1 * 3600; // Fake short drive
-        
+        if(isTravel && stopsForDay.length > 1) {
+            const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`;
+            if (tourData.routeCache[cacheKey]) driveDuration = tourData.routeCache[cacheKey].data.totalTime;
+        }
         return { isVenue, isHotel, isTravel, isLongDrive: driveDuration > 4*3600, isShortDrive: driveDuration > 0 && driveDuration < 1.5*3600 };
     }
 
     function showDayDetails(dateStr) {
         const modal = document.getElementById('calendarModal');
         const content = document.getElementById('calendarModalContent');
-        
         const venuesOnDay = tourData.venues.filter(v => v.date === dateStr);
         const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout);
         const routesOnDay = [];
@@ -554,20 +540,11 @@
                 routesOnDay.push(`${from.name} → ${to.name}`);
             }
         }
-
         let html = `<div class="modal-header"><span class="close" onclick="closeModal('calendarModal')">×</span><div>Details for ${formatDate(dateStr)}</div></div>`;
-        if (venuesOnDay.length > 0) {
-            html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join('');
-        }
-        if (hotelsOnDay.length > 0) {
-            html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join('');
-        }
-        if (routesOnDay.length > 0) {
-             html += `<h3>🚗 Travel Segments</h3>` + routesOnDay.map(r => `<div class="route-item">${r}</div>`).join('');
-        }
-        if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && routesOnDay.length === 0) {
-            html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`;
-        }
+        if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); }
+        if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); }
+        if (routesOnDay.length > 0) { html += `<h3>🚗 Travel Segments</h3>` + routesOnDay.map(r => `<div class="route-item">${r}</div>`).join(''); }
+        if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && routesOnDay.length === 0) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; }
         content.innerHTML = html;
         modal.style.display = 'block';
     }
@@ -575,8 +552,6 @@
     function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }
     function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
 
-
-    // --- OTHER FUNCTIONS ---
     function getLocationDetails(locationId) { const [type, id] = locationId.split(':'); const numId = parseInt(id); if (type === 'Hotel') { const hotel = tourData.hotels.find(h => h.id === numId); return hotel ? { ...hotel } : { type: 'Hotel', name: 'N/A', address: 'N/A' }; } else { const venue = tourData.venues.find(v => v.id === numId); return venue ? { ...venue } : { type: 'Venue', name: 'N/A', address: 'N/A' }; } }
     function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; document.getElementById('hotelModal').style.display = 'block'; }
     function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; document.getElementById('venueModal').style.display = 'block'; }
@@ -611,7 +586,7 @@
         sortedExpenses.forEach(expense => {
             totalCAD += expense.amountCAD || (expense.amountUSD * 1.35);
             const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad';
-            row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="deleteItem('expense', ${expense.id})">×</button></td>`;
+            row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`;
         });
         document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
     }
@@ -645,21 +620,31 @@
         const includeVenues = document.getElementById('exportVenues').checked;
         const includeExpenses = document.getElementById('exportExpenses').checked;
         const includeRoute = document.getElementById('exportRoute').checked;
-
-        let csvData = [];
-        csvData.push(['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']);
-        
-        if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, h.costCAD || h.costUSD * 1.35, 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`]));
+        let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']];
+        if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`]));
         if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`]));
-        if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, e.amountCAD || e.amountUSD * 1.35, 'CAD (Estimate if not Manual)', e.notes]));
-        
+        if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes]));
         if (includeRoute) {
             csvData.push(['---','---','---','---','---','---','---']);
-            csvData.push(['ROUTE ITINERARY', '', '', '', '', '', '']);
-            tourData.routePlannerState.forEach((stop, index) => {
-                const location = stop.selectValue ? getLocationDetails(stop.selectValue) : {name: 'N/A'};
-                csvData.push(['Route Stop', stop.dateValue, `${index+1}. ${location.name}`, location.address || '', '', '', '']);
-            });
+            csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']);
+            let currentRouteDate = '';
+            for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
+                const fromStop = getLocationDetails(tourData.routePlannerState[i].selectValue);
+                const toStop = getLocationDetails(tourData.routePlannerState[i+1].selectValue);
+                const date = tourData.routePlannerState[i].dateValue || 'No Date';
+                if(date !== currentRouteDate) { csvData.push(['DAY START', date, '', '', '', '', '']); currentRouteDate = date; }
+                const cacheKey = `${date}_${fromStop.address}|${toStop.address}`;
+                if(tourData.routeCache[cacheKey]) {
+                    const leg = tourData.routeCache[cacheKey].data.legs.find(l => l.end_address.includes(toStop.address.split(',')[0]));
+                    if (leg) {
+                        const legKm = leg.distance.value / 1000;
+                        const gasCost = (legKm / 100) * 8.5 * 1.75 * 1.20;
+                        csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]);
+                    }
+                } else {
+                     csvData.push(['Segment', date, fromStop.name, toStop.name, 'N/A', 'N/A', 'N/A']);
+                }
+            }
         }
         
         const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
