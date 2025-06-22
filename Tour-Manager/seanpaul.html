@@ -208,10 +208,12 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc"></script>
 <script>
+    // --- EASY-TO-EDIT GAS CALCULATION SETTINGS ---
     const FUEL_EFFICIENCY_L_PER_100KM = 14.0; 
     const PRICE_PER_LITRE_CAD = 1.95;
     const HEAVY_FOOT_SURCHARGE = 1.20;
 
+    // --- GLOBAL VARIABLES ---
     let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {} };
     let currentEditId = null;
     let routeStopCounter = 0;
@@ -221,9 +223,11 @@
     let currentModalDate = null;
     let directionsService;
 
+    // --- HELPER FUNCTIONS ---
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
 
+    // --- INITIALIZATION ---
     window.onload = function() {
         directionsService = new google.maps.DirectionsService();
         const savedData = localStorage.getItem('tourData');
@@ -237,6 +241,7 @@
         document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
     };
 
+    // --- DATA & UI MANAGEMENT ---
     function saveData() { localStorage.setItem('tourData', JSON.stringify(tourData)); }
     
     function showTab(tabName) {
