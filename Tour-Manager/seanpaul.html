@@ -27,6 +27,8 @@
         .form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
         .currency-input { position: relative; }
         .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
         .currency-input input { padding-left: 30px; }
@@ -54,7 +56,8 @@
         .day-summary-box h4 { color: #ffd700; text-align: center; margin-bottom: 10px; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
         .modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); margin: 10% auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid rgba(255,215,0,0.3); max-height: 80vh; overflow-y: auto; }
-        .modal-header { color: #ffd700; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; }
+        .modal-header { color: #ffd700; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-nav { background: none; border: none; color: #ffd700; font-size: 2em; cursor: pointer; padding: 0 10px; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
         .close:hover { color: #fff; }
         .route-selector { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
@@ -211,12 +214,11 @@
     let isGeneratingRoute = false;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
+    let currentModalDate = null;
 
-    // --- HELPER FUNCTIONS ---
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
 
-    // --- INITIALIZATION ---
     window.onload = function() {
         const savedData = localStorage.getItem('tourData');
         if (savedData) { 
@@ -225,12 +227,10 @@
             if (!tourData.routeCache) tourData.routeCache = {}; 
         }
         loadRoutePlannerState();
-        updateAllDisplays();
         showTab('calendar');
         document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
     };
 
-    // --- DATA & UI MANAGEMENT ---
     function saveData() { localStorage.setItem('tourData', JSON.stringify(tourData)); }
     
     function showTab(tabName) {
@@ -242,12 +242,10 @@
         if (tabName === 'calendar') renderCalendar();
     }
     
-    // --- ADDING DATA ---
     function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); updateAllDisplays(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
     function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); updateAllDisplays(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
     function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); updateAllDisplays(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
 
-    // --- ROUTE PLANNER FUNCTIONS ---
     function saveRoutePlannerState() {
         tourData.routePlannerState = Array.from({ length: routeStopCounter }, (_, i) => {
             const select = document.getElementById(`routeSelect${i}`);
@@ -413,7 +411,7 @@
     async function processDayRoute(date, stopsForDay) {
         if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`);
         const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`;
-        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 86400000)) {
+        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 7200000)) { // 2 hour cache
             let cachedData = tourData.routeCache[cacheKey].data;
             cachedData.isCached = true;
             return cachedData;
@@ -493,19 +491,14 @@
             
             const events = getEventsForDate(dateStr);
             let eventIcons = '';
-            if (events.isVenue) {
-                eventIcons += '🎵';
-            } else if (events.isTravel) {
-                eventIcons += '🚗';
-                if (events.isLongDrive) eventIcons += '😢'; else if (events.isShortDrive) eventIcons += '😃';
-            }
-            if (events.isHotel) eventIcons += '🏨';
+            if (events.isVenue) { eventIcons += '🎵'; } 
+            else if (events.isTravel) { eventIcons += '🚗'; }
             
             dayHtml += `<div class="day-events">${eventIcons}</div>`;
             
             if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`;
             if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`;
-            if (day % 10 === 0 && !events.isVenue && !events.isHotel && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`;
+            if (day % 10 === 0 && !events.isVenue && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`;
 
             dayHtml += '</div>';
             calendarEl.innerHTML += dayHtml;
@@ -514,30 +507,14 @@
     
     function getEventsForDate(dateStr) {
         let isVenue = tourData.venues.some(v => v.date === dateStr);
-        let isHotel = tourData.hotels.some(h => dateStr >= h.checkin && dateStr <= h.checkout);
-        let driveDuration = 0;
-        let isTravel = false;
-        
-        const stopsForDay = [];
-        for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
-             if(tourData.routePlannerState[i].dateValue === dateStr) {
-                isTravel = true;
-                if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue));
-                stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue));
-            }
-        }
-        
-        if(isTravel && stopsForDay.length > 1) {
-            const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`;
-            if (tourData.routeCache[cacheKey]) driveDuration = tourData.routeCache[cacheKey].data.totalTime;
-        }
-        
-        return { isVenue, isHotel, isTravel, isLongDrive: driveDuration > 4*3600, isShortDrive: driveDuration > 0 && driveDuration < 1.5*3600 };
+        let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr);
+        return { isVenue, isTravel };
     }
 
     function showDayDetails(dateStr) {
         const modal = document.getElementById('calendarModal');
         const content = document.getElementById('calendarModalContent');
+        
         const venuesOnDay = tourData.venues.filter(v => v.date === dateStr);
         const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout);
         const stopsForDay = [];
@@ -548,7 +525,12 @@
             }
         }
 
-        let html = `<div class="modal-header"><span class="close" onclick="closeModal('calendarModal')">&times;</span><div>Details for ${formatDate(dateStr)}</div></div>`;
+        let html = `<div class="modal-header">
+                        <button class="modal-nav prev" onclick="showPrevDay()">◄</button>
+                        <div>Details for ${formatDate(dateStr)}</div>
+                        <button class="modal-nav next" onclick="showNextDay()">►</button>
+                        <span class="close" onclick="closeModal('calendarModal')">&times;</span>
+                    </div>`;
         if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); }
         if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); }
         
@@ -578,6 +560,29 @@
         if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; }
         content.innerHTML = html;
         modal.style.display = 'block';
+        currentModalDate = dateStr;
+        addSwipeListeners(modal);
+    }
+
+    function showPrevDay() {
+        if (!currentModalDate) return;
+        let date = new Date(currentModalDate + 'T12:00:00Z');
+        date.setDate(date.getDate() - 1);
+        showDayDetails(date.toISOString().split('T')[0]);
+    }
+
+    function showNextDay() {
+        if (!currentModalDate) return;
+        let date = new Date(currentModalDate + 'T12:00:00Z');
+        date.setDate(date.getDate() + 1);
+        showDayDetails(date.toISOString().split('T')[0]);
+    }
+    
+    let touchstartX = 0; let touchendX = 0;
+    function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); }
+    function addSwipeListeners(element) {
+        element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+        element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
     }
 
     function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }
