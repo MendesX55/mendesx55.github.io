@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNX Sales Tracker - MIGRATION</title>
+    <title>MNX Sales Tracker</title>
     <style>
         :root {
             --primary-glow: rgba(240, 147, 251, 0.5);
@@ -26,34 +26,49 @@
             0% { transform: scale(1) rotate(0deg); opacity: 0.7; }
             100% { transform: scale(1.1) rotate(5deg); opacity: 0.9; }
         }
+
+        /* NEW: Login Page Styles */
+        #login-page {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100vh; text-align: center; padding: 20px; position: relative; z-index: 10;
+        }
+        .login-title { font-size: 3rem; font-weight: 800; margin-bottom: 15px; background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .login-subtitle { font-size: 1.2rem; margin-bottom: 40px; opacity: 0.8; }
+        .login-button {
+            display: inline-flex; align-items: center; background: white; color: #333;
+            border: none; padding: 15px 30px; border-radius: 15px; font-size: 1.1rem;
+            font-weight: 600; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .login-button:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+        .login-button svg { width: 24px; height: 24px; margin-right: 12px; }
+
+        /* Hide the main app container by default */
+        #app-container { display: none; }
+
         .container { position: relative; z-index: 1; width: 100%; max-width: 428px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 20px; }
-        
         .header {
-            text-align: center;
-            padding: 40px 0 40px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            margin: 0 -20px 0;
-            border-radius: 0 0 30px 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            text-align: center; padding: 40px 0 40px; background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px); margin: 0 -20px 0; border-radius: 0 0 30px 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3); position: relative;
         }
         .main-title {
-            font-size: 2.8rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            margin-bottom: 8px;
+            font-size: 2.8rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 8px;
             background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             text-shadow: 0 0 20px rgba(118, 75, 162, 0.3);
         }
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 400;
+        .subtitle { font-size: 1.1rem; opacity: 0.9; font-weight: 400; }
+
+        /* NEW: Logout Button Style */
+        #logout-btn {
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 10px;
+            padding: 8px 12px; cursor: pointer; font-weight: 600; transition: background 0.2s;
         }
-        
+        #logout-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Other styles are the same */
         .main-content { flex: 1; padding: 30px 0; display: flex; flex-direction: column; }
         .nav-pills { display: flex; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px; margin-bottom: 30px; backdrop-filter: blur(10px); }
         .nav-pill { flex: 1; padding: 12px; text-align: center; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 15px; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
@@ -112,65 +127,76 @@
         .modal-content { background: rgba(30, 30, 50, 0.8); border-radius: 25px; padding: 30px; width: 90%; max-width: 420px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #sale-modal { z-index: 1010; }
-        /* Style for the temporary import button with THE FIX */
-        #import-btn {
-            background: #f0ad4e; color: black; padding: 20px; font-size: 1.2rem; font-weight: bold;
-            border: none; border-radius: 15px; cursor: pointer; margin: 20px auto; display: block;
-            position: relative; /* FIX: This allows z-index to work */
-            z-index: 10;        /* FIX: This lifts the button above the background */
-        }
+        #sale-modal { z-index: 1010; } 
     </style>
 </head>
 <body>
-    <button id="import-btn" onclick="migrateData()">IMPORT OLD DATA (Click Only Once)</button>
+    
+    <!-- NEW: Login Page -->
+    <div id="login-page">
+        <h1 class="login-title">MNX Sales Tracker</h1>
+        <p class="login-subtitle">Please sign in to continue.</p>
+        <button class="login-button" onclick="signInWithGoogle()">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,5 12,5C14.6,5 16.1,6.2 17.1,7.2L19,5.2C17.2,3.4 14.8,2 12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 21.35,18.47 21.35,12.89C21.35,12.29 21.35,11.69 21.35,11.1Z"></path></svg>
+            Sign in with Google
+        </button>
+    </div>
 
-    <div class="container">
-        <header class="header">
-            <h1 class="main-title">MNX</h1>
-            <p class="subtitle">💰 Sales Tracker 💰</p>
-        </header>
-        <main class="main-content">
-            <div class="nav-pills">
-                <button class="nav-pill active" onclick="showPage('add')">➕ Add Sale</button>
-                <button class="nav-pill" onclick="showPage('view')">📊 Dashboard</button>
-            </div>
-            <div id="add-page" class="page-container active">
-                <div class="step-indicator"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
-                <div class="step-card" id="add-sale-card">
-                    <div id="step1"></div>
-                    <div id="step2" style="display: none;">
-                        <h2 class="step-title">🏷️ What did you sell?</h2>
-                        <div class="input-group"><label for="itemName">Item Description</label><input type="text" id="itemName" class="form-input" placeholder="e.g., Blue dress, M"></div>
-                        <div class="input-group"><label for="salePrice">Sale Price ($)</label><input type="number" id="salePrice" class="form-input" placeholder="0.00" step="0.01"></div>
-                        <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="nextStep()">Next →</button></div>
-                    </div>
-                    <div id="step3" style="display: none;">
-                        <h2 class="step-title">💳 How did they pay?</h2>
-                        <div class="platform-grid">
-                            <div class="platform-option" onclick="selectPayment('Cash')"><div class="platform-icon">💵</div><div>Cash</div></div>
-                            <div class="platform-option" onclick="selectPayment('E-Transfer')"><div class="platform-icon">📱</div><div>E-Transfer</div></div>
-                            <div class="platform-option" onclick="selectPayment('Other')"><div class="platform-icon">🏦</div><div>Other</div></div>
+    <!-- Main App Container (hidden by default) -->
+    <div id="app-container">
+        <div class="container">
+            <header class="header">
+                <button id="logout-btn" onclick="signOutUser()">Logout</button>
+                <h1 class="main-title">MNX</h1>
+                <p class="subtitle">💰 Sales Tracker 💰</p>
+            </header>
+
+            <main class="main-content">
+                <div class="nav-pills">
+                    <button class="nav-pill active" onclick="showPage('add')">➕ Add Sale</button>
+                    <button class="nav-pill" onclick="showPage('view')">📊 Dashboard</button>
+                </div>
+                
+                <div id="add-page" class="page-container active">
+                    <div class="step-indicator"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
+                    <div class="step-card" id="add-sale-card">
+                        <div id="step1"></div>
+                        <div id="step2" style="display: none;">
+                            <h2 class="step-title">🏷️ What did you sell?</h2>
+                            <div class="input-group"><label for="itemName">Item Description</label><input type="text" id="itemName" class="form-input" placeholder="e.g., Blue dress, M"></div>
+                            <div class="input-group"><label for="salePrice">Sale Price ($)</label><input type="number" id="salePrice" class="form-input" placeholder="0.00" step="0.01"></div>
+                            <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="nextStep()">Next →</button></div>
                         </div>
-                        <div class="input-group">
-                            <label>Sold On Platform</label>
+                        <div id="step3" style="display: none;">
+                            <h2 class="step-title">💳 How did they pay?</h2>
                             <div class="platform-grid">
-                                <div class="platform-option" onclick="selectPlatform('Virage')">🏪 Virage</div>
-                                <div class="platform-option" onclick="selectPlatform('Facebook')">📘 Facebook</div>
-                                <div class="platform-option" onclick="selectPlatform('Kijiji')">🔍 Kijiji</div>
-                                <div class="platform-option" onclick="selectPlatform('Other')">➕ Other</div>
+                                <div class="platform-option" onclick="selectPayment('Cash')"><div class="platform-icon">💵</div><div>Cash</div></div>
+                                <div class="platform-option" onclick="selectPayment('E-Transfer')"><div class="platform-icon">📱</div><div>E-Transfer</div></div>
+                                <div class="platform-option" onclick="selectPayment('Other')"><div class="platform-icon">🏦</div><div>Other</div></div>
                             </div>
+                            <div class="input-group">
+                                <label>Sold On Platform</label>
+                                <div class="platform-grid">
+                                    <div class="platform-option" onclick="selectPlatform('Virage')">🏪 Virage</div>
+                                    <div class="platform-option" onclick="selectPlatform('Facebook')">📘 Facebook</div>
+                                    <div class="platform-option" onclick="selectPlatform('Kijiji')">🔍 Kijiji</div>
+                                    <div class="platform-option" onclick="selectPlatform('Other')">➕ Other</div>
+                                </div>
+                            </div>
+                            <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="saveSale()">💾 Save Sale</button></div>
                         </div>
-                        <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="saveSale()">💾 Save Sale</button></div>
                     </div>
                 </div>
-            </div>
-            <div id="view-page" class="page-container">
-                <button class="btn" onclick="showShipmentModal()" style="margin-bottom: 20px;">➕ Add New Shipment</button>
-                <div id="dashboard-content"></div>
-            </div>
-        </main>
+
+                <div id="view-page" class="page-container">
+                    <button class="btn" onclick="showShipmentModal()" style="margin-bottom: 20px;">➕ Add New Shipment</button>
+                    <div id="dashboard-content"></div>
+                </div>
+            </main>
+        </div>
     </div>
+
+    <!-- Modals (no change) -->
     <div id="shipment-modal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content"><h2 id="shipment-modal-title" class="step-title"></h2><div class="input-group"><label for="shipmentName">Shipment Name</label><input type="text" id="shipmentName" class="form-input"></div><div class="input-group"><label for="shipmentCost">Total Cost ($)</label><input type="number" id="shipmentCost" class="form-input" placeholder="0.00"></div><div class="input-group"><label for="shipmentNotes">Notes</label><textarea id="shipmentNotes" class="form-textarea" placeholder="e.g., Summer collection..."></textarea></div><input type="hidden" id="shipmentId"><button class="btn" onclick="saveShipment()">💾 Save Shipment</button></div>
     </div>
@@ -184,12 +210,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- NEW: Added Firebase Auth SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
-        // Initialize Firebase with your project's configuration
         const firebaseConfig = {
           apiKey: "AIzaSyBryOB6PLZVUJUEP2F3x76eO7dGr4qayOA",
           authDomain: "mnx-sales-tracker.firebaseapp.com",
@@ -200,67 +226,53 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth(); // Initialize Firebase Auth
 
-        // --- TEMPORARY MIGRATION SCRIPT ---
-        const oldData = { /* Data from your JSON file is pasted here */
-            "shipments": [{"id": "march","name": "March Shipment","cost": 2535.91,"notes": ""},{"id": "may","name": "May Shipment","cost": 2735,"notes": ""},{"id": "june","name": "June Shipment","cost": 2138,"notes": ""}],
-            "sales": [{"id": 1700000100001,"shipment": "May","item": "Privacy garden","price": 70,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100002,"shipment": "May","item": "Go cart and classic","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100003,"shipment": "May","item": "Rocking patio 3pc blue","price": 230,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100004,"shipment": "May","item": "Trike","price": 90,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100005,"shipment": "May","item": "Patio","price": 140,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100006,"shipment": "May","item": "Bumper","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100007,"shipment": "May","item": "Dumbbells","price": 70,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100008,"shipment": "May","item": "Gravity chair","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100009,"shipment": "May","item": "Ride on digger","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100010,"shipment": "May","item": "Fridge","price": 100,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100011,"shipment": "May","item": "Mannequin","price": 30,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100012,"shipment": "May","item": "Plastic plates","price": 45,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100013,"shipment": "May","item": "Laptop","price": 750,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100014,"shipment": "May","item": "Kitchen cart","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100015,"shipment": "May","item": "Office chair","price": 20,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100016,"shipment": "May","item": "Gazebo","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100017,"shipment": "May","item": "Chair","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100018,"shipment": "May","item": "Dog bed","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100019,"shipment": "May","item": "Chairs blue","price": 160,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100020,"shipment": "May","item": "Blue cushions","price": 20,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100021,"shipment": "May","item": "Cushion","price": 10,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100022,"shipment": "May","item": "Shoe bench","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100023,"shipment": "May","item": "Nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100024,"shipment": "May","item": "Gazebo","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100025,"shipment": "May","item": "Cushion","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100026,"shipment": "May","item": "Car","price": 30,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100027,"shipment": "May","item": "Dog ramp","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100028,"shipment": "May","item": "Bike","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100029,"shipment": "May","item": "Planter","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100030,"shipment": "May","item": "White Tent","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100031,"shipment": "May","item": "Orange","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100032,"shipment": "May","item": "Black tent","price": 100,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100033,"shipment": "May","item": "litter box","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100035,"shipment": "May","item": "green rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100036,"shipment": "May","item": "squat rack","price": 125,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100037,"shipment": "May","item": "lounge grey","price": 35,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100038,"shipment": "May","item": "accent chair","price": 160,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100039,"shipment": "May","item": "chair stand","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100040,"shipment": "May","item": "step stool","price": 45,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100041,"shipment": "May","item": "bench","price": 60,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100042,"shipment": "May","item": "shoe bench","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100043,"shipment": "May","item": "carport","price": 240,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100044,"shipment": "May","item": "bench","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100045,"shipment": "May","item": "vanity mirror","price": 90,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100046,"shipment": "May","item": "blk chairs","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100047,"shipment": "May","item": "kitchen cab","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100048,"shipment": "May","item": "bookcase","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000200001,"shipment": "June","item": "dumbbells 25s","price": 80,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200002,"shipment": "June","item": "lounge","price": 50,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200003,"shipment": "June","item": "umbrella broke","price": 50,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200004,"shipment": "June","item": "lounge","price": 180,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200005,"shipment": "June","item": "lounge","price": 35,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200006,"shipment": "June","item": "our chairs","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200007,"shipment": "June","item": "gazebo","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200008,"shipment": "June","item": "gazebo","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000300001,"shipment": "March","item": "life jacket paddle","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300002,"shipment": "March","item": "scooters x2","price": 100,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300003,"shipment": "March","item": "mirror","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300004,"shipment": "March","item": "green rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300005,"shipment": "March","item": "blue rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300006,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300007,"shipment": "March","item": "rug","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300008,"shipment": "March","item": "rug plus iron board","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300009,"shipment": "March","item": "nerf. X2","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300010,"shipment": "March","item": "rackets and life vest","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300011,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300012,"shipment": "March","item": "lamp","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300013,"shipment": "March","item": "2 life jackets 1 paddle jacket ducky float","price": 85,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300014,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300015,"shipment": "March","item": "outdoor rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300016,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300017,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300018,"shipment": "March","item": "outdoor rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300019,"shipment": "March","item": "blk rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300020,"shipment": "March","item": "footballs floats","price": 105,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300021,"shipment": "March","item": "used big rug","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300022,"shipment": "March","item": "large rug","price": 80,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300023,"shipment": "March","item": "jacket baby","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300024,"shipment": "March","item": "duck","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300025,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300026,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300027,"shipment": "March","item": "x3 infant jacket","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300028,"shipment": "March","item": "cow","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300029,"shipment": "March","item": "clipboard","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300030,"shipment": "March","item": "life jacket","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300031,"shipment": "March","item": "clip boards","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300032,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300033,"shipment": "March","item": "rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300034,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300035,"shipment": "March","item": "vest","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300036,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300037,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300038,"shipment": "March","item": "game","price": 25,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300039,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300040,"shipment": "March","item": "rug","price": 80,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300041,"shipment": "March","item": "varage older stuff","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300042,"shipment": "March","item": "rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300043,"shipment": "March","item": "jacket","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300044,"shipment": "March","item": "rug","price": 40,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300045,"shipment": "March","item": "beach mat x4","price": 40,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300046,"shipment": "March","item": "life vest","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300047,"shipment": "March","item": "mat x2","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300048,"shipment": "March","item": "outdoor rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300049,"shipment": "March","item": "rug","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300050,"shipment": "March","item": "balloons","price": 5,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300051,"shipment": "March","item": "boat","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300052,"shipment": "March","item": "marshall","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300053,"shipment": "March","item": "balloons","price": 5,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300054,"shipment": "March","item": "scooter","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300055,"shipment": "March","item": "beige rug","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300056,"shipment": "March","item": "life jacket","price": 25,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300057,"shipment": "March","item": "outdoor mats","price": 100,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300058,"shipment": "March","item": "maxpro","price": 575,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300059,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300060,"shipment": "March","item": "green","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300061,"shipment": "March","item": "2 outdoor grey","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300062,"shipment": "March","item": "life jacket","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1750711199509,"shipmentId": "march","item": "Jock cup","price": 5,"payment": "Cash","platform": "Facebook"}]
-        };
+        // --- AUTHENTICATION LOGIC ---
+        const loginPage = document.getElementById('login-page');
+        const appContainer = document.getElementById('app-container');
 
-        async function migrateData() {
-            if (!confirm("Are you sure you want to import old data? This should only be done ONCE on an empty database.")) {
-                return;
+        // This function runs whenever the user's login state changes
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in.
+                console.log('User is signed in:', user.displayName);
+                loginPage.style.display = 'none';
+                appContainer.style.display = 'block';
+                loadData(); // Load data only after user is authenticated
+            } else {
+                // User is signed out.
+                console.log('User is signed out.');
+                loginPage.style.display = 'flex';
+                appContainer.style.display = 'none';
             }
+        });
 
-            const importBtn = document.getElementById('import-btn');
-            importBtn.disabled = true;
-            importBtn.innerText = "IMPORTING...";
-
-            const batch = db.batch();
-
-            oldData.shipments.forEach(shipment => {
-                const docRef = db.collection("shipments").doc(shipment.id);
-                const dataToSave = {
-                    name: shipment.name,
-                    cost: shipment.cost,
-                    notes: shipment.notes
-                };
-                batch.set(docRef, dataToSave);
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                console.error("Error during sign-in:", error);
+                showNotification("Sign-in failed. Please try again.", "error");
             });
-
-            oldData.sales.forEach(sale => {
-                const docRef = db.collection("sales").doc(); 
-                const dataToSave = {
-                    item: sale.item,
-                    payment: sale.payment,
-                    platform: sale.platform,
-                    price: sale.price,
-                    shipmentId: sale.shipmentId,
-                    createdAt: firebase.firestore.Timestamp.fromMillis(sale.id) 
-                };
-                batch.set(docRef, dataToSave);
-            });
-
-            try {
-                await batch.commit();
-                showNotification(`Successfully imported ${oldData.shipments.length} shipments and ${oldData.sales.length} sales!`, 'success');
-                importBtn.innerText = "DONE!";
-                await loadData();
-            } catch (error) {
-                console.error("Error during migration:", error);
-                showNotification("MIGRATION FAILED. Check console.", 'error');
-                importBtn.disabled = false;
-                importBtn.innerText = "RETRY IMPORT";
-            }
         }
-        
+
+        function signOutUser() {
+            auth.signOut().catch(error => {
+                console.error("Error during sign-out:", error);
+                showNotification("Sign-out failed.", "error");
+            });
+        }
+
+        // --- GLOBAL VARIABLES ---
         let shipments = [];
         let salesData = [];
         let currentStep = 1;
         let currentSale = {};
         let activeSalesListShipmentId = null;
 
+        // --- DATA MANAGEMENT (FIRESTORE) ---
         async function loadData() {
+            // Functionality is the same, but now it's protected by our auth rules
             try {
                 const shipmentsSnapshot = await db.collection('shipments').orderBy('name').get();
                 shipments = shipmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -276,6 +288,8 @@
             }
         }
         
+        // --- The rest of the app's JavaScript remains the same ---
+        // updateUI, showPage, showNotification, add sale wizard, etc.
         function updateUI() {
             const activePageEl = document.querySelector('.page-container.active');
             if (!activePageEl) return;
@@ -523,10 +537,8 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            showPage('add');
-            loadData();
-        });
+        // We don't need the DOMContentLoaded listener anymore,
+        // since onAuthStateChanged handles the initial app load.
     </script>
 </body>
 </html>
