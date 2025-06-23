@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Head content is the same, no changes here -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNX Sales Tracker</title>
+    <title>MNX Sales Tracker - MIGRATION</title>
     <style>
         :root {
             --primary-glow: rgba(240, 147, 251, 0.5);
@@ -112,24 +113,29 @@
         .modal-content { background: rgba(30, 30, 50, 0.8); border-radius: 25px; padding: 30px; width: 90%; max-width: 420px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #sale-modal { z-index: 1010; } 
+        #sale-modal { z-index: 1010; }
+        /* Style for the temporary import button */
+        #import-btn {
+            background: #f0ad4e; color: black; padding: 20px; font-size: 1.2rem; font-weight: bold;
+            border: none; border-radius: 15px; cursor: pointer; margin: 20px auto; display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- NEW TEMPORARY BUTTON -->
+    <button id="import-btn" onclick="migrateData()">IMPORT OLD DATA (Click Only Once)</button>
+
     <div class="container">
+        <!-- The rest of the HTML Body is the same as the final version -->
         <header class="header">
             <h1 class="main-title">MNX</h1>
             <p class="subtitle">💰 Sales Tracker 💰</p>
         </header>
-
         <main class="main-content">
             <div class="nav-pills">
                 <button class="nav-pill active" onclick="showPage('add')">➕ Add Sale</button>
                 <button class="nav-pill" onclick="showPage('view')">📊 Dashboard</button>
-                <!-- REMOVED: Sync tab is no longer needed -->
             </div>
-            
-            <!-- Add Sale Page -->
             <div id="add-page" class="page-container active">
                 <div class="step-indicator"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
                 <div class="step-card" id="add-sale-card">
@@ -160,17 +166,12 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Dashboard Page -->
             <div id="view-page" class="page-container">
                 <button class="btn" onclick="showShipmentModal()" style="margin-bottom: 20px;">➕ Add New Shipment</button>
                 <div id="dashboard-content"></div>
             </div>
-
         </main>
     </div>
-
-    <!-- Modals -->
     <div id="shipment-modal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content"><h2 id="shipment-modal-title" class="step-title"></h2><div class="input-group"><label for="shipmentName">Shipment Name</label><input type="text" id="shipmentName" class="form-input"></div><div class="input-group"><label for="shipmentCost">Total Cost ($)</label><input type="number" id="shipmentCost" class="form-input" placeholder="0.00"></div><div class="input-group"><label for="shipmentNotes">Notes</label><textarea id="shipmentNotes" class="form-textarea" placeholder="e.g., Summer collection..."></textarea></div><input type="hidden" id="shipmentId"><button class="btn" onclick="saveShipment()">💾 Save Shipment</button></div>
     </div>
@@ -184,12 +185,12 @@
         </div>
     </div>
 
-    <!-- NEW: Firebase SDK -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // NEW: Initialize Firebase with your project's configuration
+        // Initialize Firebase with your project's configuration
         const firebaseConfig = {
           apiKey: "AIzaSyBryOB6PLZVUJUEP2F3x76eO7dGr4qayOA",
           authDomain: "mnx-sales-tracker.firebaseapp.com",
@@ -198,58 +199,111 @@
           messagingSenderId: "949869285333",
           appId: "1:949869285333:web:0b644b539f49a7fec9f75c"
         };
-
-        // Initialize Firebase and Firestore
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- GLOBAL VARIABLES ---
+        // --- TEMPORARY MIGRATION SCRIPT ---
+        const oldData = { /* Data from your JSON file is pasted here */
+            "shipments": [{"id": "march","name": "March Shipment","cost": 2535.91,"notes": ""},{"id": "may","name": "May Shipment","cost": 2735,"notes": ""},{"id": "june","name": "June Shipment","cost": 2138,"notes": ""}],
+            "sales": [{"id": 1700000100001,"shipment": "May","item": "Privacy garden","price": 70,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100002,"shipment": "May","item": "Go cart and classic","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100003,"shipment": "May","item": "Rocking patio 3pc blue","price": 230,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100004,"shipment": "May","item": "Trike","price": 90,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100005,"shipment": "May","item": "Patio","price": 140,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100006,"shipment": "May","item": "Bumper","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100007,"shipment": "May","item": "Dumbbells","price": 70,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100008,"shipment": "May","item": "Gravity chair","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100009,"shipment": "May","item": "Ride on digger","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100010,"shipment": "May","item": "Fridge","price": 100,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100011,"shipment": "May","item": "Mannequin","price": 30,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100012,"shipment": "May","item": "Plastic plates","price": 45,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100013,"shipment": "May","item": "Laptop","price": 750,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100014,"shipment": "May","item": "Kitchen cart","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100015,"shipment": "May","item": "Office chair","price": 20,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100016,"shipment": "May","item": "Gazebo","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100017,"shipment": "May","item": "Chair","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100018,"shipment": "May","item": "Dog bed","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100019,"shipment": "May","item": "Chairs blue","price": 160,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100020,"shipment": "May","item": "Blue cushions","price": 20,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100021,"shipment": "May","item": "Cushion","price": 10,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100022,"shipment": "May","item": "Shoe bench","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100023,"shipment": "May","item": "Nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100024,"shipment": "May","item": "Gazebo","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100025,"shipment": "May","item": "Cushion","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100026,"shipment": "May","item": "Car","price": 30,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100027,"shipment": "May","item": "Dog ramp","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100028,"shipment": "May","item": "Bike","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100029,"shipment": "May","item": "Planter","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100030,"shipment": "May","item": "White Tent","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100031,"shipment": "May","item": "Orange","price": 150,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100032,"shipment": "May","item": "Black tent","price": 100,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100033,"shipment": "May","item": "litter box","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100035,"shipment": "May","item": "green rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100036,"shipment": "May","item": "squat rack","price": 125,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100037,"shipment": "May","item": "lounge grey","price": 35,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100038,"shipment": "May","item": "accent chair","price": 160,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100039,"shipment": "May","item": "chair stand","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100040,"shipment": "May","item": "step stool","price": 45,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100041,"shipment": "May","item": "bench","price": 60,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100042,"shipment": "May","item": "shoe bench","price": 50,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100043,"shipment": "May","item": "carport","price": 240,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100044,"shipment": "May","item": "bench","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100045,"shipment": "May","item": "vanity mirror","price": 90,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100046,"shipment": "May","item": "blk chairs","price": 80,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100047,"shipment": "May","item": "kitchen cab","price": 120,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000100048,"shipment": "May","item": "bookcase","price": 40,"platform": "Other","payment": "Cash","shipmentId": "may"},{"id": 1700000200001,"shipment": "June","item": "dumbbells 25s","price": 80,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200002,"shipment": "June","item": "lounge","price": 50,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200003,"shipment": "June","item": "umbrella broke","price": 50,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200004,"shipment": "June","item": "lounge","price": 180,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200005,"shipment": "June","item": "lounge","price": 35,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200006,"shipment": "June","item": "our chairs","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200007,"shipment": "June","item": "gazebo","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000200008,"shipment": "June","item": "gazebo","price": 90,"platform": "Other","payment": "Cash","shipmentId": "june"},{"id": 1700000300001,"shipment": "March","item": "life jacket paddle","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300002,"shipment": "March","item": "scooters x2","price": 100,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300003,"shipment": "March","item": "mirror","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300004,"shipment": "March","item": "green rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300005,"shipment": "March","item": "blue rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300006,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300007,"shipment": "March","item": "rug","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300008,"shipment": "March","item": "rug plus iron board","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300009,"shipment": "March","item": "nerf. X2","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300010,"shipment": "March","item": "rackets and life vest","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300011,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300012,"shipment": "March","item": "lamp","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300013,"shipment": "March","item": "2 life jackets 1 paddle jacket ducky float","price": 85,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300014,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300015,"shipment": "March","item": "outdoor rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300016,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300017,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300018,"shipment": "March","item": "outdoor rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300019,"shipment": "March","item": "blk rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300020,"shipment": "March","item": "footballs floats","price": 105,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300021,"shipment": "March","item": "used big rug","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300022,"shipment": "March","item": "large rug","price": 80,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300023,"shipment": "March","item": "jacket baby","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300024,"shipment": "March","item": "duck","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300025,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300026,"shipment": "March","item": "scooter","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300027,"shipment": "March","item": "x3 infant jacket","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300028,"shipment": "March","item": "cow","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300029,"shipment": "March","item": "clipboard","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300030,"shipment": "March","item": "life jacket","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300031,"shipment": "March","item": "clip boards","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300032,"shipment": "March","item": "rug","price": 50,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300033,"shipment": "March","item": "rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300034,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300035,"shipment": "March","item": "vest","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300036,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300037,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300038,"shipment": "March","item": "game","price": 25,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300039,"shipment": "March","item": "rug","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300040,"shipment": "March","item": "rug","price": 80,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300041,"shipment": "March","item": "varage older stuff","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300042,"shipment": "March","item": "rug","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300043,"shipment": "March","item": "jacket","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300044,"shipment": "March","item": "rug","price": 40,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300045,"shipment": "March","item": "beach mat x4","price": 40,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300046,"shipment": "March","item": "life vest","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300047,"shipment": "March","item": "mat x2","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300048,"shipment": "March","item": "outdoor rug","price": 30,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300049,"shipment": "March","item": "rug","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300050,"shipment": "March","item": "balloons","price": 5,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300051,"shipment": "March","item": "boat","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300052,"shipment": "March","item": "marshall","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300053,"shipment": "March","item": "balloons","price": 5,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300054,"shipment": "March","item": "scooter","price": 20,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300055,"shipment": "March","item": "beige rug","price": 45,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300056,"shipment": "March","item": "life jacket","price": 25,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300057,"shipment": "March","item": "outdoor mats","price": 100,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300058,"shipment": "March","item": "maxpro","price": 575,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300059,"shipment": "March","item": "nerf","price": 10,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300060,"shipment": "March","item": "green","price": 35,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300061,"shipment": "March","item": "2 outdoor grey","price": 60,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1700000300062,"shipment": "March","item": "life jacket","price": 15,"platform": "Other","payment": "Cash","shipmentId": "march"},{"id": 1750711199509,"shipmentId": "march","item": "Jock cup","price": 5,"payment": "Cash","platform": "Facebook"}]
+        };
+
+        async function migrateData() {
+            if (!confirm("Are you sure you want to import old data? This should only be done ONCE on an empty database.")) {
+                return;
+            }
+
+            const importBtn = document.getElementById('import-btn');
+            importBtn.disabled = true;
+            importBtn.innerText = "IMPORTING...";
+
+            const batch = db.batch();
+
+            // Migrate Shipments
+            oldData.shipments.forEach(shipment => {
+                const docRef = db.collection("shipments").doc(shipment.id);
+                // We only want these fields in the database
+                const dataToSave = {
+                    name: shipment.name,
+                    cost: shipment.cost,
+                    notes: shipment.notes
+                };
+                batch.set(docRef, dataToSave);
+            });
+
+            // Migrate Sales
+            oldData.sales.forEach(sale => {
+                const docRef = db.collection("sales").doc(); // Let firestore create a new ID
+                // Clean up the sale object before saving
+                const dataToSave = {
+                    item: sale.item,
+                    payment: sale.payment,
+                    platform: sale.platform,
+                    price: sale.price,
+                    shipmentId: sale.shipmentId,
+                    createdAt: firebase.firestore.Timestamp.fromMillis(sale.id) // Use old ID as timestamp
+                };
+                batch.set(docRef, dataToSave);
+            });
+
+            try {
+                await batch.commit();
+                showNotification(`Successfully imported ${oldData.shipments.length} shipments and ${oldData.sales.length} sales!`, 'success');
+                importBtn.innerText = "DONE!";
+                await loadData(); // Reload the data from the cloud to see it
+            } catch (error) {
+                console.error("Error during migration:", error);
+                showNotification("MIGRATION FAILED. Check console.", 'error');
+                importBtn.disabled = false;
+                importBtn.innerText = "RETRY IMPORT";
+            }
+        }
+        
+        // --- The rest of your app's Javascript is below ---
+        // --- GLOBAL VARIABLES, DATA MANAGEMENT, etc. ---
         let shipments = [];
         let salesData = [];
         let currentStep = 1;
         let currentSale = {};
         let activeSalesListShipmentId = null;
 
-        // --- DATA MANAGEMENT (FIRESTORE) ---
         async function loadData() {
             try {
-                // Fetch shipments
                 const shipmentsSnapshot = await db.collection('shipments').orderBy('name').get();
                 shipments = shipmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
-                // Fetch sales
                 const salesSnapshot = await db.collection('sales').orderBy('createdAt', 'desc').get();
                 salesData = salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
                 console.log("Data loaded from Firestore successfully!");
-                updateUI(); // A single function to refresh the visible page
+                updateUI();
             } catch (error) {
                 console.error("Error loading data from Firestore: ", error);
                 showNotification("Could not load cloud data!", "error");
             }
         }
         
-        // This function replaces multiple UI update calls
         function updateUI() {
-            const activePage = document.querySelector('.page-container.active').id;
+            const activePageEl = document.querySelector('.page-container.active');
+            if (!activePageEl) return;
+            const activePage = activePageEl.id;
+
             if (activePage === 'view-page') {
                 updateDashboard();
             } else if (activePage === 'add-page') {
                 renderStep1();
             }
-            // If a modal is open, refresh it
             if (activeSalesListShipmentId) {
                 showSalesListModal(activeSalesListShipmentId);
             }
         }
 
-        // --- PAGE & UI ---
         function showPage(page) {
             document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
             document.getElementById(`${page}-page`).classList.add('active');
             document.querySelectorAll('.nav-pill').forEach(pill => pill.classList.remove('active'));
             document.querySelector(`.nav-pill[onclick="showPage('${page}')"]`).classList.add('active');
-            updateUI(); // Use the unified UI update function
+            updateUI();
         }
         function showNotification(message, type = 'success') {
             const el = document.createElement('div');
@@ -260,7 +314,6 @@
             setTimeout(() => { el.classList.remove('show'); setTimeout(() => document.body.removeChild(el), 300); }, 3000);
         }
 
-        // --- ADD SALE WIZARD ---
         function resetAddSaleForm() {
             currentStep = 1;
             currentSale = {};
@@ -317,14 +370,13 @@
                 await db.collection("sales").add(newSale);
                 showNotification('Sale saved to the cloud! 🎉');
                 resetAddSaleForm();
-                await loadData(); // Reload data from the cloud
+                await loadData();
             } catch (error) {
                 console.error("Error saving sale:", error);
                 showNotification('Failed to save sale!', 'error');
             }
         }
 
-        // --- DASHBOARD ---
         function updateDashboard() {
             const content = document.getElementById('dashboard-content');
             content.innerHTML = '';
@@ -354,7 +406,6 @@
                 </div>`;
         }
 
-        // --- MODAL & EDITING LOGIC ---
         function showShipmentModal(shipmentId = null) {
             const modal = document.getElementById('shipment-modal');
             if (shipmentId) {
@@ -390,7 +441,7 @@
                 }
                 closeModal();
                 showNotification("Shipment saved to the cloud!", "success");
-                await loadData(); // Reload all data
+                await loadData();
             } catch(error) {
                 console.error("Error saving shipment:", error);
                 showNotification("Failed to save shipment!", "error");
@@ -468,7 +519,6 @@
         }
         function closeModal(event) {
             if (event && event.target !== event.currentTarget) return;
-
             if (event) {
                 event.currentTarget.classList.remove('show');
                 if (event.currentTarget.id === 'sales-list-modal') {
@@ -480,10 +530,9 @@
             }
         }
 
-        // --- APP INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            showPage('add'); // Show the initial page
-            loadData();     // Load data from the cloud
+            showPage('add');
+            loadData();
         });
     </script>
 </body>
