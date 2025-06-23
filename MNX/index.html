@@ -28,10 +28,9 @@
         }
         .container { position: relative; z-index: 1; width: 100%; max-width: 428px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 20px; }
         
-        /* --- Header Styling --- */
         .header {
             text-align: center;
-            padding: 40px 0 40px; /* Adjusted padding */
+            padding: 40px 0 40px;
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(20px);
             margin: 0 -20px 0;
@@ -54,7 +53,6 @@
             opacity: 0.9;
             font-weight: 400;
         }
-        /* --- End of Header Styling --- */
         
         .main-content { flex: 1; padding: 30px 0; display: flex; flex-direction: column; }
         .nav-pills { display: flex; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px; margin-bottom: 30px; backdrop-filter: blur(10px); }
@@ -114,14 +112,11 @@
         .modal-content { background: rgba(30, 30, 50, 0.8); border-radius: 25px; padding: 30px; width: 90%; max-width: 420px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* NEW: Fixes the edit modal appearing under the sales list modal */
         #sale-modal { z-index: 1010; } 
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <h1 class="main-title">MNX</h1>
             <p class="subtitle">💰 Sales Tracker 💰</p>
@@ -131,10 +126,9 @@
             <div class="nav-pills">
                 <button class="nav-pill active" onclick="showPage('add')">➕ Add Sale</button>
                 <button class="nav-pill" onclick="showPage('view')">📊 Dashboard</button>
-                <button class="nav-pill" onclick="showPage('export')">🔄 Sync</button>
+                <!-- REMOVED: Sync tab is no longer needed -->
             </div>
             
-            <!-- All page containers and modals remain the same -->
             <!-- Add Sale Page -->
             <div id="add-page" class="page-container active">
                 <div class="step-indicator"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
@@ -173,16 +167,6 @@
                 <div id="dashboard-content"></div>
             </div>
 
-            <!-- Sync Page -->
-            <div id="export-page" class="page-container">
-                <div class="step-card">
-                    <h2 class="step-title">🔄 Sync Data</h2>
-                    <p style="margin-bottom: 20px; opacity: 0.8; text-align:center;">Use these options to sync sales data between devices.</p>
-                    <button class="btn" onclick="exportData()" style="margin-bottom: 15px;">📤 Export Data to File</button>
-                    <button class="btn btn-secondary" onclick="importData()">📥 Import Data from File</button>
-                    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileImport(event)">
-                </div>
-            </div>
         </main>
     </div>
 
@@ -200,34 +184,63 @@
         </div>
     </div>
 
+    <!-- NEW: Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <script>
-        // All JavaScript logic remains the same as the previous version.
-        // No changes are needed here.
+        // NEW: Initialize Firebase with your project's configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBryOB6PLZVUJUEP2F3x76eO7dGr4qayOA",
+          authDomain: "mnx-sales-tracker.firebaseapp.com",
+          projectId: "mnx-sales-tracker",
+          storageBucket: "mnx-sales-tracker.appspot.com",
+          messagingSenderId: "949869285333",
+          appId: "1:949869285333:web:0b644b539f49a7fec9f75c"
+        };
+
+        // Initialize Firebase and Firestore
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- GLOBAL VARIABLES ---
         let shipments = [];
         let salesData = [];
         let currentStep = 1;
         let currentSale = {};
         let activeSalesListShipmentId = null;
 
-        // --- DATA MANAGEMENT & MIGRATION ---
-        function loadData() {
-            const appData = JSON.parse(localStorage.getItem('salesTrackerProData')) || {};
-            if (appData.costs && !appData.shipments) {
-                console.log("Old data format detected. Migrating...");
-                shipments = Object.keys(appData.costs).map(name => ({
-                    id: name.toLowerCase().replace(/\s/g, ''), name: `${name.charAt(0).toUpperCase() + name.slice(1)} Shipment`, cost: appData.costs[name] || 0, notes: ''
-                }));
-                salesData = (appData.sales || []).map(sale => ({ ...sale, shipmentId: (sale.shipment || '').toLowerCase().replace(/\s/g, '') }));
-                saveData();
-                showNotification("Data format updated!", "success");
-            } else {
-                shipments = appData.shipments || [];
-                salesData = appData.sales || [];
+        // --- DATA MANAGEMENT (FIRESTORE) ---
+        async function loadData() {
+            try {
+                // Fetch shipments
+                const shipmentsSnapshot = await db.collection('shipments').orderBy('name').get();
+                shipments = shipmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Fetch sales
+                const salesSnapshot = await db.collection('sales').orderBy('createdAt', 'desc').get();
+                salesData = salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                console.log("Data loaded from Firestore successfully!");
+                updateUI(); // A single function to refresh the visible page
+            } catch (error) {
+                console.error("Error loading data from Firestore: ", error);
+                showNotification("Could not load cloud data!", "error");
             }
         }
-        function saveData() {
-            const appData = { shipments, sales: salesData };
-            localStorage.setItem('salesTrackerProData', JSON.stringify(appData));
+        
+        // This function replaces multiple UI update calls
+        function updateUI() {
+            const activePage = document.querySelector('.page-container.active').id;
+            if (activePage === 'view-page') {
+                updateDashboard();
+            } else if (activePage === 'add-page') {
+                renderStep1();
+            }
+            // If a modal is open, refresh it
+            if (activeSalesListShipmentId) {
+                showSalesListModal(activeSalesListShipmentId);
+            }
         }
 
         // --- PAGE & UI ---
@@ -236,8 +249,7 @@
             document.getElementById(`${page}-page`).classList.add('active');
             document.querySelectorAll('.nav-pill').forEach(pill => pill.classList.remove('active'));
             document.querySelector(`.nav-pill[onclick="showPage('${page}')"]`).classList.add('active');
-            if (page === 'view') updateDashboard();
-            if (page === 'add') resetAddSaleForm();
+            updateUI(); // Use the unified UI update function
         }
         function showNotification(message, type = 'success') {
             const el = document.createElement('div');
@@ -262,7 +274,7 @@
                 return;
             }
             let html = `<h2 class="step-title">📦 Which shipment?</h2><div class="shipment-grid">`;
-            shipments.forEach(ship => html += `<div class="shipment-option" onclick="selectShipment('${ship.id}')"><h3>${ship.name}</h3></div>`);
+            shipments.forEach(ship => html += `<div class="shipment-option" data-shipment-id="${ship.id}" onclick="selectShipment('${ship.id}')"><h3>${ship.name}</h3></div>`);
             container.innerHTML = html + `</div>`;
         }
         function showStep(step) {
@@ -275,7 +287,7 @@
         function selectShipment(shipmentId) {
             currentSale.shipmentId = shipmentId;
             document.querySelectorAll('.shipment-option').forEach(el => el.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
+            document.querySelector(`.shipment-option[data-shipment-id='${shipmentId}']`).classList.add('selected');
             setTimeout(nextStep, 300);
         }
         function nextStep() {
@@ -292,24 +304,41 @@
         function previousStep() { currentStep--; showStep(currentStep); }
         function selectPlatform(platform) { currentSale.platform = platform; document.querySelectorAll('#step3 .platform-option[onclick*="selectPlatform"]').forEach(el => el.classList.remove('selected')); event.currentTarget.classList.add('selected'); }
         function selectPayment(payment) { currentSale.payment = payment; document.querySelectorAll('#step3 .platform-option[onclick*="selectPayment"]').forEach(el => el.classList.remove('selected')); event.currentTarget.classList.add('selected'); }
-        function saveSale() {
+        
+        async function saveSale() {
             if (!currentSale.payment || !currentSale.platform) { showNotification('Select payment & platform!', 'error'); return; }
-            salesData.push({ id: Date.now(), ...currentSale });
-            saveData();
-            showNotification('Sale saved! 🎉');
-            resetAddSaleForm();
+            
+            const newSale = {
+                ...currentSale,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection("sales").add(newSale);
+                showNotification('Sale saved to the cloud! 🎉');
+                resetAddSaleForm();
+                await loadData(); // Reload data from the cloud
+            } catch (error) {
+                console.error("Error saving sale:", error);
+                showNotification('Failed to save sale!', 'error');
+            }
         }
 
         // --- DASHBOARD ---
         function updateDashboard() {
             const content = document.getElementById('dashboard-content');
             content.innerHTML = '';
-            shipments.forEach(ship => content.innerHTML += createSummaryCardHTML(ship));
+            if (shipments.length === 0) {
+                 content.innerHTML = `<p style="text-align:center; opacity:0.8;">No shipments yet. Click "Add New Shipment" to begin.</p>`;
+            } else {
+                shipments.forEach(ship => content.innerHTML += createSummaryCardHTML(ship));
+            }
         }
         function createSummaryCardHTML(shipment) {
             const shipmentSales = salesData.filter(s => s.shipmentId === shipment.id);
-            const revenue = shipmentSales.reduce((sum, s) => sum + s.price, 0);
-            const profit = revenue - shipment.cost;
+            const revenue = shipmentSales.reduce((sum, s) => sum + (s.price || 0), 0);
+            const cost = shipment.cost || 0;
+            const profit = revenue - cost;
             const profitClass = profit >= 0 ? 'profit' : 'loss';
             return `
                 <div class="summary-card" onclick="showSalesListModal('${shipment.id}')">
@@ -319,7 +348,7 @@
                     </div>
                     <div class="stat-grid">
                         <div class="stat-card"><div class="stat-value">$${revenue.toFixed(2)}</div><div class="stat-label">Revenue</div></div>
-                        <div class="stat-card"><div class="stat-value">$${shipment.cost.toFixed(2)}</div><div class="stat-label">Cost</div></div>
+                        <div class="stat-card"><div class="stat-value">$${cost.toFixed(2)}</div><div class="stat-label">Cost</div></div>
                         <div class="stat-card"><div class="stat-value ${profitClass}">$${profit.toFixed(2)}</div><div class="stat-label">Profit</div></div>
                     </div>
                 </div>`;
@@ -333,7 +362,7 @@
                 document.getElementById('shipment-modal-title').innerText = 'Edit Shipment';
                 document.getElementById('shipmentName').value = ship.name;
                 document.getElementById('shipmentCost').value = ship.cost;
-                document.getElementById('shipmentNotes').value = ship.notes;
+                document.getElementById('shipmentNotes').value = ship.notes || '';
                 document.getElementById('shipmentId').value = ship.id;
             } else {
                 document.getElementById('shipment-modal-title').innerText = 'Add New Shipment';
@@ -344,22 +373,28 @@
             }
             modal.classList.add('show');
         }
-        function saveShipment() {
+        async function saveShipment() {
             const id = document.getElementById('shipmentId').value;
             const name = document.getElementById('shipmentName').value.trim();
             const cost = parseFloat(document.getElementById('shipmentCost').value) || 0;
             const notes = document.getElementById('shipmentNotes').value.trim();
             if (!name) { showNotification("Shipment name is required!", "error"); return; }
-            if (id) {
-                const index = shipments.findIndex(s => s.id === id);
-                shipments[index] = { ...shipments[index], name, cost, notes };
-            } else {
-                shipments.push({ id: name.toLowerCase().replace(/\s/g, '') + Date.now(), name, cost, notes });
+
+            const shipmentData = { name, cost, notes };
+            
+            try {
+                if (id) {
+                    await db.collection('shipments').doc(id).update(shipmentData);
+                } else {
+                    await db.collection('shipments').add(shipmentData);
+                }
+                closeModal();
+                showNotification("Shipment saved to the cloud!", "success");
+                await loadData(); // Reload all data
+            } catch(error) {
+                console.error("Error saving shipment:", error);
+                showNotification("Failed to save shipment!", "error");
             }
-            saveData();
-            updateDashboard();
-            closeModal(); // This is fine to close all, as it's a top-level action
-            showNotification("Shipment saved!", "success");
         }
         function showSaleModal(saleId) {
             const sale = salesData.find(s => s.id === saleId);
@@ -370,35 +405,43 @@
             document.getElementById('editPayment').value = sale.payment;
             document.getElementById('sale-modal').classList.add('show');
         }
-        function saveSaleEdit() {
-            const id = parseInt(document.getElementById('editSaleId').value);
-            const index = salesData.findIndex(s => s.id === id);
-            salesData[index].item = document.getElementById('editItemName').value.trim();
-            salesData[index].price = parseFloat(document.getElementById('editSalePrice').value);
-            salesData[index].platform = document.getElementById('editPlatform').value;
-            salesData[index].payment = document.getElementById('editPayment').value;
-            saveData();
-            updateDashboard();
-            // NEW: Close only the edit modal, then refresh the list behind it
-            document.getElementById('sale-modal').classList.remove('show');
-            if (activeSalesListShipmentId) showSalesListModal(activeSalesListShipmentId);
-            showNotification("Sale updated!", "success");
+        async function saveSaleEdit() {
+            const id = document.getElementById('editSaleId').value;
+            const updatedData = {
+                item: document.getElementById('editItemName').value.trim(),
+                price: parseFloat(document.getElementById('editSalePrice').value),
+                platform: document.getElementById('editPlatform').value,
+                payment: document.getElementById('editPayment').value,
+            };
+            
+            try {
+                await db.collection('sales').doc(id).update(updatedData);
+                document.getElementById('sale-modal').classList.remove('show');
+                showNotification("Sale updated!", "success");
+                await loadData();
+            } catch(error) {
+                console.error("Error updating sale: ", error);
+                showNotification("Failed to update sale!", "error");
+            }
         }
-        function deleteSale() {
+        async function deleteSale() {
             if (!confirm("Delete this sale? This cannot be undone.")) return;
-            const id = parseInt(document.getElementById('editSaleId').value);
-            salesData = salesData.filter(s => s.id !== id);
-            saveData();
-            updateDashboard();
-            // NEW: Close only the edit modal, then refresh the list behind it
-            document.getElementById('sale-modal').classList.remove('show');
-            if (activeSalesListShipmentId) showSalesListModal(activeSalesListShipmentId);
-            showNotification("Sale deleted.", "success");
+            const id = document.getElementById('editSaleId').value;
+
+            try {
+                await db.collection('sales').doc(id).delete();
+                document.getElementById('sale-modal').classList.remove('show');
+                showNotification("Sale deleted.", "success");
+                await loadData();
+            } catch(error) {
+                console.error("Error deleting sale: ", error);
+                showNotification("Failed to delete sale!", "error");
+            }
         }
         function showSalesListModal(shipmentId) {
             activeSalesListShipmentId = shipmentId;
             const shipment = shipments.find(s => s.id === shipmentId);
-            const relevantSales = salesData.filter(s => s.shipmentId === shipmentId).sort((a,b) => b.id - a.id);
+            const relevantSales = salesData.filter(s => s.shipmentId === shipmentId);
             const titleEl = document.getElementById('sales-list-modal-title');
             const contentEl = document.getElementById('sales-list-modal-content');
             
@@ -411,10 +454,10 @@
                                     <h4>${sale.item}</h4>
                                     <div class="sale-meta">
                                         <span>${sale.platform} • ${sale.payment}</span>
-                                        <span>$${sale.price.toFixed(2)}</span>
+                                        <span>$${(sale.price || 0).toFixed(2)}</span>
                                     </div>
                                 </div>
-                                <button class="sale-edit-btn" onclick="showSaleModal(${sale.id})">✏️</button>
+                                <button class="sale-edit-btn" onclick="showSaleModal('${sale.id}')">✏️</button>
                             </div>`;
                 });
             } else {
@@ -423,66 +466,25 @@
             contentEl.innerHTML = html;
             document.getElementById('sales-list-modal').classList.add('show');
         }
-        // NEW: Updated closeModal function to be more specific
         function closeModal(event) {
-            // If the click was on a child of the overlay (like the modal content), do nothing.
             if (event && event.target !== event.currentTarget) return;
 
-            // If the function was triggered by a click event, close only that specific modal.
             if (event) {
                 event.currentTarget.classList.remove('show');
-                // If we are closing the main sales list, clear the active shipment ID.
                 if (event.currentTarget.id === 'sales-list-modal') {
                     activeSalesListShipmentId = null;
                 }
             } else {
-                // Otherwise (if called like closeModal()), close all modals and reset state.
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
                 activeSalesListShipmentId = null; 
             }
         }
 
-        // --- IMPORT/EXPORT ---
-        function exportData() {
-            if (shipments.length === 0 && salesData.length === 0) { showNotification('No data to export!', 'error'); return; }
-            const dataStr = JSON.stringify({ shipments, sales: salesData }, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sales-tracker-data-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showNotification('Data exported successfully! 📁');
-        }
-        function importData() { document.getElementById('fileInput').click(); }
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported.shipments) && Array.isArray(imported.sales)) {
-                        const existingShipmentIds = new Set(shipments.map(s => s.id));
-                        const newShipments = imported.shipments.filter(s => !existingShipmentIds.has(s.id));
-                        shipments.push(...newShipments);
-                        const existingSaleIds = new Set(salesData.map(s => s.id));
-                        const newSales = imported.sales.filter(s => !existingSaleIds.has(s.id));
-                        salesData.push(...newSales);
-                        saveData();
-                        loadData();
-                        showNotification(`Synced! Added ${newShipments.length} shipments and ${newSales.length} sales.`, "success");
-                        showPage('view');
-                    } else { throw new Error("Invalid format"); }
-                } catch (err) { showNotification('Invalid or corrupted data file!', 'error'); }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
         // --- APP INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => { loadData(); showPage('add'); });
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('add'); // Show the initial page
+            loadData();     // Load data from the cloud
+        });
     </script>
 </body>
 </html>
