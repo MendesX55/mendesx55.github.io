@@ -206,6 +206,9 @@
 <div id="venueModal" class="modal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('venueModal')">&times;</span><div>Edit Venue Details</div></div><div id="venueEditForm"><div class="form-group"><label>Venue Name</label><input id="editVenueName" type="text"/></div><div class="form-group"><label>Address</label><input id="editVenueAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="editShowDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="editShowTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="editStartInventory" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="editEndInventory" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="editVenueNotes" rows="3"></textarea></div><button class="btn" onclick="saveVenueEdit()">Save Changes</button><button class="btn btn-danger" onclick="deleteVenue()">Delete Venue</button></div></div></div>
 <div id="calendarModal" class="modal"><div class="modal-content" id="calendarModalContent"></div></div>
 
+<!-- greenbox script -->
+<div id="exportBox" style="padding:10px; margin:10px; background:#222; color:#0f0; font-size:12px; white-space:pre-wrap; word-break:break-word;"></div>      
+
 <script>
     const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc';
     let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {} };
@@ -703,6 +706,9 @@ function renderDayRoute(date, dayData, dayCounter) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+        const exportDiv = document.getElementById('exportBox');
+        exportDiv.textContent = JSON.stringify(localStorage, null, 2);
     }
 </script>
 </body>
