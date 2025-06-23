@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MNX Sales Tracker</title>
+    
+    <!-- NEW: PWA Manifest and Theme Color -->
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="manifest.json">
+    
     <style>
+        /* All CSS is exactly the same as before */
         :root {
             --primary-glow: rgba(240, 147, 251, 0.5);
             --secondary-glow: rgba(102, 126, 234, 0.4);
@@ -26,8 +32,6 @@
             0% { transform: scale(1) rotate(0deg); opacity: 0.7; }
             100% { transform: scale(1.1) rotate(5deg); opacity: 0.9; }
         }
-
-        /* NEW: Login Page Styles */
         #login-page {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             height: 100vh; text-align: center; padding: 20px; position: relative; z-index: 10;
@@ -42,10 +46,7 @@
         }
         .login-button:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
         .login-button svg { width: 24px; height: 24px; margin-right: 12px; }
-
-        /* Hide the main app container by default */
         #app-container { display: none; }
-
         .container { position: relative; z-index: 1; width: 100%; max-width: 428px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 20px; }
         .header {
             text-align: center; padding: 40px 0 40px; background: rgba(255,255,255,0.05);
@@ -59,16 +60,12 @@
             text-shadow: 0 0 20px rgba(118, 75, 162, 0.3);
         }
         .subtitle { font-size: 1.1rem; opacity: 0.9; font-weight: 400; }
-
-        /* NEW: Logout Button Style */
         #logout-btn {
             position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 10px;
             padding: 8px 12px; cursor: pointer; font-weight: 600; transition: background 0.2s;
         }
         #logout-btn:hover { background: rgba(255,255,255,0.2); }
-
-        /* Other styles are the same */
         .main-content { flex: 1; padding: 30px 0; display: flex; flex-direction: column; }
         .nav-pills { display: flex; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px; margin-bottom: 30px; backdrop-filter: blur(10px); }
         .nav-pill { flex: 1; padding: 12px; text-align: center; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 15px; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
@@ -132,7 +129,6 @@
 </head>
 <body>
     
-    <!-- NEW: Login Page -->
     <div id="login-page">
         <h1 class="login-title">MNX Sales Tracker</h1>
         <p class="login-subtitle">Please sign in to continue.</p>
@@ -142,7 +138,6 @@
         </button>
     </div>
 
-    <!-- Main App Container (hidden by default) -->
     <div id="app-container">
         <div class="container">
             <header class="header">
@@ -196,7 +191,6 @@
         </div>
     </div>
 
-    <!-- Modals (no change) -->
     <div id="shipment-modal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content"><h2 id="shipment-modal-title" class="step-title"></h2><div class="input-group"><label for="shipmentName">Shipment Name</label><input type="text" id="shipmentName" class="form-input"></div><div class="input-group"><label for="shipmentCost">Total Cost ($)</label><input type="number" id="shipmentCost" class="form-input" placeholder="0.00"></div><div class="input-group"><label for="shipmentNotes">Notes</label><textarea id="shipmentNotes" class="form-textarea" placeholder="e.g., Summer collection..."></textarea></div><input type="hidden" id="shipmentId"><button class="btn" onclick="saveShipment()">💾 Save Shipment</button></div>
     </div>
@@ -210,12 +204,12 @@
         </div>
     </div>
 
-    <!-- NEW: Added Firebase Auth SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
+        // All the app's JavaScript is the same... no changes needed here
         const firebaseConfig = {
           apiKey: "AIzaSyBryOB6PLZVUJUEP2F3x76eO7dGr4qayOA",
           authDomain: "mnx-sales-tracker.firebaseapp.com",
@@ -226,22 +220,18 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth(); // Initialize Firebase Auth
+        const auth = firebase.auth();
 
-        // --- AUTHENTICATION LOGIC ---
         const loginPage = document.getElementById('login-page');
         const appContainer = document.getElementById('app-container');
 
-        // This function runs whenever the user's login state changes
         auth.onAuthStateChanged(user => {
             if (user) {
-                // User is signed in.
                 console.log('User is signed in:', user.displayName);
                 loginPage.style.display = 'none';
                 appContainer.style.display = 'block';
-                loadData(); // Load data only after user is authenticated
+                loadData();
             } else {
-                // User is signed out.
                 console.log('User is signed out.');
                 loginPage.style.display = 'flex';
                 appContainer.style.display = 'none';
@@ -263,16 +253,13 @@
             });
         }
 
-        // --- GLOBAL VARIABLES ---
         let shipments = [];
         let salesData = [];
         let currentStep = 1;
         let currentSale = {};
         let activeSalesListShipmentId = null;
 
-        // --- DATA MANAGEMENT (FIRESTORE) ---
         async function loadData() {
-            // Functionality is the same, but now it's protected by our auth rules
             try {
                 const shipmentsSnapshot = await db.collection('shipments').orderBy('name').get();
                 shipments = shipmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -288,8 +275,6 @@
             }
         }
         
-        // --- The rest of the app's JavaScript remains the same ---
-        // updateUI, showPage, showNotification, add sale wizard, etc.
         function updateUI() {
             const activePageEl = document.querySelector('.page-container.active');
             if (!activePageEl) return;
@@ -536,9 +521,19 @@
                 activeSalesListShipmentId = null; 
             }
         }
+    </script>
 
-        // We don't need the DOMContentLoaded listener anymore,
-        // since onAuthStateChanged handles the initial app load.
+    <!-- NEW: PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/MNX/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
