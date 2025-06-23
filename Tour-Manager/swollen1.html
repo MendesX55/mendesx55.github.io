@@ -420,8 +420,7 @@ async function processBatchedRoute(stops) {
     const waypoints = stops.slice(1, -1).map(s => encodeURIComponent(s.address)).join('|');
 
     const googleApiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${waypoints}&departure_time=now&units=metric&key=${GOOGLE_MAPS_API_KEY}`;
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(googleApiUrl)}`;
-
+    const proxyUrl = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
     const response = await fetch(proxyUrl);
     if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`);
     const data = await response.json();
