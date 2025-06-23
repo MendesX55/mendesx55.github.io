@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNX Sales Tracker</title>
+    <style>
+        :root {
+            --primary-glow: rgba(240, 147, 251, 0.5);
+            --secondary-glow: rgba(102, 126, 234, 0.4);
+            --active-border: #f093fb;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #1a1a2e, #16213e, #0f3460);
+            color: white; min-height: 100vh; overflow-x: hidden; position: relative;
+        }
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            animation: backgroundShift 10s ease-in-out infinite alternate;
+        }
+        @keyframes backgroundShift {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+            100% { transform: scale(1.1) rotate(5deg); opacity: 0.9; }
+        }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 428px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 20px; }
+        
+        /* --- Header Styling --- */
+        .header {
+            text-align: center;
+            padding: 40px 0 40px; /* Adjusted padding */
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            margin: 0 -20px 0;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(118, 75, 162, 0.3);
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        /* --- End of Header Styling --- */
+        
+        .main-content { flex: 1; padding: 30px 0; display: flex; flex-direction: column; }
+        .nav-pills { display: flex; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px; margin-bottom: 30px; backdrop-filter: blur(10px); }
+        .nav-pill { flex: 1; padding: 12px; text-align: center; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 15px; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+        .nav-pill.active { background: rgba(255,255,255,0.2); color: white; box-shadow: 0 4px 20px rgba(255,255,255,0.1); }
+        .page-container { flex: 1; display: none; }
+        .page-container.active { display: flex; flex-direction: column; }
+        .step-card, .summary-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border-radius: 25px; padding: 30px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .step-title { font-size: 1.4rem; font-weight: 600; margin-bottom: 30px; color: #f093fb; text-align: center; }
+        .shipment-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px; }
+        .shipment-option { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .shipment-option:hover { border-color: #667eea; background: rgba(102, 126, 234, 0.2); transform: translateY(-2px); }
+        .shipment-option.selected { border-color: var(--active-border); background: rgba(240, 147, 251, 0.2); box-shadow: 0 0 20px var(--primary-glow); }
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; font-size: 1rem; font-weight: 500; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+        .form-input, .form-textarea { width: 100%; padding: 18px 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 15px; background: rgba(255,255,255,0.1); color: white; font-size: 1.1rem; backdrop-filter: blur(10px); transition: all 0.3s ease; font-family: inherit; }
+        .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.5); }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px var(--secondary-glow); background: rgba(255,255,255,0.15); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .platform-option { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 18px; padding: 20px 15px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .platform-option:hover { border-color: #764ba2; background: rgba(118, 75, 162, 0.2); transform: scale(1.05); }
+        .platform-option.selected { border-color: var(--active-border); background: rgba(240, 147, 251, 0.2); box-shadow: 0 0 20px var(--primary-glow); }
+        .platform-icon { font-size: 2rem; margin-bottom: 8px; }
+        .btn { background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 20px; padding: 18px 40px; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px var(--secondary-glow); width: 100%; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5); }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .btn-danger { background: linear-gradient(135deg, #e55d5d, #c33a3a); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3); }
+        .btn-group { display: flex; gap: 15px; margin-top: 20px; }
+        .sales-list { max-height: 60vh; overflow-y: auto; padding-right: 10px; }
+        .sale-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--active-border); }
+        .sale-item-info { flex-grow: 1; }
+        .sale-item h4 { margin-bottom: 5px; color: #f093fb; }
+        .sale-meta { font-size: 0.9rem; opacity: 0.8; display: flex; justify-content: space-between; }
+        .sale-edit-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: 0.7; transition: opacity 0.3s; margin-left: 15px; }
+        .sale-edit-btn:hover { opacity: 1; }
+        .summary-card { cursor: pointer; transition: all 0.3s ease; }
+        .summary-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .summary-title { font-size: 1.2rem; font-weight: 600; color: #f093fb; }
+        .summary-edit-btn { background: none; border: none; color: white; opacity: 0.6; cursor: pointer; font-size: 1.2rem; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .stat-card { text-align: center; }
+        .stat-value { font-size: 1.3rem; font-weight: 700; }
+        .stat-value.profit { color: #4ade80; }
+        .stat-value.loss { color: #f87171; }
+        .stat-label { font-size: 0.8rem; opacity: 0.8; }
+        .notification { position: fixed; top: 100px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(40, 167, 69, 0.9); color: white; padding: 15px 25px; border-radius: 15px; backdrop-filter: blur(20px); z-index: 2000; transition: transform 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); text-align: center; }
+        .notification.show { transform: translateX(-50%) translateY(0); }
+        .notification.error { background: rgba(220, 53, 69, 0.9); }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 10px; } ::-webkit-scrollbar-thumb { background: rgba(240, 147, 251, 0.5); border-radius: 10px; }
+        .step-indicator { display: flex; justify-content: center; margin-bottom: 20px; }
+        .step-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); margin: 0 5px; transition: all 0.3s ease; }
+        .step-dot.active { background: #f093fb; box-shadow: 0 0 10px var(--primary-glow); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: rgba(30, 30, 50, 0.8); border-radius: 25px; padding: 30px; width: 90%; max-width: 420px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* NEW: Fixes the edit modal appearing under the sales list modal */
+        #sale-modal { z-index: 1010; } 
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="main-title">MNX</h1>
+            <p class="subtitle">💰 Sales Tracker 💰</p>
+        </header>
+
+        <main class="main-content">
+            <div class="nav-pills">
+                <button class="nav-pill active" onclick="showPage('add')">➕ Add Sale</button>
+                <button class="nav-pill" onclick="showPage('view')">📊 Dashboard</button>
+                <button class="nav-pill" onclick="showPage('export')">🔄 Sync</button>
+            </div>
+            
+            <!-- All page containers and modals remain the same -->
+            <!-- Add Sale Page -->
+            <div id="add-page" class="page-container active">
+                <div class="step-indicator"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
+                <div class="step-card" id="add-sale-card">
+                    <div id="step1"></div>
+                    <div id="step2" style="display: none;">
+                        <h2 class="step-title">🏷️ What did you sell?</h2>
+                        <div class="input-group"><label for="itemName">Item Description</label><input type="text" id="itemName" class="form-input" placeholder="e.g., Blue dress, M"></div>
+                        <div class="input-group"><label for="salePrice">Sale Price ($)</label><input type="number" id="salePrice" class="form-input" placeholder="0.00" step="0.01"></div>
+                        <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="nextStep()">Next →</button></div>
+                    </div>
+                    <div id="step3" style="display: none;">
+                        <h2 class="step-title">💳 How did they pay?</h2>
+                        <div class="platform-grid">
+                            <div class="platform-option" onclick="selectPayment('Cash')"><div class="platform-icon">💵</div><div>Cash</div></div>
+                            <div class="platform-option" onclick="selectPayment('E-Transfer')"><div class="platform-icon">📱</div><div>E-Transfer</div></div>
+                            <div class="platform-option" onclick="selectPayment('Other')"><div class="platform-icon">🏦</div><div>Other</div></div>
+                        </div>
+                        <div class="input-group">
+                            <label>Sold On Platform</label>
+                            <div class="platform-grid">
+                                <div class="platform-option" onclick="selectPlatform('Virage')">🏪 Virage</div>
+                                <div class="platform-option" onclick="selectPlatform('Facebook')">📘 Facebook</div>
+                                <div class="platform-option" onclick="selectPlatform('Kijiji')">🔍 Kijiji</div>
+                                <div class="platform-option" onclick="selectPlatform('Other')">➕ Other</div>
+                            </div>
+                        </div>
+                        <div class="btn-group"><button class="btn btn-secondary" onclick="previousStep()">← Back</button><button class="btn" onclick="saveSale()">💾 Save Sale</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="view-page" class="page-container">
+                <button class="btn" onclick="showShipmentModal()" style="margin-bottom: 20px;">➕ Add New Shipment</button>
+                <div id="dashboard-content"></div>
+            </div>
+
+            <!-- Sync Page -->
+            <div id="export-page" class="page-container">
+                <div class="step-card">
+                    <h2 class="step-title">🔄 Sync Data</h2>
+                    <p style="margin-bottom: 20px; opacity: 0.8; text-align:center;">Use these options to sync sales data between devices.</p>
+                    <button class="btn" onclick="exportData()" style="margin-bottom: 15px;">📤 Export Data to File</button>
+                    <button class="btn btn-secondary" onclick="importData()">📥 Import Data from File</button>
+                    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="shipment-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content"><h2 id="shipment-modal-title" class="step-title"></h2><div class="input-group"><label for="shipmentName">Shipment Name</label><input type="text" id="shipmentName" class="form-input"></div><div class="input-group"><label for="shipmentCost">Total Cost ($)</label><input type="number" id="shipmentCost" class="form-input" placeholder="0.00"></div><div class="input-group"><label for="shipmentNotes">Notes</label><textarea id="shipmentNotes" class="form-textarea" placeholder="e.g., Summer collection..."></textarea></div><input type="hidden" id="shipmentId"><button class="btn" onclick="saveShipment()">💾 Save Shipment</button></div>
+    </div>
+    <div id="sale-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content"><h2 class="step-title">Edit Sale</h2><div class="input-group"><label>Item</label><input type="text" id="editItemName" class="form-input"></div><div class="input-group"><label>Price ($)</label><input type="number" id="editSalePrice" class="form-input"></div><div class="input-group"><label>Platform</label><select id="editPlatform" class="form-input"><option>Virage</option><option>Facebook</option><option>Kijiji</option><option>Other</option></select></div><div class="input-group"><label>Payment</label><select id="editPayment" class="form-input"><option>Cash</option><option>E-Transfer</option><option>Other</option></select></div><input type="hidden" id="editSaleId"><div class="btn-group"><button class="btn btn-danger" onclick="deleteSale()">🗑️ Delete</button><button class="btn" onclick="saveSaleEdit()">💾 Save</button></div></div>
+    </div>
+    <div id="sales-list-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <h2 id="sales-list-modal-title" class="step-title"></h2>
+            <div id="sales-list-modal-content" class="sales-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // All JavaScript logic remains the same as the previous version.
+        // No changes are needed here.
+        let shipments = [];
+        let salesData = [];
+        let currentStep = 1;
+        let currentSale = {};
+        let activeSalesListShipmentId = null;
+
+        // --- DATA MANAGEMENT & MIGRATION ---
+        function loadData() {
+            const appData = JSON.parse(localStorage.getItem('salesTrackerProData')) || {};
+            if (appData.costs && !appData.shipments) {
+                console.log("Old data format detected. Migrating...");
+                shipments = Object.keys(appData.costs).map(name => ({
+                    id: name.toLowerCase().replace(/\s/g, ''), name: `${name.charAt(0).toUpperCase() + name.slice(1)} Shipment`, cost: appData.costs[name] || 0, notes: ''
+                }));
+                salesData = (appData.sales || []).map(sale => ({ ...sale, shipmentId: (sale.shipment || '').toLowerCase().replace(/\s/g, '') }));
+                saveData();
+                showNotification("Data format updated!", "success");
+            } else {
+                shipments = appData.shipments || [];
+                salesData = appData.sales || [];
+            }
+        }
+        function saveData() {
+            const appData = { shipments, sales: salesData };
+            localStorage.setItem('salesTrackerProData', JSON.stringify(appData));
+        }
+
+        // --- PAGE & UI ---
+        function showPage(page) {
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}-page`).classList.add('active');
+            document.querySelectorAll('.nav-pill').forEach(pill => pill.classList.remove('active'));
+            document.querySelector(`.nav-pill[onclick="showPage('${page}')"]`).classList.add('active');
+            if (page === 'view') updateDashboard();
+            if (page === 'add') resetAddSaleForm();
+        }
+        function showNotification(message, type = 'success') {
+            const el = document.createElement('div');
+            el.className = `notification ${type}`;
+            el.textContent = message;
+            document.body.appendChild(el);
+            setTimeout(() => el.classList.add('show'), 10);
+            setTimeout(() => { el.classList.remove('show'); setTimeout(() => document.body.removeChild(el), 300); }, 3000);
+        }
+
+        // --- ADD SALE WIZARD ---
+        function resetAddSaleForm() {
+            currentStep = 1;
+            currentSale = {};
+            renderStep1();
+            showStep(1);
+        }
+        function renderStep1() {
+            const container = document.getElementById('step1');
+            if (shipments.length === 0) {
+                container.innerHTML = `<h2 class="step-title">📦 Add a shipment first!</h2><p style="text-align:center; opacity:0.8;">Go to the Dashboard tab to add your first shipment.</p>`;
+                return;
+            }
+            let html = `<h2 class="step-title">📦 Which shipment?</h2><div class="shipment-grid">`;
+            shipments.forEach(ship => html += `<div class="shipment-option" onclick="selectShipment('${ship.id}')"><h3>${ship.name}</h3></div>`);
+            container.innerHTML = html + `</div>`;
+        }
+        function showStep(step) {
+            for (let i = 1; i <= 3; i++) document.getElementById(`step${i}`).style.display = (i === step) ? 'block' : 'none';
+            updateStepIndicator();
+        }
+        function updateStepIndicator() {
+            document.querySelectorAll('.step-dot').forEach((dot, i) => dot.classList.toggle('active', i < currentStep));
+        }
+        function selectShipment(shipmentId) {
+            currentSale.shipmentId = shipmentId;
+            document.querySelectorAll('.shipment-option').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(nextStep, 300);
+        }
+        function nextStep() {
+            if (currentStep === 2) {
+                const name = document.getElementById('itemName').value.trim();
+                const price = parseFloat(document.getElementById('salePrice').value);
+                if (!name || isNaN(price) || price <= 0) { showNotification('Invalid item or price!', 'error'); return; }
+                currentSale.item = name;
+                currentSale.price = price;
+            }
+            currentStep++;
+            showStep(currentStep);
+        }
+        function previousStep() { currentStep--; showStep(currentStep); }
+        function selectPlatform(platform) { currentSale.platform = platform; document.querySelectorAll('#step3 .platform-option[onclick*="selectPlatform"]').forEach(el => el.classList.remove('selected')); event.currentTarget.classList.add('selected'); }
+        function selectPayment(payment) { currentSale.payment = payment; document.querySelectorAll('#step3 .platform-option[onclick*="selectPayment"]').forEach(el => el.classList.remove('selected')); event.currentTarget.classList.add('selected'); }
+        function saveSale() {
+            if (!currentSale.payment || !currentSale.platform) { showNotification('Select payment & platform!', 'error'); return; }
+            salesData.push({ id: Date.now(), ...currentSale });
+            saveData();
+            showNotification('Sale saved! 🎉');
+            resetAddSaleForm();
+        }
+
+        // --- DASHBOARD ---
+        function updateDashboard() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = '';
+            shipments.forEach(ship => content.innerHTML += createSummaryCardHTML(ship));
+        }
+        function createSummaryCardHTML(shipment) {
+            const shipmentSales = salesData.filter(s => s.shipmentId === shipment.id);
+            const revenue = shipmentSales.reduce((sum, s) => sum + s.price, 0);
+            const profit = revenue - shipment.cost;
+            const profitClass = profit >= 0 ? 'profit' : 'loss';
+            return `
+                <div class="summary-card" onclick="showSalesListModal('${shipment.id}')">
+                    <div class="summary-header">
+                        <span class="summary-title">${shipment.name}</span>
+                        <button class="summary-edit-btn" onclick="event.stopPropagation(); showShipmentModal('${shipment.id}')">⚙️</button>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-card"><div class="stat-value">$${revenue.toFixed(2)}</div><div class="stat-label">Revenue</div></div>
+                        <div class="stat-card"><div class="stat-value">$${shipment.cost.toFixed(2)}</div><div class="stat-label">Cost</div></div>
+                        <div class="stat-card"><div class="stat-value ${profitClass}">$${profit.toFixed(2)}</div><div class="stat-label">Profit</div></div>
+                    </div>
+                </div>`;
+        }
+
+        // --- MODAL & EDITING LOGIC ---
+        function showShipmentModal(shipmentId = null) {
+            const modal = document.getElementById('shipment-modal');
+            if (shipmentId) {
+                const ship = shipments.find(s => s.id === shipmentId);
+                document.getElementById('shipment-modal-title').innerText = 'Edit Shipment';
+                document.getElementById('shipmentName').value = ship.name;
+                document.getElementById('shipmentCost').value = ship.cost;
+                document.getElementById('shipmentNotes').value = ship.notes;
+                document.getElementById('shipmentId').value = ship.id;
+            } else {
+                document.getElementById('shipment-modal-title').innerText = 'Add New Shipment';
+                document.getElementById('shipmentName').value = '';
+                document.getElementById('shipmentCost').value = '';
+                document.getElementById('shipmentNotes').value = '';
+                document.getElementById('shipmentId').value = '';
+            }
+            modal.classList.add('show');
+        }
+        function saveShipment() {
+            const id = document.getElementById('shipmentId').value;
+            const name = document.getElementById('shipmentName').value.trim();
+            const cost = parseFloat(document.getElementById('shipmentCost').value) || 0;
+            const notes = document.getElementById('shipmentNotes').value.trim();
+            if (!name) { showNotification("Shipment name is required!", "error"); return; }
+            if (id) {
+                const index = shipments.findIndex(s => s.id === id);
+                shipments[index] = { ...shipments[index], name, cost, notes };
+            } else {
+                shipments.push({ id: name.toLowerCase().replace(/\s/g, '') + Date.now(), name, cost, notes });
+            }
+            saveData();
+            updateDashboard();
+            closeModal(); // This is fine to close all, as it's a top-level action
+            showNotification("Shipment saved!", "success");
+        }
+        function showSaleModal(saleId) {
+            const sale = salesData.find(s => s.id === saleId);
+            document.getElementById('editSaleId').value = sale.id;
+            document.getElementById('editItemName').value = sale.item;
+            document.getElementById('editSalePrice').value = sale.price;
+            document.getElementById('editPlatform').value = sale.platform;
+            document.getElementById('editPayment').value = sale.payment;
+            document.getElementById('sale-modal').classList.add('show');
+        }
+        function saveSaleEdit() {
+            const id = parseInt(document.getElementById('editSaleId').value);
+            const index = salesData.findIndex(s => s.id === id);
+            salesData[index].item = document.getElementById('editItemName').value.trim();
+            salesData[index].price = parseFloat(document.getElementById('editSalePrice').value);
+            salesData[index].platform = document.getElementById('editPlatform').value;
+            salesData[index].payment = document.getElementById('editPayment').value;
+            saveData();
+            updateDashboard();
+            // NEW: Close only the edit modal, then refresh the list behind it
+            document.getElementById('sale-modal').classList.remove('show');
+            if (activeSalesListShipmentId) showSalesListModal(activeSalesListShipmentId);
+            showNotification("Sale updated!", "success");
+        }
+        function deleteSale() {
+            if (!confirm("Delete this sale? This cannot be undone.")) return;
+            const id = parseInt(document.getElementById('editSaleId').value);
+            salesData = salesData.filter(s => s.id !== id);
+            saveData();
+            updateDashboard();
+            // NEW: Close only the edit modal, then refresh the list behind it
+            document.getElementById('sale-modal').classList.remove('show');
+            if (activeSalesListShipmentId) showSalesListModal(activeSalesListShipmentId);
+            showNotification("Sale deleted.", "success");
+        }
+        function showSalesListModal(shipmentId) {
+            activeSalesListShipmentId = shipmentId;
+            const shipment = shipments.find(s => s.id === shipmentId);
+            const relevantSales = salesData.filter(s => s.shipmentId === shipmentId).sort((a,b) => b.id - a.id);
+            const titleEl = document.getElementById('sales-list-modal-title');
+            const contentEl = document.getElementById('sales-list-modal-content');
+            
+            titleEl.innerText = `${shipment.name} Sales (${relevantSales.length})`;
+            let html = '';
+            if (relevantSales.length > 0) {
+                relevantSales.forEach(sale => {
+                    html += `<div class="sale-item">
+                                <div class="sale-item-info">
+                                    <h4>${sale.item}</h4>
+                                    <div class="sale-meta">
+                                        <span>${sale.platform} • ${sale.payment}</span>
+                                        <span>$${sale.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <button class="sale-edit-btn" onclick="showSaleModal(${sale.id})">✏️</button>
+                            </div>`;
+                });
+            } else {
+                html = `<p style="text-align: center; opacity: 0.6;">No sales recorded for this shipment yet.</p>`;
+            }
+            contentEl.innerHTML = html;
+            document.getElementById('sales-list-modal').classList.add('show');
+        }
+        // NEW: Updated closeModal function to be more specific
+        function closeModal(event) {
+            // If the click was on a child of the overlay (like the modal content), do nothing.
+            if (event && event.target !== event.currentTarget) return;
+
+            // If the function was triggered by a click event, close only that specific modal.
+            if (event) {
+                event.currentTarget.classList.remove('show');
+                // If we are closing the main sales list, clear the active shipment ID.
+                if (event.currentTarget.id === 'sales-list-modal') {
+                    activeSalesListShipmentId = null;
+                }
+            } else {
+                // Otherwise (if called like closeModal()), close all modals and reset state.
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
+                activeSalesListShipmentId = null; 
+            }
+        }
+
+        // --- IMPORT/EXPORT ---
+        function exportData() {
+            if (shipments.length === 0 && salesData.length === 0) { showNotification('No data to export!', 'error'); return; }
+            const dataStr = JSON.stringify({ shipments, sales: salesData }, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sales-tracker-data-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully! 📁');
+        }
+        function importData() { document.getElementById('fileInput').click(); }
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported.shipments) && Array.isArray(imported.sales)) {
+                        const existingShipmentIds = new Set(shipments.map(s => s.id));
+                        const newShipments = imported.shipments.filter(s => !existingShipmentIds.has(s.id));
+                        shipments.push(...newShipments);
+                        const existingSaleIds = new Set(salesData.map(s => s.id));
+                        const newSales = imported.sales.filter(s => !existingSaleIds.has(s.id));
+                        salesData.push(...newSales);
+                        saveData();
+                        loadData();
+                        showNotification(`Synced! Added ${newShipments.length} shipments and ${newSales.length} sales.`, "success");
+                        showPage('view');
+                    } else { throw new Error("Invalid format"); }
+                } catch (err) { showNotification('Invalid or corrupted data file!', 'error'); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // --- APP INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => { loadData(); showPage('add'); });
+    </script>
+</body>
+</html>
