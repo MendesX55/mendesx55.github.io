@@ -689,7 +689,7 @@ function renderDayRoute(date, dayData, dayCounter) {
                     const fromStop = dayData.stops[index];
                     const toStop = dayData.stops[index+1];
                     const legKm = leg.distance.value / 1000;
-                    const gasCost = (legKm / 100) * 8.5 * 1.75 * 1.20;
+                    const gasCost = (legKm / 100) * 12.5 * 1.75 * 1.20;
                     csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]);
                 });
             });
