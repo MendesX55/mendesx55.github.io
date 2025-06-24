@@ -248,7 +248,6 @@
 <div class="form-group"><label>Heavy Foot %</label><input id="heavyFootPercent" step="1" type="number"/></div>
 </div>
 </div>
-
 <div style="text-align:center; margin-top:20px;">
 <button onclick="applySettings()">✅ Apply Settings</button>
 </div>
@@ -757,7 +756,6 @@ function renderDayRoute(date, dayData, dayCounter) {
         document.body.removeChild(link);
     }
 </script>
-
 <script>
 function applySettings() {
   const settings = {
@@ -773,6 +771,13 @@ function applySettings() {
   if (typeof saveToFirebase === "function") saveToFirebase(data);
 
   alert("Settings saved and applied!");
+}
+</script>
+
+<script>
+function saveTourData() {
+  localStorage.setItem(storageKey, JSON.stringify(tourData));
+  if (typeof saveToFirebase === "function") saveToFirebase(tourData);
 }
 </script>
 </body>
