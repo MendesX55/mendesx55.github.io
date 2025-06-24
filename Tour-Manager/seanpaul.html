@@ -2,54 +2,6 @@
 
 <html lang="en">
 <head>
-<!-- Firebase (Legacy API for Safari/iOS compatibility) -->
-<script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
-    authDomain: "tour-manager-b2888.firebaseapp.com",
-    projectId: "tour-manager-b2888",
-    storageBucket: "tour-manager-b2888.appspot.com",
-    messagingSenderId: "230753722563",
-    appId: "1:230753722563:web:3d27eb4e31fd1ef52ac276"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  const tourId = "seanpaul";
-  const storageKey = "tourData_" + tourId;
-
-  async function loadFromFirebase() {
-    try {
-      const docRef = db.collection("tourData").doc(storageKey);
-      const doc = await docRef.get();
-      if (doc.exists) {
-        const data = doc.data();
-        console.log("Loaded from Firebase:", data);
-        localStorage.setItem(storageKey, JSON.stringify(data));
-        return data;
-      }
-    } catch (e) {
-      console.error("Firebase load error:", e);
-    }
-    return null;
-  }
-
-  async function saveToFirebase(data) {
-    try {
-      await db.collection("tourData").doc(storageKey).set(data);
-      console.log("Saved to Firebase:", data);
-    } catch (e) {
-      console.error("Firebase save error:", e);
-    }
-  }
-
-  window.loadFromFirebase = loadFromFirebase;
-  window.saveToFirebase = saveToFirebase;
-  window.storageKey = storageKey;
-</script>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <link href="icon.png" rel="apple-touch-icon"/>
@@ -240,16 +192,6 @@
 <label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label>
 </div>
 <button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
-</div>
-<div class="form-section"><h3>🚗 Fuel &amp; Driving Settings</h3>
-<div class="form-row-3">
-<div class="form-group"><label>KM / Litre</label><input id="kmPerLitre" step="0.1" type="number"/></div>
-<div class="form-group"><label>Cost / Litre (CAD)</label><input id="costPerLitre" step="0.01" type="number"/></div>
-<div class="form-group"><label>Heavy Foot %</label><input id="heavyFootPercent" step="1" type="number"/></div>
-</div>
-</div>
-<div style="text-align:center; margin-top:20px;">
-<button onclick="applySettings()">✅ Apply Settings</button>
 </div>
 </div>
 </div>
@@ -756,29 +698,32 @@ function renderDayRoute(date, dayData, dayCounter) {
         document.body.removeChild(link);
     }
 </script>
-<script>
-function applySettings() {
-  const settings = {
-    kmPerLitre: parseFloat(document.getElementById("kmPerLitre").value) || 0,
-    costPerLitre: parseFloat(document.getElementById("costPerLitre").value) || 0,
-    heavyFootPercent: parseFloat(document.getElementById("heavyFootPercent").value) || 0
-  };
-
-  // Load tour data and inject settings
-  let data = JSON.parse(localStorage.getItem(storageKey)) || {};
-  data.settings = settings;
-  localStorage.setItem(storageKey, JSON.stringify(data));
-  if (typeof saveToFirebase === "function") saveToFirebase(data);
-
-  alert("Settings saved and applied!");
-}
-</script>
 
 <script>
 function saveTourData() {
-  localStorage.setItem(storageKey, JSON.stringify(tourData));
-  if (typeof saveToFirebase === "function") saveToFirebase(tourData);
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(tourData));
+    if (typeof saveToFirebase === "function") saveToFirebase(tourData);
+  } catch (e) {
+    console.error("Failed to save tourData:", e);
+  }
 }
+
+// Ensure every change is hooked properly
+function bindSyncEvents() {
+  const originalPush = Array.prototype.push;
+  Array.prototype.push = function () {
+    const result = originalPush.apply(this, arguments);
+    saveTourData();
+    return result;
+  };
+
+  // Save when data is edited manually
+  document.querySelectorAll("input, textarea, select").forEach(el => {
+    el.addEventListener("change", saveTourData);
+  });
+}
+document.addEventListener("DOMContentLoaded", bindSyncEvents);
 </script>
 </body>
 </html>
