@@ -248,6 +248,10 @@
 <div class="form-group"><label>Heavy Foot %</label><input id="heavyFootPercent" step="1" type="number"/></div>
 </div>
 </div>
+
+<div style="text-align:center; margin-top:20px;">
+<button onclick="applySettings()">✅ Apply Settings</button>
+</div>
 </div>
 </div>
 <!-- MODALS -->
@@ -752,6 +756,24 @@ function renderDayRoute(date, dayData, dayCounter) {
         link.click();
         document.body.removeChild(link);
     }
+</script>
+
+<script>
+function applySettings() {
+  const settings = {
+    kmPerLitre: parseFloat(document.getElementById("kmPerLitre").value) || 0,
+    costPerLitre: parseFloat(document.getElementById("costPerLitre").value) || 0,
+    heavyFootPercent: parseFloat(document.getElementById("heavyFootPercent").value) || 0
+  };
+
+  // Load tour data and inject settings
+  let data = JSON.parse(localStorage.getItem(storageKey)) || {};
+  data.settings = settings;
+  localStorage.setItem(storageKey, JSON.stringify(data));
+  if (typeof saveToFirebase === "function") saveToFirebase(data);
+
+  alert("Settings saved and applied!");
+}
 </script>
 </body>
 </html>
