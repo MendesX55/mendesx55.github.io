@@ -180,6 +180,51 @@
 }
 </style>
 
+
+<style>
+/* Prevent entire page from bouncing or scrolling */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Lock header and tab bar */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.tab-bar {
+  position: fixed;
+  top: 60px; /* assuming header is 60px high */
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+/* Scroll only content below tabs */
+.main-content {
+  position: absolute;
+  top: 110px; /* header + tab bar height */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 120px;
+}
+
+/* Fix back button tap zone */
+.back-btn {
+  padding-top: 28px; /* move below iPhone time area */
+  display: inline-block;
+}
+</style>
+
 </head>
 <body>
 <div style="padding: 10px 20px; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);">
