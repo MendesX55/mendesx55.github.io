@@ -196,7 +196,6 @@ const storageKey = `tourData_${tourName}`;
 </div>
 <button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
 </div>
-
 <div style="margin-top:15px">
 <label>Fuel Efficiency (km/l):</label>
 <input id="kmPerLitre" placeholder="e.g. 8" type="number"/>
@@ -715,12 +714,16 @@ function renderDayRoute(date, dayData, dayCounter) {
 </script>
 
 <script>
+const tourName = "seanpaul";
+const storageKey = `tourData_${tourName}`;
+let tourData = JSON.parse(localStorage.getItem(storageKey)) || { hotels: [], venues: [], expenses: [], settings: {} };
+
 function saveTourData() {
   try {
     localStorage.setItem(storageKey, JSON.stringify(tourData));
     if (typeof saveToFirebase === "function") saveToFirebase(tourData);
   } catch (e) {
-    console.error("Failed to save tourData:", e);
+    console.error("Save failed:", e);
   }
 }
 
@@ -733,34 +736,30 @@ function applySettings() {
   if (!isNaN(cost)) tourData.settings.costPerLitre = cost;
   if (!isNaN(heavy)) tourData.settings.heavyFootPercent = heavy;
   saveTourData();
-  calculateRouteDetails(); // Refresh route math
+  alert("Settings applied and saved.");
+  if (typeof calculateRouteDetails === "function") calculateRouteDetails();
 }
 
 function uploadLocalToFirebase() {
   try {
-    const local = localStorage.getItem(storageKey);
-    if (local && typeof saveToFirebase === "function") {
-      saveToFirebase(JSON.parse(local));
-      alert("Data pushed to Firebase!");
+    const data = localStorage.getItem(storageKey);
+    if (!data) return alert("No local data found.");
+    const parsed = JSON.parse(data);
+    if (typeof saveToFirebase === "function") {
+      saveToFirebase(parsed);
+      alert("Data uploaded to Firebase.");
     } else {
-      alert("Local data not found or Firebase sync not ready.");
+      alert("Firebase sync function not ready.");
     }
   } catch (e) {
-    console.error("Upload failed:", e);
+    console.error("Upload error:", e);
+    alert("Error uploading to Firebase.");
   }
 }
 
-// Hook all input changes
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("input, textarea, select").forEach(el =>
     el.addEventListener("change", saveTourData));
-  const originalPush = Array.prototype.push;
-  Array.prototype.push = function () {
-    const result = originalPush.apply(this, arguments);
-    saveTourData();
-    return result;
-  };
 });
-</script>
-</body>
+</script></body>
 </html>
