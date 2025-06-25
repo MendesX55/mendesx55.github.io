@@ -30,7 +30,7 @@
         .form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
         .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
         .currency-input { position: relative; }
         .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
@@ -92,6 +92,19 @@
         .day-number { font-weight: bold; }
         .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
         .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.currency-input input {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 </style>
 </head>
 <body>
