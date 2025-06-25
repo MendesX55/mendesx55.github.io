@@ -91,10 +91,7 @@
         .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
 </style>
 </head>
-<body><script>
-const tourName = "seanpaul";
-const storageKey = `tourData_${tourName}`;
-</script>
+<body>
 <div style="padding: 10px 20px;">
 <a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
@@ -712,54 +709,55 @@ function renderDayRoute(date, dayData, dayCounter) {
         document.body.removeChild(link);
     }
 </script>
-
 <script>
-const tourName = "seanpaul";
-const storageKey = `tourData_${tourName}`;
-let tourData = JSON.parse(localStorage.getItem(storageKey)) || { hotels: [], venues: [], expenses: [], settings: {} };
+(function() {
+  const tourName = "seanpaul";
+  const storageKey = `tourData_${tourName}`;
+  let tourData = JSON.parse(localStorage.getItem(storageKey)) || { hotels: [], venues: [], expenses: [], settings: {} };
 
-function saveTourData() {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(tourData));
-    if (typeof saveToFirebase === "function") saveToFirebase(tourData);
-  } catch (e) {
-    console.error("Save failed:", e);
-  }
-}
-
-function applySettings() {
-  const km = parseFloat(document.getElementById("kmPerLitre").value);
-  const cost = parseFloat(document.getElementById("costPerLitre").value);
-  const heavy = parseFloat(document.getElementById("heavyFootPercent").value);
-  if (!tourData.settings) tourData.settings = {};
-  if (!isNaN(km)) tourData.settings.kmPerLitre = km;
-  if (!isNaN(cost)) tourData.settings.costPerLitre = cost;
-  if (!isNaN(heavy)) tourData.settings.heavyFootPercent = heavy;
-  saveTourData();
-  alert("Settings applied and saved.");
-  if (typeof calculateRouteDetails === "function") calculateRouteDetails();
-}
-
-function uploadLocalToFirebase() {
-  try {
-    const data = localStorage.getItem(storageKey);
-    if (!data) return alert("No local data found.");
-    const parsed = JSON.parse(data);
-    if (typeof saveToFirebase === "function") {
-      saveToFirebase(parsed);
-      alert("Data uploaded to Firebase.");
-    } else {
-      alert("Firebase sync function not ready.");
+  window.saveTourData = function() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(tourData));
+      if (typeof saveToFirebase === "function") saveToFirebase(tourData);
+    } catch (e) {
+      console.error("Save failed:", e);
     }
-  } catch (e) {
-    console.error("Upload error:", e);
-    alert("Error uploading to Firebase.");
-  }
-}
+  };
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("input, textarea, select").forEach(el =>
-    el.addEventListener("change", saveTourData));
-});
+  window.applySettings = function() {
+    const km = parseFloat(document.getElementById("kmPerLitre").value);
+    const cost = parseFloat(document.getElementById("costPerLitre").value);
+    const heavy = parseFloat(document.getElementById("heavyFootPercent").value);
+    if (!tourData.settings) tourData.settings = {};
+    if (!isNaN(km)) tourData.settings.kmPerLitre = km;
+    if (!isNaN(cost)) tourData.settings.costPerLitre = cost;
+    if (!isNaN(heavy)) tourData.settings.heavyFootPercent = heavy;
+    window.saveTourData();
+    alert("Settings applied and saved.");
+    if (typeof calculateRouteDetails === "function") calculateRouteDetails();
+  };
+
+  window.uploadLocalToFirebase = function() {
+    try {
+      const data = localStorage.getItem(storageKey);
+      if (!data) return alert("No local data found.");
+      const parsed = JSON.parse(data);
+      if (typeof saveToFirebase === "function") {
+        saveToFirebase(parsed);
+        alert("Data uploaded to Firebase.");
+      } else {
+        alert("Firebase sync function not ready.");
+      }
+    } catch (e) {
+      console.error("Upload error:", e);
+      alert("Error uploading to Firebase.");
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("input, textarea, select").forEach(el =>
+      el.addEventListener("change", window.saveTourData));
+  });
+})();
 </script></body>
 </html>
