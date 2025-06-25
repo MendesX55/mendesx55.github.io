@@ -226,7 +226,7 @@
 <div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</label><textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
 <div class="form-section"><h3>⚙️ App Settings</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Configure gas cost calculations.</p>
 <div class="settings-row">
-<div class="form-group"><label for="kmPerLitre">Fuel KM/L</label><input id="kmPerLitre" placeholder="e.g. 8" type="number"/></div>
+<div class="form-group"><label for="litresPer100km">Fuel L/100km</label><input id="litresPer100km" placeholder="e.g. 12" type="number"/></div>
 <div class="form-group"><label for="costPerLitre">Cost $/L</label><input id="costPerLitre" placeholder="e.g. 1.75" type="number"/></div>
 <div class="form-group"><label for="heavyFootPercent">Go FAST %</label><input id="heavyFootPercent" placeholder="e.g. 10" type="number"/></div>
 </div>
@@ -268,7 +268,7 @@
     };
 
     // --- Global State ---
-    let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } };
+    let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { litresPer100km: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } };
     let currentEditId = null;
     let isGeneratingRoute = false;
     let currentMonth = new Date().getMonth();
@@ -344,7 +344,7 @@
         if (!tourData.expenses) tourData.expenses = [];
         if (!tourData.routePlannerState) tourData.routePlannerState = [];
         if (!tourData.routeCache) tourData.routeCache = {};
-        if (!tourData.settings) tourData.settings = { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 };
+        if (!tourData.settings) tourData.settings = { litresPer100km: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 };
 
         loadRoutePlannerState();
         applySettingsToUI();
@@ -539,8 +539,18 @@
 
     // --- End Route Planner Refactor ---
 
-    function getGasSettings() { const settings = tourData.settings || {}; const kmPerLitre = parseFloat(document.getElementById('kmPerLitre').value) || settings.kmPerLitre || 8.5; const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75; const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10; return { kmPerLitre, costPerLitre, heavyFootPercent }; }
-    function calculateGasCost(distanceKm) { const { kmPerLitre, costPerLitre, heavyFootPercent } = getGasSettings(); if (kmPerLitre <= 0) return 0; const effectiveKmPerLitre = kmPerLitre / (1 + (heavyFootPercent / 100)); const litresUsed = distanceKm / effectiveKmPerLitre; return litresUsed * costPerLitre; }
+    function getGasSettings() {
+    const settings = tourData.settings || {};
+    const litresPer100km = parseFloat(document.getElementById('litresPer100km').value) || settings.litresPer100km || 12;
+    const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75;
+    const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10;
+    return { litresPer100km, costPerLitre, heavyFootPercent }; }
+    function calculateGasCost(distanceKm) {
+    const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings();
+    if (litresPer100km <= 0) return 0;
+    const adjustedLitresPer100km = litresPer100km * (1 + (heavyFootPercent / 100));
+    const litresUsed = (distanceKm / 100) * adjustedLitresPer100km;
+    return litresUsed * costPerLitre; }
     function applySettings() { const { kmPerLitre, costPerLitre, heavyFootPercent } = getGasSettings(); tourData.settings = { kmPerLitre, costPerLitre, heavyFootPercent }; saveData(); alert("Settings applied and saved."); if (document.getElementById('routeResults').innerHTML.trim() !== '') { rerenderRouteCosts(); } }
     function applySettingsToUI() { const settings = tourData.settings || {}; document.getElementById('kmPerLitre').value = settings.kmPerLitre || ''; document.getElementById('costPerLitre').value = settings.costPerLitre || ''; document.getElementById('heavyFootPercent').value = settings.heavyFootPercent || ''; }
     function rerenderRouteCosts() { let grandTotalGas = 0; const daySummaries = document.querySelectorAll('#routeResults .day-summary-box'); daySummaries.forEach(daySummary => { let dayTotalDistance = 0; const dayId = daySummary.dataset.dayId; const segments = document.querySelectorAll(`.route-item[data-day-id='${dayId}']`); segments.forEach(segment => { const distanceKm = parseFloat(segment.dataset.distanceKm); dayTotalDistance += distanceKm; const newGasCost = calculateGasCost(distanceKm); segment.querySelector('.gas-cost').textContent = `$${newGasCost.toFixed(0)} CAD`; }); const newDayGasCost = calculateGasCost(dayTotalDistance); grandTotalGas += newDayGasCost; daySummary.querySelector('.day-gas-value').textContent = `$${newDayGasCost.toFixed(0)}`; }); document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); }
