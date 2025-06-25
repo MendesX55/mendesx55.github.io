@@ -122,6 +122,23 @@
     }
 }
 
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.container {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 
 <style>
@@ -180,55 +197,10 @@
 }
 </style>
 
-
-<style>
-/* Prevent entire page from bouncing or scrolling */
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-/* Lock header and tab bar */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-.tab-bar {
-  position: fixed;
-  top: 60px; /* assuming header is 60px high */
-  left: 0;
-  right: 0;
-  z-index: 999;
-}
-
-/* Scroll only content below tabs */
-.main-content {
-  position: absolute;
-  top: 110px; /* header + tab bar height */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 120px;
-}
-
-/* Fix back button tap zone */
-.back-btn {
-  padding-top: 28px; /* move below iPhone time area */
-  display: inline-block;
-}
-</style>
-
 </head>
 <body>
-<div style="padding: 10px 20px; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);">
-<a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
+<div style="padding-top: env(safe-area-inset-top); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999;">
+  <a href="index.html" style="display: block; padding: 10px 20px; text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
 <div class="header">
 <h1>🎤 TOUR MANAGER 🎤</h1>
