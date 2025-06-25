@@ -24,7 +24,6 @@
              border-radius: 15px 15px 0 0;
              margin: 10px 10px 0 10px;
              overflow: hidden;
-             /* Removed overflow-x, -webkit-overflow-scrolling, white-space, scrollbar-width, -ms-overflow-style, ::-webkit-scrollbar */
         }
         .tab-btn {
             flex: 1; /* Allow shrinking and growing */
@@ -61,12 +60,22 @@
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         /* --- VISUAL FIX 3: Gas settings layout --- */
         .form-group-inline {
-             display: grid;
-             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid */
-             gap: 8px;
+             display: flex; /* Use flexbox */
+             gap: 8px; /* Add gap between items */
+             flex-wrap: wrap; /* Allow wrapping if needed */
+             align-items: flex-start; /* Align items to the top */
         }
-         .form-group-inline .form-group { /* Remove bottom margin from grouped items */
-             margin-bottom: 0;
+         .form-group-inline .form-group {
+             flex: 1 1 auto; /* Allow shrinking and growing */
+             min-width: 100px; /* Minimum width for each item */
+             margin-bottom: 0; /* Remove bottom margin from grouped items */
+         }
+         .form-group-inline label {
+             white-space: nowrap; /* Prevent label wrapping if space is tight */
+         }
+         /* Ensure inputs within inline groups still take full width of their container */
+         .form-group-inline .form-group input {
+            width: 100%;
          }
          /* --- End VISUAL FIX 3 --- */
 
@@ -87,8 +96,44 @@
         .stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .stat-value { font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 3px; }
         .stat-label { color: #ccc; font-size: 0.8em; }
-        .venue-card, .hotel-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #ffd700; cursor: pointer; transition: all 0.3s ease; }
+        /* Modified card styles to accommodate event listeners */
+        .venue-card, .hotel-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
         .venue-card:hover, .hotel-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-2px); }
+        /* Expenses row style */
+        .expense-row {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 5px; /* Smaller margin for rows */
+            padding: 8px 12px; /* Padding inside row */
+            border-left: 4px solid #6A5ACD; /* Example color for expenses */
+            display: flex; /* Use flex for layout within row */
+            justify-content: space-between; /* Space out content */
+            align-items: center; /* Vertically align items */
+            font-size: 0.9em;
+        }
+         .expense-row > div {
+             flex: 1; /* Allow divs inside to grow/shrink */
+             overflow: hidden; /* Hide overflow */
+             text-overflow: ellipsis; /* Add ellipsis */
+             white-space: nowrap; /* Prevent wrapping */
+             padding-right: 5px; /* Add space between columns */
+         }
+        .expense-row .exp-date { flex-basis: 60px; flex-grow: 0; }
+        .expense-row .exp-type { flex-basis: 50px; flex-grow: 0; }
+        .expense-row .exp-loc { flex-basis: 80px; } /* Location can take more space */
+        .expense-row .exp-usd,
+        .expense-row .exp-cad { flex-basis: 50px; flex-grow: 0; text-align: right; }
+         .expense-row .exp-actions { flex-basis: 30px; flex-grow: 0; padding-right: 0; text-align: right;} /* Actions column */
+
+
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
         .card-title { color: #ffd700; font-weight: bold; flex-grow: 1; word-break: break-word; }
         .card-date { font-weight: bold; color: #fff; white-space: nowrap; flex-shrink: 0; font-size: 11px; }
@@ -120,7 +165,7 @@
         .checkbox-item input { width: 20px; height: 20px; margin-right: 10px; }
         /* Calendar Styles */
         #calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        #calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 6生产者: 6px; cursor: pointer; }
+        #calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 生产者: 6px; cursor: pointer; }
         #month-year { font-size: 1.2em; font-weight: bold; }
         #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .calendar-day { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); min-height: 80px; border-radius: 8px; padding: 5px; font-size: 0.8em; cursor: pointer; transition: background-color 0.3s; }
@@ -217,7 +262,9 @@
 <div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label">Total Cost</div></div>
 </div>
 </div>
-<table class="data-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Location</th><th>USD</th><th>CAD</th><th>Action</th></tr></thead><tbody id="expensesBody"></tbody></table>
+<!-- Changed table layout to use flexbox for better control on mobile -->
+<!-- Removed the <table> structure here -->
+<div id="expensesList"></div>
 </div>
 <!-- SETTINGS (INPUT) TAB -->
 <div class="tab-content" id="settings">
@@ -261,13 +308,15 @@
 <script>
     // Tour name and localStorage keys
     const TOUR_NAME = "seanpaul";
+    // New key used in previous versions, will be primary going forward
     const CURRENT_LOCAL_STORAGE_KEY = `tourData_${TOUR_NAME}`;
-    const OLD_LOCAL_STORAGE_KEY = `tourData`; // Key used in your previous version
+    // Old key potentially holding your data
+    const OLD_LOCAL_STORAGE_KEY = `tourData`;
 
     // Firebase Configuration (Use your actual project config here)
     // You confirmed these are correct, so we keep them.
     const firebaseConfig = {
-      apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
+      apiKey: "AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc", // Reverted to the one provided in your initial code snippet
       authDomain: "tour-manager-b2888.firebaseapp.com",
       projectId: "tour-manager-b2888",
       // measurementId: "G-XXXXXXXXXX", // Add if you have it
@@ -309,17 +358,31 @@
         settings: { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } // Default settings
     };
 
-    let currentEditId = null;
-    let routeStopCounter = 0;
+    let currentEditId = null; // Used for modals
+    let routeStopCounter = 0; // Counter for route planner steps in the UI
     let isGeneratingRoute = false;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let currentModalDate = null;
+    let currentModalDate = null; // Used for calendar day modal navigation
 
     // Helper functions
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
-    function getLocationDetails(locationId) { const [type, id] = locationId.split(':'); const numId = parseInt(id); if (type === 'Hotel') { const hotel = tourData.hotels.find(h => h.id === numId); return hotel ? { ...hotel } : { type: 'Hotel', name: 'N/A', address: 'N/A' }; } else { const venue = tourData.venues.find(v => v.id === numId); return venue ? { ...venue } : { type: 'Venue', name: 'N/A', address: 'N/A' }; } }
+    function getLocationDetails(locationId) {
+         if (!locationId) return { type: 'Unknown', name: 'N/A', address: 'N/A' };
+        const [type, id] = locationId.split(':');
+         if (!type || !id) return { type: 'Unknown', name: 'N/A', address: 'N/A' };
+
+        const numId = parseInt(id);
+        if (type === 'Hotel') {
+            const hotel = tourData.hotels.find(h => h.id === numId);
+            return hotel ? { ...hotel, type: 'Hotel' } : { type: 'Hotel', name: `Hotel ${id}`, address: 'N/A' }; // Use ID in fallback name
+        } else if (type === 'Venue') {
+            const venue = tourData.venues.find(v => v.id === numId);
+            return venue ? { ...venue, type: 'Venue' } : { type: 'Venue', name: `Venue ${id}`, address: 'N/A' }; // Use ID in fallback name
+        }
+         return { type: 'Unknown', name: `ID ${id}`, address: 'N/A' }; // Generic fallback
+     }
 
     // --- Data Loading & Saving ---
 
@@ -332,8 +395,13 @@
                 tourData.settings.costPerLitre = parseFloat(tourData.settings.costPerLitre) || 0;
                 tourData.settings.heavyFootPercent = parseFloat(tourData.settings.heavyFootPercent) || 0;
             } else {
-                 tourData.settings = { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 }; // Ensure settings object exists
+                 tourData.settings = { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 }; // Ensure settings object exists with defaults
             }
+             // Ensure routePlannerState is an array
+            if (!Array.isArray(tourData.routePlannerState)) tourData.routePlannerState = [];
+             // Ensure routeCache is an object
+            if (tourData.routeCache === null || typeof tourData.routeCache !== 'object') tourData.routeCache = {};
+
 
             // Save to the CURRENT local storage key
             localStorage.setItem(CURRENT_LOCAL_STORAGE_KEY, JSON.stringify(tourData));
@@ -375,10 +443,16 @@
             const oldLocalDataString = localStorage.getItem(OLD_LOCAL_STORAGE_KEY);
             if (oldLocalDataString) {
                 try {
-                    loadedData = JSON.parse(oldLocalDataString);
-                     console.log("Data loaded from OLD localStorage key:", OLD_LOCAL_STORAGE_KEY);
-                     alert("Existing tour data found locally! It will now be synced to Firebase.");
-                     // After loading old data, it will be saved to the new key and Firebase by the save logic below
+                    const parsedOldData = JSON.parse(oldLocalDataString);
+                    // Basic check to see if it looks like actual data vs empty object
+                    if (parsedOldData && (parsedOldData.hotels?.length > 0 || parsedOldData.venues?.length > 0 || parsedOldData.expenses?.length > 0 || parsedOldData.routePlannerState?.length > 0)) {
+                         loadedData = parsedOldData;
+                         console.log("Data loaded from OLD localStorage key:", OLD_LOCAL_STORAGE_KEY);
+                         alert("Existing tour data found locally! It will now be synced to Firebase and stored under a new key.");
+                         // After loading old data, it will be saved to the new key and Firebase by the save logic below
+                    } else {
+                         console.log("OLD localStorage key found, but seems empty or invalid.");
+                    }
                 } catch (e) {
                     console.error("Failed to parse data from OLD localStorage key:", OLD_LOCAL_STORAGE_KEY, e);
                     loadedData = null; // Ensure loadedData is null if parsing fails
@@ -393,8 +467,14 @@
             const currentLocalDataString = localStorage.getItem(CURRENT_LOCAL_STORAGE_KEY);
              if (currentLocalDataString) {
                 try {
-                    loadedData = JSON.parse(currentLocalDataString);
-                    console.log("Data loaded from CURRENT localStorage key:", CURRENT_LOCAL_STORAGE_KEY);
+                    const parsedCurrentData = JSON.parse(currentLocalDataString);
+                     // Basic check
+                    if (parsedCurrentData && (parsedCurrentData.hotels?.length > 0 || parsedCurrentData.venues?.length > 0 || parsedCurrentData.expenses?.length > 0 || parsedCurrentData.routePlannerState?.length > 0)) {
+                        loadedData = parsedCurrentData;
+                        console.log("Data loaded from CURRENT localStorage key:", CURRENT_LOCAL_STORAGE_KEY);
+                    } else {
+                         console.log("CURRENT localStorage key found, but seems empty or invalid.");
+                    }
                 } catch (e) {
                      console.error("Failed to parse data from CURRENT localStorage key:", CURRENT_LOCAL_STORAGE_KEY, e);
                      loadedData = null; // Ensure loadedData is null if parsing fails
@@ -408,6 +488,9 @@
         // 4. Update global tourData and ensure structure/types
         if (loadedData) {
              // Merge loaded data with default structure to ensure all properties exist
+             // Use a deep merge strategy for arrays and nested objects if conflicts are expected,
+             // but a simple spread might suffice assuming one source is the 'correct' one.
+             // For this simple app, a shallow merge is probably okay for top-level keys.
             tourData = {
                 ...{ hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } },
                 ...loadedData
@@ -415,15 +498,15 @@
         } else {
              // No data found anywhere, use default tourData initialized globally
              console.log("No saved data found anywhere. Starting with default tourData.");
-             // Ensure the default settings are also numeric
-             if (tourData.settings) {
-                tourData.settings.kmPerLitre = parseFloat(tourData.settings.kmPerLitre) || 0;
-                tourData.settings.costPerLitre = parseFloat(tourData.settings.costPerLitre) || 0;
-                tourData.settings.heavyFootPercent = parseFloat(tourData.settings.heavyFootPercent) || 0;
-            }
         }
 
-        // Ensure settings are numeric after loading/merging
+        // Ensure core arrays and objects exist and settings are numeric after loading/merging
+        if (!Array.isArray(tourData.hotels)) tourData.hotels = [];
+        if (!Array.isArray(tourData.venues)) tourData.venues = [];
+        if (!Array.isArray(tourData.expenses)) tourData.expenses = [];
+        if (!Array.isArray(tourData.routePlannerState)) tourData.routePlannerState = [];
+        if (tourData.routeCache === null || typeof tourData.routeCache !== 'object') tourData.routeCache = {};
+
          if (tourData.settings) {
             tourData.settings.kmPerLitre = parseFloat(tourData.settings.kmPerLitre) || 0;
             tourData.settings.costPerLitre = parseFloat(tourData.settings.costPerLitre) || 0;
@@ -433,14 +516,17 @@
         }
 
 
-        // If we loaded data from the OLD key or Firebase was empty,
+        // If we loaded data from the OLD key or Firebase was empty initially,
         // save it now to the new key and Firebase for future use.
-        if (!firebaseLoaded && loadedData) {
-             console.log("Saving loaded data to new key and Firebase...");
-             saveData(); // This saves to CURRENT_LOCAL_STORAGE_KEY and Firebase
-             // Optionally, clear the old key after successful load and save
-             // localStorage.removeItem(OLD_LOCAL_STORAGE_KEY); // Be cautious with this
-        }
+        // This implicitly happens the first time any data is saved, but doing it here ensures the recovered
+        // old data is backed up immediately if no Firebase data existed before.
+         if (loadedData && !firebaseLoaded && db) {
+             console.log("Loaded non-Firebase data, saving to Firebase...");
+             // Do not await here to avoid blocking UI load
+              db.collection("tourData").doc(CURRENT_LOCAL_STORAGE_KEY).set(tourData)
+                 .then(() => console.log("Recovered data synced to Firebase."))
+                 .catch(e => console.error("Failed to sync recovered data to Firebase:", e));
+         }
 
 
         // Initialize UI elements based on loaded data
@@ -453,15 +539,16 @@
     // Manually trigger upload of the *currently loaded* data to Firebase
     function uploadLocalToFirebase() {
         if (!db) {
-            alert("Firebase is not initialized. Cannot upload.");
+            alert("Firebase is not initialized. Cannot upload. Check console for errors.");
             return;
         }
 
-        // Save the *current* state of the tourData object to Firebase
-        // This ensures whatever data is currently visible/loaded (including old data if recovered) is uploaded.
-        saveData() // saveData already saves to both local and Firebase
+        // Use the saveData function, which saves the current tourData object to both local and Firebase
+        saveData()
             .then(() => {
                 alert("Current data successfully uploaded/synced to Firebase.");
+                 // Optional: Clear the old local storage key after a successful upload/sync
+                // localStorage.removeItem(OLD_LOCAL_STORAGE_KEY); // Use with caution
             })
             .catch((error) => {
                 console.error("Error uploading data to Firebase:", error);
@@ -521,8 +608,12 @@
         alert("Settings applied and saved.");
 
         // Re-render route displays to reflect new gas costs immediately
-        renderRouteResults(); // Re-render existing cached routes with updated gas costs
-        updateRouteSummaryStats(); // Update the total stats with updated gas costs
+        // Only do this if the Routes tab is currently active for efficiency
+        if (document.getElementById('routes').classList.contains('active')) {
+            renderRouteResults(); // Re-render existing cached routes with updated gas costs
+            updateRouteSummaryStats(); // Update the total stats with updated gas costs
+        }
+         // Gas costs on other tabs (Expenses, Calendar) are recalculated on display refresh anyway
     }
 
 
@@ -536,12 +627,17 @@
 
         // Add event listeners for forms to auto-save on change
         // These listeners are added AFTER data is loaded, so initial load doesn't trigger saves
-        document.querySelectorAll(".form-section input, .form-section select, .form-section textarea").forEach(el =>
-            el.addEventListener("change", saveData)); // Now saves to LS and Firebase
+        // Use event delegation for forms might be more efficient, but direct listeners are fine for a few forms
+        document.querySelectorAll(".form-section input, .form-section select, .form-section textarea").forEach(el => {
+             // Avoid adding listeners if they already exist (though unlikely with window.onload)
+             // Add a check or use a flag if necessary for more complex apps.
+             el.addEventListener("change", saveData); // Now saves to LS and Firebase
+        });
+
 
         // Add listeners for USD inputs to show approx CAD
-        document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
-        document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
+        document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
+        document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
 
 
         // Initial tab display - ensures correct display state after load
@@ -556,30 +652,36 @@
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
+        const activeTabContent = document.getElementById(tabName);
+         if (activeTabContent) {
+             activeTabContent.classList.add('active');
+         } else {
+             console.error(`Tab content not found for tab: ${tabName}`);
+             return; // Stop if tab content doesn't exist
+         }
         const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`);
         if (activeButton) activeButton.classList.add('active');
 
         // Update displays specific to tabs when shown
         // These functions now render based on the current state of tourData, which is loaded on init
         if (tabName === 'calendar') renderCalendar();
-        else if (tabName === 'venues') updateVenuesDisplay();
-        else if (tabName === 'hotels') updateHotelsDisplay();
+        else if (tabName === 'venues') updateVenuesDisplay(); // This will now attach click listeners
+        else if (tabName === 'hotels') updateHotelsDisplay(); // This will now attach click listeners
         else if (tabName === 'routes') {
             updateRouteSelects(); // Ensure dropdowns are populated
             renderRouteResults(); // Render cached results with current settings
             updateRouteSummaryStats(); // Update total stats with current settings
         }
-        else if (tabName === 'expenses') updateExpensesDisplay();
+        else if (tabName === 'expenses') updateExpensesDisplay(); // This will now attach click listeners
          else if (tabName === 'settings') populateSettingsForm(); // Ensure settings form shows current values
     }
 
     // Called from various places to refresh UI elements
     function updateAllDisplays() {
         // These functions now rely on tourData object and render based on its current state
-        updateHotelsDisplay();
-        updateExpensesDisplay();
-        updateVenuesDisplay();
+        updateHotelsDisplay(); // Will attach event listeners
+        updateExpensesDisplay(); // Will attach event listeners
+        updateVenuesDisplay(); // Will attach event listeners
         updateRouteSelects(); // This one only updates the dropdowns, not the results view
         // Route results and summary are updated when the 'routes' tab is shown
         // or when settings are applied via renderRouteResults() and updateRouteSummaryStats()
@@ -587,15 +689,152 @@
     }
 
     // --- Data Entry Functions ---
-    function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); updateAllDisplays(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
-    function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); updateAllDisplays(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
-    function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); updateAllDisplays(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
+    function addHotel() {
+        const nameInput = document.getElementById('hotelName').value.trim();
+        const addressInput = document.getElementById('hotelAddress').value.trim();
+        const checkinInput = document.getElementById('checkinDate').value;
+        const checkoutInput = document.getElementById('checkoutDate').value;
+        const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0;
+        const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0;
+        const notesInput = document.getElementById('hotelNotes').value.trim();
 
-    function deleteItem(type, id) { if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); updateAllDisplays(); } }
+        if (!nameInput || !addressInput || !checkinInput) {
+             alert('Please fill in hotel name, full address, and check-in date');
+             return;
+        }
+         // Basic date validation
+        if (checkoutInput && new Date(checkinInput) > new Date(checkoutInput)) {
+             alert('Check-out date cannot be before check-in date.');
+             return;
+        }
 
-     function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); }
+        const hotel = {
+             id: Date.now(), // Unique ID
+             name: nameInput,
+             address: addressInput,
+             checkin: checkinInput,
+             checkout: checkoutInput,
+             costUSD: usdCost,
+             costCAD: cadCost,
+             // Approx CAD is calculated on display if manual CAD isn't used
+             notes: notesInput,
+             type: 'hotel' // Identifier for lookups
+        };
+
+        tourData.hotels.push(hotel);
+        saveData(); // Save changes
+        updateHotelsDisplay(); // Refresh UI for hotels tab
+        updateRouteSelects(); // Update route planner selects if this hotel is added
+        renderCalendar(); // Refresh calendar to show new hotel stays
+        clearHotelForm();
+        alert('Hotel added successfully!');
+     }
+
+     function addVenue() {
+        const nameInput = document.getElementById('venueName').value.trim();
+        const addressInput = document.getElementById('venueAddress').value.trim();
+        const dateInput = document.getElementById('showDate').value;
+        const timeInput = document.getElementById('showTime').value;
+        const startInventory = parseInt(document.getElementById('startInventory').value) || 0;
+        const endInventory = parseInt(document.getElementById('endInventory').value) || 0;
+        const totalSales = parseFloat(document.getElementById('totalSales').value) || 0;
+        const notesInput = document.getElementById('venueNotes').value.trim();
+
+        if (!nameInput || !addressInput || !dateInput) {
+             alert('Please fill in venue name, full address, and show date');
+             return;
+        }
+
+        const venue = {
+             id: Date.now(), // Unique ID
+             name: nameInput,
+             address: addressInput,
+             date: dateInput,
+             time: timeInput,
+             startInventory: startInventory,
+             endInventory: endInventory,
+             totalSales: totalSales,
+             notes: notesInput,
+             type: 'venue' // Identifier for lookups
+        };
+
+        tourData.venues.push(venue);
+        saveData(); // Save changes
+        updateVenuesDisplay(); // Refresh UI for venues tab
+         updateRouteSelects(); // Update route planner selects if this venue is added
+        renderCalendar(); // Refresh calendar to show new shows
+        clearVenueForm();
+        alert('Venue added successfully!');
+     }
+
+     function addExpense() {
+        const typeInput = document.getElementById('expenseType').value;
+        const dateInput = document.getElementById('expenseDate').value;
+        const locationInput = document.getElementById('expenseLocation').value.trim();
+        const usdAmount = parseFloat(document.getElementById('expenseAmountUSD').value) || 0;
+        const cadAmount = parseFloat(document.getElementById('expenseAmountCAD').value) || 0;
+        const notesInput = document.getElementById('expenseNotes').value.trim();
+
+        if (!dateInput || (usdAmount <= 0 && cadAmount <= 0)) {
+             alert('Please enter date and an amount (USD or Manual CAD).');
+             return;
+        }
+
+        const expense = {
+             id: Date.now(), // Unique ID
+             type: typeInput,
+             date: dateInput,
+             location: locationInput,
+             amountUSD: usdAmount,
+             amountCAD: cadAmount,
+             // Approx CAD is calculated on display if manual CAD isn't used
+             notes: notesInput,
+             category: 'expense' // Identifier for lookups
+        };
+
+        tourData.expenses.push(expense);
+        saveData(); // Save changes
+        updateExpensesDisplay(); // Refresh UI for expenses tab
+        clearExpenseForm();
+        alert('Expense added successfully!');
+     }
+
+
+    // Delete function (used by delete buttons)
+    function deleteItem(type, id) {
+        if (confirm(`Are you sure you want to delete this ${type}?`)) {
+            if (type === 'hotel') {
+                tourData.hotels = tourData.hotels.filter(h => h.id !== id);
+                 // Also remove this hotel from route planner if it's used
+                 tourData.routePlannerState = tourData.routePlannerState.map(stop =>
+                     stop.selectValue === `Hotel:${id}` ? { selectValue: '', dateValue: stop.dateValue } : stop
+                 );
+                 // Invalidate relevant route cache entries? Or just let them error if stop is missing?
+                 // Let's keep the cache for now, regeneration will fix it.
+                updateHotelsDisplay(); // Refresh display
+                 updateRouteSelects(); // Update dropdowns
+                 renderCalendar(); // Refresh calendar
+            } else if (type === 'venue') {
+                tourData.venues = tourData.venues.filter(v => v.id !== id);
+                 // Also remove this venue from route planner if it's used
+                 tourData.routePlannerState = tourData.routePlannerState.map(stop =>
+                     stop.selectValue === `Venue:${id}` ? { selectValue: '', dateValue: stop.dateValue } : stop
+                 );
+                 // Invalidate relevant route cache entries?
+                updateVenuesDisplay(); // Refresh display
+                 updateRouteSelects(); // Update dropdowns
+                 renderCalendar(); // Refresh calendar
+            } else if (type === 'expense') {
+                tourData.expenses = tourData.expenses.filter(e => e.id !== id);
+                updateExpensesDisplay(); // Refresh display
+            }
+            saveData(); // Save changes after filtering
+        }
+    }
+
+     function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('hotelCostCAD').placeholder = '0.00'; }
     function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => document.getElementById(id).value = ''); }
-    function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; }
+    function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; document.getElementById('expenseAmountCAD').placeholder = '0.00';}
 
 
     // --- Route Builder Logic ---
@@ -619,8 +858,8 @@
             tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
         }
 
-        routeStopCounter = 0;
         // Add stops based on the loaded/migrated routePlannerState
+        routeStopCounter = 0; // Reset counter before adding
         tourData.routePlannerState.forEach(() => addRouteStop(false)); // Add stops without saving immediately
 
         updateStopCounter();
@@ -637,25 +876,42 @@
         const newStep = document.createElement('div');
         newStep.className = 'route-step';
         newStep.id = `routeStep${newIndex}`;
-        newStep.innerHTML = `<div class="route-step-number">${newIndex + 1}</div><select id="routeSelect${newIndex}" onchange="saveRoutePlannerState()"><option value="">-- Select Stop --</option></select><input type="date" id="routeDate${newIndex}" onchange="saveRoutePlannerState()" style="margin-left: 10px; width: 120px; padding: 4px; font-size: 12px; flex-shrink: 0;">`;
+        // InnerHTML contains the select and date input
+        newStep.innerHTML = `<div class="route-step-number">${newIndex + 1}</div><select id="routeSelect${newIndex}"><option value="">-- Select Stop --</option></select><input type="date" id="routeDate${newIndex}" style="margin-left: 10px; width: 120px; padding: 4px; font-size: 12px; flex-shrink: 0;">`;
         routeStepsContainer.appendChild(newStep);
         routeStopCounter++;
         updateStopCounter();
-        // Populate the new select box with locations
-        updateRouteSelects(); // Update all selects to ensure the new one has options
 
-        if (shouldSave) { saveRoutePlannerState(); }
+         // Add event listeners AFTER the elements are appended
+         const selectEl = document.getElementById(`routeSelect${newIndex}`);
+         const dateEl = document.getElementById(`routeDate${newIndex}`);
+         if(selectEl) selectEl.addEventListener('change', saveRoutePlannerState);
+         if(dateEl) dateEl.addEventListener('change', saveRoutePlannerState);
+
+
+        // Populate the new select box with locations AND set the value if it exists in state
+        // Need to make sure tourData.routePlannerState has an entry for this new index if adding
+        if (tourData.routePlannerState.length <= newIndex) {
+             tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
+        }
+         updateRouteSelects(); // Update all selects to ensure the new one has options and values
+
+        if (shouldSave) { saveData(); } // Save the updated state
         // updateAllDisplays is called by showTab or loadData, which should handle the final render sync
     }
 
+
     function removeRouteStop() {
         if (routeStopCounter <= 1) return;
-        document.getElementById('routeSteps').lastElementChild.remove();
-        routeStopCounter--;
-        updateStopCounter();
-        saveRoutePlannerState(); // Now saves to LS and Firebase
-        // No need to updateAllDisplays here, saveRoutePlannerState handles persistence,
-        // and the UI element is removed directly.
+        const lastStep = document.getElementById('routeSteps').lastElementChild;
+        if (lastStep) {
+            lastStep.remove();
+            routeStopCounter--;
+            updateStopCounter();
+            saveRoutePlannerState(); // Save the state after removing
+            // No need to updateAllDisplays here, saveRoutePlannerState handles persistence,
+            // and the UI element is removed directly.
+        }
     }
 
     function clearAllStops() {
@@ -684,32 +940,61 @@
         alert(`Auto-filled ${allStops.length} stops!`);
     }
 
+     // Updates the options and selected values in all route planner selects
     function updateRouteSelects() {
         const allLocations = [...tourData.hotels.map(h => ({ id: h.id, name: h.name, type: 'Hotel' })), ...tourData.venues.map(v => ({ id: v.id, name: v.name, type: 'Venue' }))];
         for (let i = 0; i < routeStopCounter; i++) {
             const select = document.getElementById(`routeSelect${i}`);
+            const dateInput = document.getElementById(`routeDate${i}`);
+
             if (select) {
-                const savedState = tourData.routePlannerState[i]; // Get the state for this specific step index
+                // Store the current selection and date value before clearing options
+                 const savedSelectValue = select.value;
+                 const savedDateValue = dateInput ? dateInput.value : '';
+
                 let placeholderText = (i === 0) ? '-- Select Starting Point --' : '-- Select Next Stop --';
-                select.innerHTML = `<option value="">${placeholderText}</option>`;
+                select.innerHTML = `<option value="">${placeholderText}</option>`; // Clear existing options and add placeholder
+
+                // Add options for all locations
                 allLocations.forEach(location => {
                     const option = document.createElement('option');
                     option.value = `${location.type}:${location.id}`;
                     option.textContent = `${location.type}: ${location.name}`;
                     select.appendChild(option);
                 });
-                 // Set the saved value AFTER populating options
-                 if (savedState && savedState.selectValue) {
-                    select.value = savedState.selectValue;
+
+                 // Attempt to restore the saved value
+                 if (savedSelectValue) {
+                    select.value = savedSelectValue;
+                 } else if (tourData.routePlannerState[i] && tourData.routePlannerState[i].selectValue) {
+                     // If not found in current UI state, try loading from tourData state
+                      select.value = tourData.routePlannerState[i].selectValue;
                  }
-                 // Set the saved date value
-                 const dateInput = document.getElementById(`routeDate${i}`);
-                 if (dateInput && savedState && savedState.dateValue) {
-                    dateInput.value = savedState.dateValue;
+
+                 // Attempt to restore the saved date value
+                 if (dateInput) {
+                      if (savedDateValue) {
+                         dateInput.value = savedDateValue;
+                      } else if (tourData.routePlannerState[i] && tourData.routePlannerState[i].dateValue) {
+                          // If not found in current UI state, try loading from tourData state
+                           dateInput.value = tourData.routePlannerState[i].dateValue;
+                      }
                  }
+
+                 // Ensure the tourData.routePlannerState is updated with the current UI values after refresh
+                 // This is important if the UI state changed (e.g., manual input) before refresh
+                 if (tourData.routePlannerState[i]) {
+                     tourData.routePlannerState[i].selectValue = select.value;
+                     if(dateInput) tourData.routePlannerState[i].dateValue = dateInput.value;
+                 } else {
+                      // Should not happen if addRouteStop maintains state correctly, but as a safeguard
+                      tourData.routePlannerState[i] = { selectValue: select.value, dateValue: dateInput ? dateInput.value : '' };
+                 }
+
             }
         }
     }
+
 
     function toggleRouteBuilder() {
         const content = document.getElementById('route-builder-content');
@@ -739,29 +1024,32 @@
 
         try {
             const plannedSegments = [];
+            // Build segments from the route planner state
             for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
                 const fromStopInfo = tourData.routePlannerState[i];
                 const toStopInfo = tourData.routePlannerState[i + 1];
+                // A segment is valid only if both start and end stops are selected
                 if (!fromStopInfo.selectValue || !toStopInfo.selectValue) {
                      console.warn(`Skipping incomplete segment at index ${i}: Missing stop selection.`);
-                    continue; // Skip segments with empty select values
+                    continue;
                  }
-                // Ensure date is present for the starting point of the segment
+                // A segment is considered to "start" on the date specified for its *start* stop
                  if (!fromStopInfo.dateValue) {
-                      console.warn(`Skipping segment at index ${i}: Missing start date.`);
-                      continue;
+                      console.warn(`Segment at index ${i} missing start date. Using 'No Date'.`);
                  }
 
 
                 const fromLocation = getLocationDetails(fromStopInfo.selectValue);
                 const toLocation = getLocationDetails(toStopInfo.selectValue);
 
+                 // A segment is routable only if both stops have valid addresses
                  if(fromLocation.address && toLocation.address && fromLocation.address !== 'N/A' && toLocation.address !== 'N/A') {
                      plannedSegments.push({
-                         date: fromStopInfo.dateValue, // Segment is tied to the *start* date
+                         date: fromStopInfo.dateValue || 'No Date', // Use date of the start stop, or 'No Date'
                          from: fromLocation,
                          to: toLocation,
-                         fromStopId: fromStopInfo.selectValue, // Store original IDs
+                         // Include original IDs for potential future use, though not strictly needed for current rendering/caching
+                         fromStopId: fromStopInfo.selectValue,
                          toStopId: toStopInfo.selectValue
                      });
                  } else {
@@ -771,124 +1059,146 @@
             }
 
             if (plannedSegments.length === 0) {
-                throw new Error('No valid route segments found with selected stops and dates.');
+                throw new Error('No valid route segments found with selected stops, dates, and addresses in the planner.');
             }
 
-            // Group segments by date they START on
-            const segmentsStartingByDate = plannedSegments.reduce((acc, segment) => {
+            // Group *consecutive* planned segments by date they START on to form route "sequences" for API calls.
+            // Example: A->B on Date1, B->C on Date1 => Sequence: A, B, C on Date1.
+            // Example: C->D on Date2, D->E on Date2 => Sequence: C, D, E on Date2.
+            // This grouping ensures we ask Google for A->C via B, and C->E via D, which is more efficient than A->B, B->C separately.
+            const sequencesStartingByDate = {};
+             let currentSequence = null;
+
+            plannedSegments.forEach((segment, index) => {
                 const date = segment.date;
-                if (!acc[date]) acc[date] = [];
-                acc[date].push(segment);
-                return acc;
-            }, {});
+                const isFirstSegmentOfDay = !sequencesStartingByDate[date] || sequencesStartingByDate[date].length === 0;
 
-            const allDates = Object.keys(segmentsStartingByDate).sort();
+                if (isFirstSegmentOfDay || segment.from.id !== currentSequence.stops[currentSequence.stops.length - 1].id) {
+                    // Start a new sequence if it's the first segment for this date,
+                    // OR if the 'from' stop of the current segment doesn't match the 'to' stop of the previous segment in the *planner list*.
+                    // NOTE: This assumes the planner order is the desired travel order for the day.
+                    currentSequence = {
+                        date: date,
+                        stops: [segment.from, segment.to], // Sequence of stops for this API call
+                        segments: [segment] // Planned segments included in this sequence
+                    };
+                     if (!sequencesStartingByDate[date]) sequencesStartingByDate[date] = [];
+                     sequencesStartingByDate[date].push(currentSequence);
+                } else {
+                    // Add segment to the current sequence if the stops link up.
+                    // Only add the 'to' stop to the sequence list (the 'from' is already the last stop).
+                    currentSequence.stops.push(segment.to);
+                    currentSequence.segments.push(segment);
+                }
+            });
 
-            if (allDates.length === 0) {
-                 // This case should be covered by the previous check, but as a safeguard
-                 throw new Error('No route segments found with valid start dates.');
+
+            const allDatesWithSequences = Object.keys(sequencesStartingByDate).sort();
+
+            if (allDatesWithSequences.length === 0) {
+                 throw new Error('No route sequences found with valid start dates after processing segments.');
             }
 
             let processedDays = 0;
              routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; // Add main header
 
-            // Process each day that has segments starting on it
-            for (const date of allDates) {
-                 const segmentsForDay = segmentsStartingByDate[date]; // These are segments that START today
+            // Process each date that has one or more route sequences starting on it
+            for (const date of allDatesWithSequences) {
+                 const sequencesForDay = sequencesStartingByDate[date]; // These are sequences that START today
 
-                 // Determine the full sequence of stops for the day based on the planned segments
-                 // The sequence starts with the 'from' of the first segment
-                 // and includes the 'to' of all segments as intermediate stops/final destination.
-                 // Assumes segmentsForDay is already in the order defined by the planner.
-                 const dayStopsSequence = [segmentsForDay[0].from];
-                 segmentsForDay.forEach(segment => dayStopsSequence.push(segment.to));
+                 // We will generate ONE cached entry per sequence starting on this day.
+                 for (const sequence of sequencesForDay) {
 
-                 // Ensure all addresses in the sequence are valid before attempting API call
-                 const allAddressesValid = dayStopsSequence.every(stop => stop.address && stop.address !== 'N/A');
-                 if (!allAddressesValid) {
-                     console.warn(`Skipping API call for date ${date} due to invalid addresses in sequence.`, dayStopsSequence);
-                     renderErrorDay(date, processedDays + 1, 'Invalid address(es) in route sequence for this day.');
-                     processedDays++;
-                     const progress = (processedDays / allDates.length) * 100;
-                     progressFill.style.width = `${progress}%`;
-                     progressText.textContent = `Day ${processedDays}/${allDates.length} (skipped due to address error)...`;
-                     await new Promise(resolve => setTimeout(resolve, 100));
-                     continue; // Skip to the next date
-                 }
+                     // Ensure all addresses in the sequence are valid before attempting API call
+                     const allAddressesValid = sequence.stops.every(stop => stop.address && stop.address !== 'N/A');
+                     if (!allAddressesValid) {
+                         console.warn(`Skipping API call for sequence starting ${date} due to invalid addresses.`, sequence.stops);
+                         renderErrorDay(date, processedDays + 1, 'Invalid address(es) in route sequence for this day.');
+                         processedDays++;
+                         const progress = (processedDays / allDatesWithSequences.length) * 100; // Progress is per date, not sequence
+                         progressFill.style.width = `${progress}%`;
+                         progressText.textContent = `Day ${processedDays}/${allDatesWithSequences.length} (skipped due to address error)...`;
+                         await new Promise(resolve => setTimeout(resolve, 100));
+                         continue; // Skip this sequence, move to next one or next date
+                     }
 
 
-                try {
-                    // Cache key includes the date and the sequence of all addresses for the day
-                    const cacheKey = `${date}_${dayStopsSequence.map(s => s.address).join('|')}`;
-                     const CACHE_TTL = 7200000; // 2 hours in milliseconds
+                    try {
+                        // Cache key includes the date and the sequence of all addresses for this specific sequence
+                        const cacheKey = `${date}_${sequence.stops.map(s => s.address).join('|')}`;
+                         const CACHE_TTL = 7200000; // 2 hours in milliseconds
 
-                    let dayRouteData;
+                        let dayRouteData; // Renamed to sequenceRouteData conceptually
 
-                    if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < CACHE_TTL)) {
-                        dayRouteData = tourData.routeCache[cacheKey].data;
-                        dayRouteData.isCached = true;
-                        console.log(`Cache hit for date: ${date}`);
-                    } else {
-                         console.log(`Cache miss for date: ${date}. Fetching from API.`);
-                        // Construct origin, destination, and waypoints for API
-                        const origin = dayStopsSequence[0].address;
-                        const destination = dayStopsSequence[dayStopsSequence.length - 1].address;
-                        const waypoints = dayStopsSequence.slice(1, -1).map(loc => loc.address).join('|'); // All intermediate stops are waypoints
+                        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < CACHE_TTL)) {
+                            dayRouteData = tourData.routeCache[cacheKey].data;
+                            dayRouteData.isCached = true;
+                            console.log(`Cache hit for sequence key: ${cacheKey}`);
+                        } else {
+                             console.log(`Cache miss for sequence key: ${cacheKey}. Fetching from API.`);
+                            // Construct origin, destination, and waypoints for API from the sequence stops
+                            const origin = sequence.stops[0].address;
+                            const destination = sequence.stops[sequence.stops.length - 1].address;
+                            const waypoints = sequence.stops.slice(1, -1).map(loc => loc.address).join('|'); // All intermediate stops are waypoints
 
-                         // Using the proxy URL
-                        const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
+                             // Using the proxy URL
+                            const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
 
-                        const response = await fetch(url);
-                        if (!response.ok) {
-                             // Attempt to read error body if available
-                            const errorBody = await response.text();
-                            throw new Error(`API Load failed (status: ${response.status}) for date ${date}. Response: ${errorBody}`);
+                            const response = await fetch(url);
+                            if (!response.ok) {
+                                 // Attempt to read error body if available
+                                const errorBody = await response.text();
+                                throw new Error(`API Load failed (status: ${response.status}) for sequence starting ${date}. Response: ${errorBody}`);
+                            }
+                            const data = await response.json();
+
+                            if (data.status !== 'OK') {
+                                 // Include Google Maps error message if available
+                                 const googleErrorMessage = data.error_message || 'Check addresses or API key validity.';
+                                throw new Error(`Google Maps Error for sequence starting ${date}: ${data.status}. ${googleErrorMessage}`);
+                            }
+
+                            // Store minimal data in cache + stops info needed for rendering
+                            // Store the full sequence of stops that was used for the API call
+                            dayRouteData = { // Renamed to sequenceRouteData conceptually
+                                legs: data.routes[0].legs, // Stores distance, duration, start/end addresses per leg
+                                stops: sequence.stops, // Store the actual stop details used in the order they were requested
+                                totalDistance: data.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0),
+                                totalTime: data.routes[0].legs.reduce((sum, leg) => sum + (leg.duration_in_traffic || leg.duration).value, 0),
+                                 // DO NOT store totalGas here, it's calculated dynamically on render/summary
+                                isCached: false
+                            };
+
+                            // Update cache
+                            tourData.routeCache[cacheKey] = { data: dayRouteData, timestamp: Date.now() };
+                            saveData(); // Save the updated cache
                         }
-                        const data = await response.json();
 
-                        if (data.status !== 'OK') {
-                             // Include Google Maps error message if available
-                             const googleErrorMessage = data.error_message || 'Check addresses or API key validity.';
-                            throw new Error(`Google Maps Error for date ${date}: ${data.status}. ${googleErrorMessage}`);
-                        }
+                        // Render this sequence's route
+                        renderDayRouteSequence(date, dayRouteData, processedDays + 1, sequence.stops); // Pass the sequence stops for rendering
 
-                        // Store minimal data in cache + stops info needed for rendering
-                        dayRouteData = {
-                            legs: data.routes[0].legs, // Stores distance, duration, start/end addresses per leg
-                            stops: dayStopsSequence, // Store the actual stop details used in the order they were requested
-                            totalDistance: data.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0),
-                            totalTime: data.routes[0].legs.reduce((sum, leg) => sum + (leg.duration_in_traffic || leg.duration).value, 0),
-                             // DO NOT store totalGas here, it's calculated dynamically on render/summary
-                            isCached: false
-                        };
-
-                        // Update cache
-                        tourData.routeCache[cacheKey] = { data: dayRouteData, timestamp: Date.now() };
-                        saveData(); // Save the updated cache
+                    } catch (dayError) { // This catch block handles errors for a single sequence
+                        console.error(`Error processing sequence starting ${date}:`, dayError);
+                         renderErrorDay(date, processedDays + 1, `Error in route sequence: ${dayError.message}`);
                     }
+                 } // End sequence loop
 
-                    // Render the day's route using the loaded/cached data
-                    renderDayRoute(date, dayRouteData, processedDays + 1);
+                 processedDays++; // Increment day counter after processing ALL sequences for this date
+                 const progress = (processedDays / allDatesWithSequences.length) * 100;
+                 progressFill.style.width = `${progress}%`;
+                 progressText.textContent = `Day ${processedDays}/${allDatesWithSequences.length} processed...`;
+                 await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between dates
 
-                } catch (dayError) {
-                    console.error(`Error processing day ${date}:`, dayError);
-                    renderErrorDay(date, processedDays + 1, dayError.message);
-                }
-                processedDays++;
-                const progress = (processedDays / allDates.length) * 100;
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`;
-                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
-            }
+            } // End date loop
 
              // Update total stats after all days are processed
-             // This sums up ALL cached days, regardless of whether they were just generated or pre-existing cache
+             // This sums up ALL cached data entries, regardless of their start date.
              updateRouteSummaryStats();
 
             progressText.textContent = '✅ Route generation completed!';
 
-        } catch (error) {
-            console.error('Route generation error:', error);
+        } catch (error) { // This catch block handles overall errors (e.g., no valid segments)
+            console.error('Overall Route generation error:', error);
             routeResults.innerHTML = `<div class="route-item error"><strong>❌ Overall Route Generation Error:</strong> ${error.message}</div>`;
             progressText.textContent = '❌ Generation failed';
         } finally {
@@ -898,6 +1208,60 @@
             // Keep progress bar visible briefly to show completion/failure
             setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
         }
+    }
+
+
+    // Renders a single cached route *sequence* (which might cover one or more planner segments)
+    // date: The date the sequence starts on
+    // sequenceData: The data from the cache for this sequence
+    // sequenceStops: The ordered list of stops for this sequence (from cacheData.stops)
+    function renderDayRouteSequence(date, sequenceData, dayCounter, sequenceStops) {
+        const routeResults = document.getElementById('routeResults');
+        // Ensure sequenceData structure is valid
+         if (!sequenceData || !Array.isArray(sequenceData.legs) || !Array.isArray(sequenceData.stops) || sequenceData.legs.length === 0 || sequenceData.stops.length < 2) {
+             console.warn("Attempted to render invalid sequence data:", sequenceData);
+             return; // Do not render invalid data
+         }
+
+
+        const sequenceHours = Math.floor(sequenceData.totalTime / 3600);
+        const sequenceMinutes = Math.floor((sequenceData.totalTime % 3600) / 60);
+
+        // Calculate total gas for the sequence dynamically using current settings
+        let sequenceTotalGas = 0;
+        sequenceData.legs.forEach(leg => {
+           sequenceTotalGas += calculateGasCost(leg.distance.value);
+        });
+
+        // Display a summary for this specific sequence
+        const sequenceSummary = document.createElement('div');
+        sequenceSummary.className = 'day-summary-box'; // Re-using day-summary style for sequences
+        sequenceSummary.innerHTML = `<h4>Route Sequence Starting ${formatDate(date)} (${sequenceData.isCached ? 'Cached' : 'Real-time'})</h4>
+                                     <div class="stats-grid stats-grid-3-col">
+                                         <div class="stat-card"><div class="stat-value">${(sequenceData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Seq. Distance</div></div>
+                                         <div class="stat-card"><div class="stat-value">${sequenceHours}h ${sequenceMinutes}m</div><div class="stat-label">Seq. Drive Time</div></div>
+                                         <div class="stat-card"><div class="stat-value">$${sequenceTotalGas.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div>
+                                     </div>`;
+        routeResults.appendChild(sequenceSummary);
+
+        // Render each leg within this sequence
+        sequenceData.legs.forEach((leg, index) => {
+            // Calculate gas cost for the segment dynamically
+            const gasCost = calculateGasCost(leg.distance.value);
+            // Get the correct 'from' and 'to' stop for this leg from the cached 'stops' array for THIS sequence
+            const fromStop = sequenceData.stops[index] || { name: 'Unknown From', type: 'Unknown' }; // Fallback
+            const toStop = sequenceData.stops[index + 1] || { name: 'Unknown To', type: 'Unknown' }; // Fallback
+
+            const routeSegment = document.createElement('div');
+            // Add 'show-day' class if the *end* of this segment (leg) is a Venue
+            routeSegment.className = `route-item ${sequenceData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`;
+            routeSegment.innerHTML = `<div class="route-header"><strong>${fromStop.name} → ${toStop.name}</strong></div>
+                                     <div class="route-info">
+                                         <strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br>
+                                         <strong>Est. Gas:</strong> $${gasCost.toFixed(0)} CAD
+                                     </div>`;
+            routeResults.appendChild(routeSegment);
+        });
     }
 
 
@@ -912,59 +1276,24 @@
 
          routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; // Add main header
 
-         // Sort cache keys by date
+         // Sort cache keys by date (the start date of the sequence)
          const sortedCacheKeys = Object.keys(tourData.routeCache).sort();
-         let dayCounter = 0;
 
          sortedCacheKeys.forEach(key => {
              const cacheEntry = tourData.routeCache[key];
              // Ensure the cache entry structure is valid
-             if (!cacheEntry || !cacheEntry.data || !Array.isArray(cacheEntry.data.legs) || !Array.isArray(cacheEntry.data.stops) || cacheEntry.data.legs.length === 0) {
-                  console.warn(`Skipping invalid or empty cache entry: ${key}`, cacheEntry);
-                  return; // Skip this invalid or empty entry
+             if (!cacheEntry || !cacheEntry.data || !Array.isArray(cacheEntry.data.legs) || !Array.isArray(cacheEntry.data.stops) || cacheEntry.data.legs.length === 0 || cacheEntry.data.stops.length < 2) {
+                  console.warn(`Skipping invalid or empty cache entry for rendering: ${key}`, cacheEntry);
+                  // Optionally render an error message for this specific key
+                  // routeResults.innerHTML += `<div class="route-item error">Invalid cache data for key: ${key}</div>`;
+                  return; // Skip this invalid entry
              }
 
-             const dayData = cacheEntry.data;
-             const date = key.split('_')[0]; // Extract date from the cache key
-             dayCounter++;
+             const sequenceData = cacheEntry.data;
+             const date = key.split('_')[0]; // Extract date from the cache key (which is the sequence start date)
 
-             const dayHours = Math.floor(dayData.totalTime / 3600);
-             const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60);
-
-             // Calculate total gas for the day dynamically using current settings
-             let dayTotalGas = 0;
-             dayData.legs.forEach(leg => {
-                dayTotalGas += calculateGasCost(leg.distance.value);
-             });
-
-             const daySummary = document.createElement('div');
-             daySummary.className = 'day-summary-box';
-             daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ${dayData.isCached ? '✓' : '✅'}</h4>
-                                     <div class="stats-grid stats-grid-3-col">
-                                         <div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Day Distance</div></div>
-                                         <div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div>
-                                         <div class="stat-card"><div class="stat-value">$${dayTotalGas.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div>
-                                     </div>`;
-             routeResults.appendChild(daySummary);
-
-             // Render each leg within the day's route
-             dayData.legs.forEach((leg, index) => {
-                 // Calculate gas cost for the segment dynamically
-                 const gasCost = calculateGasCost(leg.distance.value);
-                 // Get the correct 'from' and 'to' stop for this leg from the cached 'stops' array
-                 const fromStop = dayData.stops[index] || { name: 'Unknown From', type: 'Unknown' }; // Fallback
-                 const toStop = dayData.stops[index + 1] || { name: 'Unknown To', type: 'Unknown' }; // Fallback
-
-                 const routeSegment = document.createElement('div');
-                 // Add 'show-day' class if the *end* of this segment is a Venue
-                 routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`;
-                 routeSegment.innerHTML = `<div class="route-header"><strong>${fromStop.name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div>
-                                          <div class="route-info">
-                                              <strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br>
-                                              <strong>Est. Gas:</strong> $${gasCost.toFixed(0)} CAD
-                                          </div>`;
-                 routeResults.appendChild(routeSegment);
-             });
+             // Use the renderDayRouteSequence function to display this cached sequence
+             renderDayRouteSequence(date, sequenceData, null, sequenceData.stops); // Pass null for dayCounter as it's per sequence now
          });
     }
 
@@ -979,19 +1308,19 @@
             tourData.routeCache = {}; // Reset if invalid
         }
 
-
+        // Iterate through ALL cached sequences to sum totals
         Object.values(tourData.routeCache).forEach(cacheEntry => {
             // Ensure cache entry is valid before processing
              if (!cacheEntry || !cacheEntry.data || !Array.isArray(cacheEntry.data.legs)) {
                   console.warn(`Skipping invalid cache entry in stats:`, cacheEntry);
                   return; // Skip this invalid entry
              }
-            const dayData = cacheEntry.data;
+            const sequenceData = cacheEntry.data;
              // Sum distances and times directly from cached values
-            grandTotalDistanceMeters += dayData.totalDistance || 0;
-            grandTotalTimeSecs += dayData.totalTime || 0;
+            grandTotalDistanceMeters += sequenceData.totalDistance || 0;
+            grandTotalTimeSecs += sequenceData.totalTime || 0;
              // Sum gas costs per leg dynamically using current settings
-            dayData.legs.forEach(leg => {
+            sequenceData.legs.forEach(leg => {
                 grandTotalGas += calculateGasCost(leg.distance.value);
             });
         });
@@ -1008,11 +1337,13 @@
     function renderErrorDay(date, dayCounter, errorMessage) {
         const routeResults = document.getElementById('routeResults');
         const errorSummary = document.createElement('div');
-        errorSummary.className = 'day-summary-box';
+        errorSummary.className = 'day-summary-box'; // Use day-summary style
         errorSummary.style.borderColor = '#e74c3c';
-        errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`;
+        // Display the date and a specific error message for clarity
+        errorSummary.innerHTML = `<h4>Route Sequence Starting ${date === 'No Date' ? 'No Date' : formatDate(date)} ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`;
         routeResults.appendChild(errorSummary);
     }
+
 
     // --- Calendar Logic ---
      function renderCalendar() {
@@ -1023,20 +1354,15 @@
         const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday, 6 = Saturday
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
-        const daysInNextMonth = new Date(currentYear, currentMonth + 2, 0).getDate(); // Need this to fill out the grid
 
         monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`;
 
-        // Add days from previous month
+        // Add days from previous month to fill the first week
         for (let i = firstDay - 1; i >= 0; i--) {
              const prevMonthDay = daysInPrevMonth - i;
              const prevMonthDate = new Date(currentYear, currentMonth - 1, prevMonthDay);
              const dateStr = prevMonthDate.toISOString().split('T')[0];
-             const events = getEventsForDate(dateStr);
-             let eventIcons = '';
-             if (events.isVenue) eventIcons += '🎵';
-             if (events.isTravel) eventIcons += '🚗';
-             // Only show icons for days in the current month visually, but keep click handler for nav
+             // Use other-month class and add click handler for potential month navigation
               calendarEl.innerHTML += `<div class="calendar-day other-month" onclick="showDayDetails('${dateStr}')"><div class="day-number">${prevMonthDay}</div></div>`;
         }
 
@@ -1048,14 +1374,23 @@
             const events = getEventsForDate(dateStr);
             let eventIcons = '';
             if (events.isVenue) { eventIcons += '🎵'; }
-            if (events.isTravel) { eventIcons += '🚗'; } // Show car if it's any part of a travel day
+            if (events.isTravel) { eventIcons += '🚗'; }
+            if (events.isHotelStay && !events.isVenue && !events.isTravel) { eventIcons += '🏨'; } // Show hotel icon if staying and not also venue/travel
 
             dayHtml += `<div class="day-events">${eventIcons}</div>`;
 
             // Add static notes (adjust dates as needed)
             if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`;
             if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`;
-            if (day % 10 === 0 && !events.isVenue && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`;
+            // Add a note if it's a hotel check-in/out day that isn't also a venue or travel day
+             if (events.isHotelStay && !events.isVenue && !events.isTravel) {
+                  const hotel = tourData.hotels.find(h => dateStr === h.checkin || dateStr === h.checkout);
+                  if (hotel) {
+                       if (dateStr === hotel.checkin && dateStr === hotel.checkout) dayHtml += `<div class="day-note">${hotel.name} (Day Use?)</div>`;
+                       else if (dateStr === hotel.checkin) dayHtml += `<div class="day-note">${hotel.name} (Check-in)</div>`;
+                       else if (dateStr === hotel.checkout) dayHtml += `<div class="day-note">${hotel.name} (Check-out)</div>`;
+                  }
+             }
 
 
             dayHtml += '</div>';
@@ -1064,17 +1399,18 @@
 
          // Add days from next month to fill the grid
         const totalDaysDisplayed = calendarEl.children.length; // Count the elements already added
-        const remainingSlots = 42 - totalDaysDisplayed; // 6 rows * 7 days = 42 slots. Max possible slots.
+        const remainingSlots = 42 - totalDaysDisplayed; // Max slots needed for 6 full weeks
         if (remainingSlots > 0) {
-            for (let i = 1; i <= remainingSlots; i++) {
+             for (let i = 1; i <= remainingSlots; i++) {
                 const nextMonthDate = new Date(currentYear, currentMonth + 1, i);
                 const dateStr = nextMonthDate.toISOString().split('T')[0];
-                // Only show icons for days in the current month visually, but keep click handler for nav
+                 // Use other-month class and add click handler
                  calendarEl.innerHTML += `<div class="calendar-day other-month" onclick="showDayDetails('${dateStr}')"><div class="day-number">${i}</div></div>`;
-            }
+             }
         }
     }
 
+     // Determines what kind of events happen on a given date
      function getEventsForDate(dateStr) {
          let isVenue = tourData.venues.some(v => v.date === dateStr);
          let isHotelStay = tourData.hotels.some(h => {
@@ -1088,25 +1424,23 @@
              return false;
          });
 
-
          // Check route planner for travel days
          let isTravel = false;
-         // A day is a travel day if it is the date associated with *any* stop in the planner
-         // AND that stop is part of a planned segment (i.e., has a stop before or after it *in the planner state sequence*)
+         // A day is a travel day if its date appears anywhere in the route planner sequence dates,
+         // and the corresponding stop is part of a planned segment (has a prev or next stop in planner).
          tourData.routePlannerState.forEach((r, i) => {
               if (r.dateValue === dateStr && r.selectValue) { // If the date matches any stop's date in the planner
-                  // Check if this stop is part of a *meaningful* route segment (i.e. not just a single standalone stop)
+                  // Check if this stop is part of a *meaningful* route segment
                   const hasPrevStop = (i > 0 && tourData.routePlannerState[i-1].selectValue);
                   const hasNextStop = (i < tourData.routePlannerState.length - 1 && tourData.routePlannerState[i+1].selectValue);
 
-                  // If the stop has a previous *or* next selected stop in the sequence, it's a travel day related to that stop
                   if (hasPrevStop || hasNextStop) {
                       isTravel = true;
                   }
               }
          });
 
-         // Additionally, consider days that fall *between* the start and end dates of any multi-day cached route
+          // Also check if the date falls within the range of any cached route sequence
          Object.keys(tourData.routeCache).forEach(key => {
               const cacheDayStartDateStr = key.split('_')[0];
               // Ensure cache entry and data are valid
@@ -1114,25 +1448,28 @@
                    return; // Skip invalid cache entry
               }
               const dayData = tourData.routeCache[key].data;
-              // Find the last stop of the sequence for this cached day
-              const lastStopInSequence = dayData.stops[dayData.stops.length - 1];
-              const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
-              // Try to find the date for this last stop in the planner state
+
+              // Find the date for the LAST stop in the cached sequence
+               const lastStopInSequence = dayData.stops[dayData.stops.length - 1];
+               const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
                const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
                let cacheDayEndDateStr = null;
                if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
                    cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
                }
 
-              if (cacheDayStartDateStr && cacheDayEndDateStr && cacheDayStartDateStr !== cacheDayEndDateStr) {
+              if (cacheDayStartDateStr && cacheDayEndDateStr) {
                    const cacheStart = new Date(cacheDayStartDateStr + 'T00:00:00');
                    const cacheEnd = new Date(cacheDayEndDateStr + 'T00:00:00');
                    const current = new Date(dateStr + 'T00:00:00');
 
-                   // If the current date is strictly between the cache start and end dates (non-inclusive of start, inclusive of end?)
-                   // Let's consider any day from the day *after* the start up to and including the end date
-                   if (current > cacheStart && current <= cacheEnd) {
-                       isTravel = true; // It's an intermediate or end travel day
+                   // If the current date is within the range [cacheStart, cacheEnd] and it's not explicitly a Venue day,
+                   // consider it a travel day associated with this cached route.
+                   // We only mark as travel *if* it's covered by a cached route and not a venue day
+                   // (to avoid overwriting the more important Venue icon).
+                   // Note: This logic can still be complex for overlapping events.
+                   if (current >= cacheStart && current <= cacheEnd) {
+                       isTravel = true; // It's an intermediate or end travel day covered by cache
                    }
               }
          });
@@ -1142,6 +1479,7 @@
     }
 
 
+    // Shows modal with details for a specific date
     function showDayDetails(dateStr) {
         const modal = document.getElementById('calendarModal');
         const content = document.getElementById('calendarModalContent');
@@ -1169,20 +1507,17 @@
 
 
         // Find cached route data that *includes* this date as part of its sequence range.
-        // A cached day's route key is date_address1|address2|... where date is the start date.
-        // We need to find any cached entry whose start date <= dateStr AND whose end date >= dateStr.
-        const relevantCachedDayKeys = Object.keys(tourData.routeCache).filter(key => {
+         const relevantCachedDayKeys = Object.keys(tourData.routeCache).filter(key => {
             const cacheDayStartDateStr = key.split('_')[0];
             // Ensure cache entry and data are valid
             if (!tourData.routeCache[key] || !tourData.routeCache[key].data || !Array.isArray(tourData.routeCache[key].data.stops) || tourData.routeCache[key].data.stops.length < 2) {
                  return false; // Skip invalid cache entry
             }
-             const dayData = tourData.routeCache[key].data;
+             const dayData = tourData.routeCache[key].data; // Use dayData for clarity within this scope
 
-            // Find the last stop of the sequence for this cached day
+            // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
             const lastStopInSequence = dayData.stops[dayData.stops.length - 1];
             const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
-            // Try to find the date for this last stop in the planner state
              const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
              let cacheDayEndDateStr = null;
              if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
@@ -1194,42 +1529,42 @@
                  const cacheEnd = new Date(cacheDayEndDateStr + 'T00:00:00');
                  const current = new Date(dateStr + 'T00:00:00');
 
-                 // Check if the current date is within the range [cacheStart, cacheEnd]
+                 // Check if the current date is within the range [cacheStart, cacheEnd] inclusive
                  return current >= cacheStart && current <= cacheEnd;
              }
              return false; // Cannot determine range if dates are missing
-        }).sort(); // Sort to display days in order
+        }).sort(); // Sort keys to display routes in chronological order by start date
 
         if (relevantCachedDayKeys.length > 0) {
              html += `<h3>🚗 Travel Information</h3>`; // General header for travel info on this date
 
              relevantCachedDayKeys.forEach(key => {
                  const cacheEntry = tourData.routeCache[key];
-                 const dayData = cacheEntry.data; // Already checked for validity in filter
+                 const sequenceData = cacheEntry.data; // Already checked for validity in filter
                  const cacheDayStartDateStr = key.split('_')[0];
 
-                 const dayHours = Math.floor(dayData.totalTime / 3600);
-                 const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60);
-                 const dayTotalGas = calculateGasCost(dayData.totalDistance); // Dynamic gas calc
+                 const sequenceHours = Math.floor(sequenceData.totalTime / 3600);
+                 const sequenceMinutes = Math.floor((sequenceData.totalTime % 3600) / 60);
+                 const sequenceTotalGas = calculateGasCost(sequenceData.totalDistance); // Dynamic gas calc
 
-                  // Display summary for the entire cached route this date belongs to
-                  html += `<h4>Route Starting ${formatDate(cacheDayStartDateStr)} (${dayData.isCached ? 'Cached' : 'Real-time'})</h4>
+                  // Display a summary for this specific sequence
+                  html += `<h4>Route Sequence Starting ${formatDate(cacheDayStartDateStr)} (${sequenceData.isCached ? 'Cached' : 'Real-time'})</h4>
                          <div class="day-summary-box" style="margin-top:0;">
                             <div class="stats-grid stats-grid-3-col" style="margin-bottom:0;">
-                                <div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div>
-                                <div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div>
-                                <div class="stat-card"><div class="stat-value">$${dayTotalGas.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div>
+                                <div class="stat-card"><div class="stat-value">${(sequenceData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Seq. Distance</div></div>
+                                <div class="stat-card"><div class="stat-value">${sequenceHours}h ${sequenceMinutes}m</div><div class="stat-label">Seq. Drive Time</div></div>
+                                <div class="stat-card"><div class="stat-value">$${sequenceTotalGas.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div>
                             </div>
                          </div>
                          <h4>Segments for this Route Sequence</h4>`; // Changed to Segments as it lists legs
 
 
-                   // Display segments (legs) from the cached day data
-                   dayData.legs.forEach((leg, index) => {
+                   // Display segments (legs) from the cached sequence data
+                   sequenceData.legs.forEach((leg, index) => {
                         const gasCost = calculateGasCost(leg.distance.value); // Dynamic gas calc
-                        const fromStop = dayData.stops[index] || { name: 'Unknown From', type: 'Unknown' };
-                        const toStop = dayData.stops[index+1] || { name: 'Unknown To', type: 'Unknown' };
-                         html += `<div class="route-item" style="border-left-color:${dayData.isCached ? '#4CAF50' : '#87CEEB'};">
+                        const fromStop = sequenceData.stops[index] || { name: 'Unknown From', type: 'Unknown' };
+                        const toStop = sequenceData.stops[index+1] || { name: 'Unknown To', type: 'Unknown' };
+                         html += `<div class="route-item" style="border-left-color:${sequenceData.isCached ? '#4CAF50' : '#87CEEB'};">
                                      <strong>${fromStop.name} → ${toStop.name}</strong>
                                      <br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text} | Est. Gas: $${gasCost.toFixed(0)}</small>
                                      </div>`;
@@ -1267,99 +1602,361 @@
         showDayDetails(date.toISOString().split('T')[0]);
     }
 
-    let touchstartX = 0; let touchendX = 0;
-    function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); }
+    let touchstartX = 0;
+    let touchendX = 0;
+    function handleSwipe() {
+         // Allow swipe only if the modal content itself is NOT scrollable
+         const modalContentEl = document.getElementById('calendarModalContent');
+         const isContentScrollable = modalContentEl.scrollHeight > modalContentEl.clientHeight;
+
+         if (!isContentScrollable) {
+            if (touchendX < touchstartX - 50) showNextDay();
+            if (touchendX > touchstartX + 50) showPrevDay();
+         } else {
+             console.log("Modal content is scrollable, swipe for navigation disabled.");
+         }
+     }
+
     function addSwipeListeners(element) {
         // Ensure listeners are not duplicated by removing them first
-        // This prevents multiple swipe handlers being added if modal is opened/closed repeatedly
-        element.removeEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-        element.removeEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
+        const handleTouchStart = (e) => { touchstartX = e.changedTouches[0].screenX; };
+        const handleTouchEnd = (e) => { touchendX = e.changedTouches[0].screenX; handleSwipe(); };
 
-        element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-        element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
+        // Use a specific identifier or check the function reference if needed for more complex removal
+        // For now, simply re-adding might be okay if done only when modal is shown
+        element.removeEventListener('touchstart', handleTouchStart, {passive: true});
+        element.removeEventListener('touchend', handleTouchEnd, {passive: true});
+
+        element.addEventListener('touchstart', handleTouchStart, {passive: true});
+        element.addEventListener('touchend', handleTouchEnd, {passive: true});
     }
+
 
     function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }
     function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
 
 
     // --- Modal Edit Functions ---
-    function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; document.getElementById('hotelModal').style.display = 'block'; }
-    function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; document.getElementById('venueModal').style.display = 'block'; }
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; currentEditId = null; }
-    function saveHotelEdit() { const hotel = tourData.hotels.find(h => h.id === currentEditId); if (!hotel) return; hotel.name = document.getElementById('editHotelName').value; hotel.address = document.getElementById('editHotelAddress').value; hotel.checkin = document.getElementById('editCheckinDate').value; hotel.checkout = document.getElementById('editCheckoutDate').value; hotel.costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; hotel.costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; hotel.approxCAD = hotel.costUSD * 1.35; hotel.notes = document.getElementById('editHotelNotes').value; saveData(); updateAllDisplays(); closeModal('hotelModal'); }
-    function saveVenueEdit() { const venue = tourData.venues.find(v => v.id === currentEditId); if (!venue) return; venue.name = document.getElementById('editVenueName').value; venue.address = document.getElementById('editVenueAddress').value; venue.date = document.getElementById('editShowDate').value; venue.time = document.getElementById('editShowTime').value; venue.startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; venue.endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; venue.totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; venue.notes = document.getElementById('editVenueNotes').value; saveData(); updateAllDisplays(); closeModal('venueModal'); }
+    function openHotelModal(hotelId) {
+        console.log("Attempting to open hotel modal for ID:", hotelId);
+        const hotel = tourData.hotels.find(h => h.id === hotelId);
+        if (!hotel) {
+            console.error("Hotel not found for editing:", hotelId);
+            return;
+        }
+        currentEditId = hotelId;
+        // Populate form
+        document.getElementById('editHotelName').value = hotel.name;
+        document.getElementById('editHotelAddress').value = hotel.address;
+        document.getElementById('editCheckinDate').value = hotel.checkin;
+        document.getElementById('editCheckoutDate').value = hotel.checkout;
+        document.getElementById('editHotelCostUSD').value = hotel.costUSD;
+        document.getElementById('editHotelCostCAD').value = hotel.costCAD; // Populate manual CAD if present
+        document.getElementById('editHotelNotes').value = hotel.notes || '';
+
+        document.getElementById('hotelModal').style.display = 'block';
+         console.log("Hotel modal opened for ID:", hotelId);
+    }
+    function openVenueModal(venueId) {
+         console.log("Attempting to open venue modal for ID:", venueId);
+         const venue = tourData.venues.find(v => v.id === venueId);
+         if (!venue) {
+             console.error("Venue not found for editing:", venueId);
+             return;
+         }
+         currentEditId = venueId;
+         // Populate form
+         document.getElementById('editVenueName').value = venue.name;
+         document.getElementById('editVenueAddress').value = venue.address;
+         document.getElementById('editShowDate').value = venue.date;
+         document.getElementById('editShowTime').value = venue.time;
+         document.getElementById('editStartInventory').value = venue.startInventory;
+         document.getElementById('editEndInventory').value = venue.endInventory;
+         document.getElementById('editTotalSales').value = venue.totalSales;
+         document.getElementById('editVenueNotes').value = venue.notes || '';
+
+         document.getElementById('venueModal').style.display = 'block';
+         console.log("Venue modal opened for ID:", venueId);
+     }
+
+    function closeModal(modalId) {
+         const modal = document.getElementById(modalId);
+         if (modal) {
+              modal.style.display = 'none';
+              currentEditId = null; // Clear edit ID on close
+              console.log("Modal closed:", modalId);
+         }
+    }
+
+    function saveHotelEdit() {
+        console.log("Attempting to save hotel edit for ID:", currentEditId);
+        const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId);
+        if (hotelIndex === -1) {
+             console.error("Hotel not found for saving:", currentEditId);
+             return;
+        }
+
+        const hotel = tourData.hotels[hotelIndex];
+        hotel.name = document.getElementById('editHotelName').value.trim();
+        hotel.address = document.getElementById('editHotelAddress').value.trim();
+        hotel.checkin = document.getElementById('editCheckinDate').value;
+        hotel.checkout = document.getElementById('editCheckoutDate').value;
+        hotel.costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0;
+        hotel.costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0;
+        // Approx CAD is not stored, it's calculated on display
+        hotel.notes = document.getElementById('editHotelNotes').value.trim();
+
+        // Basic validation again on save
+         if (!hotel.name || !hotel.address || !hotel.checkin) {
+             alert('Please fill in hotel name, full address, and check-in date.');
+             return;
+         }
+         if (hotel.checkout && new Date(hotel.checkin) > new Date(hotel.checkout)) {
+              alert('Check-out date cannot be before check-in date.');
+              return;
+         }
+
+        saveData(); // Save changes
+        updateAllDisplays(); // Refresh UI
+        closeModal('hotelModal');
+         console.log("Hotel edit saved for ID:", currentEditId);
+    }
+
+    function saveVenueEdit() {
+         console.log("Attempting to save venue edit for ID:", currentEditId);
+         const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId);
+         if (venueIndex === -1) {
+             console.error("Venue not found for saving:", currentEditId);
+             return;
+         }
+
+         const venue = tourData.venues[venueIndex];
+         venue.name = document.getElementById('editVenueName').value.trim();
+         venue.address = document.getElementById('editVenueAddress').value.trim();
+         venue.date = document.getElementById('editShowDate').value;
+         venue.time = document.getElementById('editShowTime').value;
+         venue.startInventory = parseInt(document.getElementById('editStartInventory').value) || 0;
+         venue.endInventory = parseInt(document.getElementById('editEndInventory').value) || 0;
+         venue.totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0;
+         venue.notes = document.getElementById('editVenueNotes').value.trim();
+
+         // Basic validation on save
+         if (!venue.name || !venue.address || !venue.date) {
+              alert('Please fill in venue name, full address, and show date.');
+              return;
+         }
+
+
+         saveData(); // Save changes
+         updateAllDisplays(); // Refresh UI
+         closeModal('venueModal');
+         console.log("Venue edit saved for ID:", currentEditId);
+    }
+
+    // Delete function specific for modals (uses currentEditId)
+     function deleteHotel() {
+         if (confirm('Are you sure you want to delete this hotel?')) {
+              console.log("Attempting to delete hotel ID:", currentEditId);
+             tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId);
+             // Also remove this hotel from route planner if it's used
+              tourData.routePlannerState = tourData.routePlannerState.map(stop =>
+                  stop.selectValue === `Hotel:${currentEditId}` ? { selectValue: '', dateValue: stop.dateValue } : stop
+              );
+             saveData(); // Save changes
+             updateAllDisplays(); // Refresh UI
+             closeModal('hotelModal');
+             console.log("Hotel deleted ID:", currentEditId);
+         }
+     }
+
+    // Delete function specific for modals (uses currentEditId)
+     function deleteVenue() {
+          if (confirm('Are you sure you want to delete this venue?')) {
+              console.log("Attempting to delete venue ID:", currentEditId);
+              tourData.venues = tourData.venues.filter(v => v.id !== currentEditId);
+              // Also remove this venue from route planner if it's used
+               tourData.routePlannerState = tourData.routePlannerState.map(stop =>
+                   stop.selectValue === `Venue:${currentEditId}` ? { selectValue: '', dateValue: stop.dateValue } : stop
+               );
+              saveData(); // Save changes
+              updateAllDisplays(); // Refresh UI
+              closeModal('venueModal');
+              console.log("Venue deleted ID:", currentEditId);
+          }
+      }
 
 
     // --- Display Functions ---
+
     function updateHotelsDisplay() {
-        const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = '';
+        const hotelsList = document.getElementById('hotelsList');
+        hotelsList.innerHTML = ''; // Clear current list
+
         const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin));
         let totalCAD = 0;
-        let totalNights = 0; // Use a more accurate calculation for total nights
+        let totalNights = 0;
 
         sortedHotels.forEach(hotel => {
-            // Use manual CAD if available, otherwise calculate approx
             const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35);
-            totalCAD += displayCAD; // Sum the displayed CAD value
+            totalCAD += displayCAD;
 
-            // Calculate nights: count of nights = checkout date - checkin date
              if (hotel.checkin && hotel.checkout) {
                  const checkin = new Date(hotel.checkin + 'T00:00:00'); // Use T00:00:00 for consistent day start
                  const checkout = new Date(hotel.checkout + 'T00:00:00');
-                 if (checkout > checkin) {
+                 if (checkout >= checkin) {
                       const diffTime = checkout.getTime() - checkin.getTime();
-                      totalNights += diffTime / (1000 * 60 * 60 * 24); // Difference in days = number of nights
-                 } else if (checkout.getTime() === checkin.getTime() && hotel.checkin) {
-                     // Handle case where checkin and checkout are the same date (e.g., day use or late checkout)
-                     // Count as 1 night if there's a checkin date
+                      totalNights += Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Difference in days = number of nights
+                 } else if (hotel.checkin) { // If checkout is before checkin, or invalid, just count checkin day/night
                      totalNights += 1;
                  }
              }
 
-
             const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad';
-            const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id);
-            hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address ? hotel.address.substring(0, 50) + (hotel.address.length > 50 ? '...' : '') : 'N/A'}</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button></div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`;
+
+            const hotelCard = document.createElement('div');
+            hotelCard.className = 'hotel-card';
+            // Add click listener to open modal
+            hotelCard.addEventListener('click', () => openHotelModal(hotel.id));
+
+            hotelCard.innerHTML = `
+                <div class="card-header">
+                    <strong class="card-title">${hotel.name}</strong>
+                    <small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small>
+                </div>
+                <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address ? hotel.address.substring(0, 50) + (hotel.address.length > 50 ? '...' : '') : 'N/A'}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span>
+                    <button class="btn btn-small btn-danger delete-btn" data-id="${hotel.id}" data-type="hotel">×</button> <!-- Use data attributes -->
+                </div>
+                ${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}
+            `;
             hotelsList.appendChild(hotelCard);
         });
+
+         // Add event listeners for delete buttons using delegation on the list container
+         hotelsList.querySelectorAll('.delete-btn').forEach(button => {
+             button.addEventListener('click', (event) => {
+                 event.stopPropagation(); // Prevent card click
+                 const id = parseInt(event.target.dataset.id);
+                 const type = event.target.dataset.type;
+                 deleteItem(type, id); // Call the shared delete function
+             });
+         });
+
+
         document.getElementById('hotelCountStat').textContent = tourData.hotels.length;
-        document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); // Round total nights for display
+        document.getElementById('hotelDaysStat').textContent = Math.round(totalNights);
         document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0);
     }
 
-    function updateExpensesDisplay() {
-        const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0;
-        const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
-        sortedExpenses.forEach(expense => {
-             // Use manual CAD if available, otherwise calculate approx
-            const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35);
-            totalCAD += displayCAD; // Sum the displayed CAD value
 
-            const row = tbody.insertRow(); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad';
-             row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}${(expense.location || '').length > 15 ? '...' : ''}</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`;
+    function updateExpensesDisplay() {
+        const expensesList = document.getElementById('expensesList');
+         expensesList.innerHTML = ''; // Clear current list
+
+        let totalCAD = 0;
+        const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        sortedExpenses.forEach(expense => {
+             const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35);
+            totalCAD += displayCAD;
+
+             const expenseRow = document.createElement('div');
+             expenseRow.className = 'expense-row';
+
+             // Add content divs
+             const dateDiv = document.createElement('div'); dateDiv.className = 'exp-date'; dateDiv.textContent = formatDate(expense.date); expenseRow.appendChild(dateDiv);
+
+             const typeDiv = document.createElement('div'); typeDiv.className = 'exp-type'; typeDiv.textContent = expense.type; expenseRow.appendChild(typeDiv);
+
+             const locDiv = document.createElement('div'); locDiv.className = 'exp-loc'; locDiv.textContent = (expense.location || 'N/A').substring(0, 15) + ((expense.location || '').length > 15 ? '...' : ''); expenseRow.appendChild(locDiv);
+
+             const usdDiv = document.createElement('div'); usdDiv.className = 'exp-usd'; usdDiv.textContent = expense.amountUSD.toFixed(0); expenseRow.appendChild(usdDiv);
+
+             const cadDiv = document.createElement('div'); cadDiv.className = `exp-cad ${expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'}`; cadDiv.textContent = `${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}`; expenseRow.appendChild(cadDiv);
+
+             const actionsDiv = document.createElement('div'); actionsDiv.className = 'exp-actions';
+             const deleteButton = document.createElement('button');
+             deleteButton.className = 'btn btn-small btn-danger delete-btn';
+             deleteButton.textContent = '×';
+             deleteButton.dataset.id = expense.id; // Use data attribute
+             deleteButton.dataset.type = 'expense'; // Use data attribute
+             // Add click listener for delete
+             deleteButton.addEventListener('click', (event) => {
+                  event.stopPropagation(); // Prevent potential row click logic if added later
+                  const id = parseInt(event.target.dataset.id);
+                  const type = event.target.dataset.type;
+                  deleteItem(type, id); // Call the shared delete function
+             });
+             actionsDiv.appendChild(deleteButton);
+             expenseRow.appendChild(actionsDiv);
+
+
+             expensesList.appendChild(expenseRow);
         });
-        document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
+
+        document.getElementById('expenseCountStat').textContent = tourData.expenses.length;
+        document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
     }
+
 
     function updateVenuesDisplay() {
-        const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = '';
+        const venuesList = document.getElementById('venuesList');
+        venuesList.innerHTML = ''; // Clear current list
+
         const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date));
         let totalSales = 0;
+
         sortedVenues.forEach(venue => {
             totalSales += venue.totalSales;
-             // Calculate sold items safely, handling potential NaN/null inputs
             const soldItems = (venue.startInventory != null && venue.endInventory != null) ? (parseInt(venue.startInventory) || 0) - (parseInt(venue.endInventory) || 0) : 'N/A';
 
-            const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id);
-             venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address ? venue.address.substring(0, 50) + (venue.address.length > 50 ? '...' : '') : 'N/A'}</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory ?? 'N/A'} | End ${venue.endInventory ?? 'N/A'} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button></div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`;
+            const venueCard = document.createElement('div');
+            venueCard.className = 'venue-card';
+             // Add click listener to open modal
+            venueCard.addEventListener('click', () => openVenueModal(venue.id));
+
+
+             venueCard.innerHTML = `
+                 <div class="card-header">
+                     <strong class="card-title">${venue.name}</strong>
+                     <small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small>
+                 </div>
+                 <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address ? venue.address.substring(0, 50) + (venue.address.length > 50 ? '...' : '') : 'N/A'}</div>
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                     <span style="font-size: 12px;">Inventory: Start ${venue.startInventory ?? 'N/A'} | End ${venue.endInventory ?? 'N/A'} | Sold ${soldItems}</span>
+                 </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                     <span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span>
+                     <button class="btn btn-small btn-danger delete-btn" data-id="${venue.id}" data-type="venue">×</button> <!-- Use data attributes -->
+                 </div>
+                 ${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}
+             `;
             venuesList.appendChild(venueCard);
         });
-        document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
+
+         // Add event listeners for delete buttons using delegation on the list container
+         venuesList.querySelectorAll('.delete-btn').forEach(button => {
+              button.addEventListener('click', (event) => {
+                  event.stopPropagation(); // Prevent card click
+                  const id = parseInt(event.target.dataset.id);
+                  const type = event.target.dataset.type;
+                  deleteItem(type, id); // Call the shared delete function
+              });
+         });
+
+
+        document.getElementById('venueCountStat').textContent = tourData.venues.length;
+        document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
     }
 
 
-    window.onclick = function(event) { if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal'); if (event.target === document.getElementById('venueModal')) closeModal('venueModal'); if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal'); }
+    window.onclick = function(event) {
+         // Check if the click is directly on the modal backdrop, not inside the modal content
+         if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal');
+         if (event.target === document.getElementById('venueModal')) closeModal('venueModal');
+         if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal');
+    }
 
     function exportTourData() {
         const includeHotels = document.getElementById('exportHotels').checked;
@@ -1370,20 +1967,20 @@
 
         if(includeHotels) tourData.hotels.forEach(h => {
             const displayCAD = h.costCAD > 0 ? h.costCAD : (h.costUSD * 1.35);
-            csvData.push(['Hotel', h.checkin, h.name, h.address, displayCAD.toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout || 'N/A'} | ${h.notes || ''}`]);
+            csvData.push(['Hotel', h.checkin || 'N/A', h.name || 'N/A', h.address || 'N/A', displayCAD.toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout || 'N/A'} | ${h.notes || ''}`]);
         });
         if(includeVenues) tourData.venues.forEach(v => {
              const soldItems = (v.startInventory != null && v.endInventory != null) ? (parseInt(v.startInventory) || 0) - (parseInt(v.endInventory) || 0) : 'N/A';
-             csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time || 'N/A'} | Sold: ${soldItems} | ${v.notes || ''}`]);
+             csvData.push(['Venue', v.date || 'N/A', v.name || 'N/A', v.address || 'N/A', v.totalSales ?? 0, 'USD', `Time: ${v.time || 'N/A'} | Sold: ${soldItems} | ${v.notes || ''}`]);
         });
         if(includeExpenses) tourData.expenses.forEach(e => {
             const displayCAD = e.amountCAD > 0 ? e.amountCAD : (e.amountUSD * 1.35);
-             csvData.push(['Expense', e.date, e.type, e.location, displayCAD.toFixed(2), 'CAD (Estimate if not Manual)', e.notes || '']);
+             csvData.push(['Expense', e.date || 'N/A', e.type || 'N/A', e.location || 'N/A', displayCAD.toFixed(2), 'CAD (Estimate if not Manual)', e.notes || '']);
         });
 
         if (includeRoute) {
             csvData.push(['---','---','---','---','---','---','---']);
-            csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']);
+            csvData.push(['ROUTE ITINERARY', 'Sequence Start Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']);
             // Sort cache keys by date for ordered export
             Object.keys(tourData.routeCache).sort().forEach(key => {
                  const cacheEntry = tourData.routeCache[key];
@@ -1392,11 +1989,12 @@
                      console.warn(`Skipping invalid cache entry for export: ${key}`);
                      return;
                  }
-                const dayData = cacheEntry.data;
-                const date = key.split('_')[0];
-                dayData.legs.forEach((leg, index) => {
-                    const fromStop = dayData.stops[index];
-                    const toStop = dayData.stops[index+1];
+                const sequenceData = cacheEntry.data;
+                const date = key.split('_')[0]; // Sequence start date
+
+                sequenceData.legs.forEach((leg, index) => {
+                    const fromStop = sequenceData.stops[index];
+                    const toStop = sequenceData.stops[index+1];
                     const gasCost = calculateGasCost(leg.distance.value); // Calculate gas dynamically
 
                     csvData.push(['Segment', date, fromStop.name || 'N/A', toStop.name || 'N/A', leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]);
