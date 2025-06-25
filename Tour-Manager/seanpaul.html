@@ -759,5 +759,22 @@ function renderDayRoute(date, dayData, dayCounter) {
       el.addEventListener("change", window.saveTourData));
   });
 })();
+</script><script>
+// Firebase sync function that was missing
+function saveToFirebase(data) {
+  try {
+    const firebaseApp = firebase.initializeApp({
+      apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
+      authDomain: "tour-manager-b2888.firebaseapp.com",
+      projectId: "tour-manager-b2888",
+    });
+    const db = firebaseApp.firestore();
+    db.collection("tourData").doc("tourData_seanpaul").set(data)
+      .then(() => console.log("Firebase sync successful"))
+      .catch((error) => console.error("Firebase sync failed:", error));
+  } catch (e) {
+    console.error("Firebase not initialized:", e);
+  }
+}
 </script></body>
 </html>
