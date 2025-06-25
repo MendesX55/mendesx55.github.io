@@ -91,7 +91,10 @@
         .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
 </style>
 </head>
-<body>
+<body><script>
+const tourName = "seanpaul";
+const storageKey = `tourData_${tourName}`;
+</script>
 <div style="padding: 10px 20px;">
 <a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
@@ -192,6 +195,16 @@
 <label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label>
 </div>
 <button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
+</div>
+
+<div style="margin-top:15px">
+<label>Fuel Efficiency (km/l):</label>
+<input id="kmPerLitre" placeholder="e.g. 8" type="number"/>
+<br/><label>Fuel Cost ($/l):</label>
+<input id="costPerLitre" placeholder="e.g. 1.75" type="number"/>
+<br/><label>Heavy Foot % Increase:</label>
+<input id="heavyFootPercent" placeholder="e.g. 10" type="number"/>
+<br/><button onclick="applySettings()">Apply Settings</button>
 </div>
 </div>
 </div>
@@ -709,21 +722,29 @@ function saveTourData() {
   }
 }
 
-// Ensure every change is hooked properly
-function bindSyncEvents() {
+function applySettings() {
+  const km = parseFloat(document.getElementById("kmPerLitre").value);
+  const cost = parseFloat(document.getElementById("costPerLitre").value);
+  const heavy = parseFloat(document.getElementById("heavyFootPercent").value);
+  if (!tourData.settings) tourData.settings = {};
+  if (!isNaN(km)) tourData.settings.kmPerLitre = km;
+  if (!isNaN(cost)) tourData.settings.costPerLitre = cost;
+  if (!isNaN(heavy)) tourData.settings.heavyFootPercent = heavy;
+  saveTourData();
+  calculateRouteDetails(); // Update live
+}
+
+// Patch all input/save/edit triggers to hook
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("input, textarea, select").forEach(el =>
+    el.addEventListener("change", saveTourData));
   const originalPush = Array.prototype.push;
   Array.prototype.push = function () {
     const result = originalPush.apply(this, arguments);
     saveTourData();
     return result;
   };
-
-  // Save when data is edited manually
-  document.querySelectorAll("input, textarea, select").forEach(el => {
-    el.addEventListener("change", saveTourData);
-  });
-}
-document.addEventListener("DOMContentLoaded", bindSyncEvents);
+});
 </script>
 </body>
 </html>
