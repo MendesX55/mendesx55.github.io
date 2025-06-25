@@ -10,16 +10,60 @@
 <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
 <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
-        body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
-        .header { background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
-        .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-        .logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); 
+            color: #fff; 
+            min-height: 100vh; 
+            -webkit-user-select: none; 
+            -webkit-touch-callout: none; 
+            -webkit-tap-highlight-color: transparent;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .header { 
+            background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700); 
+            padding: 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            padding-top: max(15px, env(safe-area-inset-top));
+        }
+        .header h1 { font-size: 1.4em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
+        .artist-logos { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+        .logo-placeholder { width: 70px; height: 30px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 8px; color: #ffd700; border: 1px solid #ffd700; }
         .container { max-width: 430px; margin: 0 auto; height: calc(100vh - 120px); display: flex; flex-direction: column; }
-        .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow-x: auto; white-space: nowrap; }
-        .tab-btn { flex: 0 1 auto; padding: 8px 12px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
-        .tab-btn span { font-size: 1.5em; }
+        .tab-navigation { 
+            display: flex; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 15px 15px 0 0; 
+            margin: 10px 10px 0 10px; 
+            overflow: hidden;
+            position: relative;
+            width: calc(100% - 20px);
+        }
+        .tab-btn { 
+            flex: 1; 
+            padding: 6px 4px; 
+            background: transparent; 
+            border: none; 
+            color: #ccc; 
+            font-weight: bold; 
+            font-size: 9px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            border-bottom: 3px solid transparent; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.1;
+            min-width: 0;
+            max-width: calc(100% / 6);
+        }
+        .tab-btn span { font-size: 1.3em; margin-bottom: 2px; }
         .tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
         .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; }
         .tab-content.active { display: block; }
@@ -31,6 +75,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .settings-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .currency-input { position: relative; }
         .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
         .currency-input input { padding-left: 30px; }
@@ -79,8 +124,6 @@
         .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .checkbox-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; }
         .checkbox-item input { width: 20px; height: 20px; margin-right: 10px; }
-        .settings-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end; }
-        .settings-row .form-group { margin-bottom: 0; }
         /* Calendar Styles */
         #calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
@@ -92,10 +135,20 @@
         .day-number { font-weight: bold; }
         .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
         .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
+        .firebase-status { 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            border-radius: 6px; 
+            margin-bottom: 15px; 
+            text-align: center; 
+            font-size: 12px; 
+        }
+        .firebase-connected { border-left: 4px solid #4CAF50; }
+        .firebase-disconnected { border-left: 4px solid #e74c3c; }
 </style>
 </head>
 <body>
-<div style="padding: 10px 20px; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);">
+<div style="padding: 10px 20px;">
 <a href="index.html" style="text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
 <div class="header">
@@ -184,19 +237,37 @@
 </div>
 <!-- SETTINGS (INPUT) TAB -->
 <div class="tab-content" id="settings">
+
+<div class="firebase-status" id="firebaseStatus">
+<div id="firebaseStatusText">🔄 Initializing Firebase...</div>
+</div>
+
+<div class="form-section">
+<h3>⛽ Fuel Settings</h3>
+<div class="settings-row-3">
+<div class="form-group">
+<label>Fuel KM/L</label>
+<input id="kmPerLitre" placeholder="e.g. 8" type="number" step="0.1" onchange="applySettings()"/>
+</div>
+<div class="form-group">
+<label>Cost $/L</label>
+<input id="costPerLitre" placeholder="e.g. 1.75" type="number" step="0.01" onchange="applySettings()"/>
+</div>
+<div class="form-group">
+<label>Go FAST %</label>
+<input id="heavyFootPercent" placeholder="e.g. 10" type="number" step="1" onchange="applySettings()"/>
+</div>
+</div>
+<div style="display: flex; gap: 10px;">
+<button class="btn" onclick="applySettings()">Apply Settings</button>
+<button class="btn" onclick="uploadLocalToFirebase()">🔄 Sync to Firebase</button>
+</div>
+</div>
+
 <div class="form-section"><h3>🏨 Hotel Confirmations</h3><div class="form-group"><label>Hotel Name</label><input id="hotelName" placeholder="Hotel name" type="text"/></div><div class="form-group"><label>Address</label><input id="hotelAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="checkinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="checkoutDate" type="date"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="hotelCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="hotelCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="hotelNotes" placeholder="Confirmation number, special requests, etc." rows="2"></textarea></div><button class="btn" onclick="addHotel()">Add Hotel</button></div>
 <div class="form-section"><h3>🎵 Venue Information</h3><div class="form-group"><label>Venue Name</label><input id="venueName" placeholder="Venue name" type="text"/></div><div class="form-group"><label>Address</label><input id="venueAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="showDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="showTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="startInventory" placeholder="0" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="endInventory" placeholder="0" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="totalSales" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="venueNotes" placeholder="Stage setup, sound requirements, etc." rows="2"></textarea></div><button class="btn" onclick="addVenue()">Add Venue</button></div>
 <div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</label><textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
-<div class="form-section"><h3>⚙️ App Settings</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Configure gas cost calculations.</p>
-<div class="settings-row">
-<div class="form-group"><label for="kmPerLitre">Fuel KM/L</label><input id="kmPerLitre" placeholder="e.g. 8" type="number"/></div>
-<div class="form-group"><label for="costPerLitre">Cost $/L</label><input id="costPerLitre" placeholder="e.g. 1.75" type="number"/></div>
-<div class="form-group"><label for="heavyFootPercent">Go FAST %</label><input id="heavyFootPercent" placeholder="e.g. 10" type="number"/></div>
-</div>
-<button class="btn" onclick="applySettings()" style="margin-top: 15px;">Apply Settings</button>
-</div>
-<div class="form-section"><h3>📤 Data Management</h3>
-<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Export data or sync with the cloud.</p>
+<div class="form-section"><h3>📤 Export Data</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Select which data to include in your CSV file.</p>
 <div class="checkbox-group">
 <label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label>
 <label class="checkbox-item"><input checked="" id="exportVenues" type="checkbox"/> Venues</label>
@@ -204,8 +275,6 @@
 <label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label>
 </div>
 <button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
-<button class="btn" onclick="uploadLocalToFirebase()" style="margin-top: 10px;">Upload Local → Firebase</button>
-<p id="syncStatus" style="font-size: 12px; text-align: center; color: #ccc; margin-top: 10px;"></p>
 </div>
 </div>
 </div>
@@ -215,208 +284,232 @@
 <div class="modal" id="calendarModal"><div class="modal-content" id="calendarModalContent"></div></div>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-    // --- App Configuration ---
     const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc';
-    const TOUR_NAME = "seanpaul";
-    const STORAGE_KEY = `tourData_${TOUR_NAME}`;
-    const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
-      authDomain: "tour-manager-b2888.firebaseapp.com",
-      projectId: "tour-manager-b2888",
+    let tourData = { 
+        hotels: [], 
+        venues: [], 
+        expenses: [], 
+        routePlannerState: [], 
+        routeCache: {},
+        settings: {
+            kmPerLitre: 8.0,
+            costPerLitre: 1.75,
+            heavyFootPercent: 10
+        }
     };
-
-    // --- Global State ---
-    let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } };
     let currentEditId = null;
     let routeStopCounter = 0;
     let isGeneratingRoute = false;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let currentModalDate = null;
-    let db; // Firebase Firestore instance
+    let firebaseApp = null;
+    let db = null;
+    let isFirebaseConnected = false;
 
-    // --- Firebase & Data Handling ---
-    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Firebase
+    function initializeFirebase() {
         try {
-            firebase.initializeApp(FIREBASE_CONFIG);
-            db = firebase.firestore();
-            loadInitialData();
-        } catch (e) {
-            console.error("Firebase initialization failed:", e);
-            document.getElementById('syncStatus').textContent = '⚠️ Cloud Sync Disabled';
-            loadInitialData(); // Load from local storage if firebase fails
+            const firebaseConfig = {
+                apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
+                authDomain: "tour-manager-b2888.firebaseapp.com",
+                projectId: "tour-manager-b2888",
+                storageBucket: "tour-manager-b2888.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:abcdef123456"
+            };
+            
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            db = firebaseApp.firestore();
+            isFirebaseConnected = true;
+            updateFirebaseStatus("✅ Firebase Connected", true);
+            
+            // Auto-load data from Firebase
+            loadFromFirebase();
+            
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            isFirebaseConnected = false;
+            updateFirebaseStatus("❌ Firebase Disconnected", false);
         }
-    });
-    
-    async function loadInitialData() {
-        if (db) {
-            try {
-                const docRef = db.collection("tourData").doc(STORAGE_KEY);
-                const doc = await docRef.get();
-                if (doc.exists) {
-                    console.log("Loaded data from Firebase.");
-                    document.getElementById('syncStatus').textContent = '☁️ Data loaded from Cloud.';
-                    // Merge cloud data with default structure to prevent errors if some keys are missing
-                    const cloudData = doc.data();
-                    tourData = { ...tourData, ...cloudData };
-                } else {
-                    console.log("No document in Firebase, checking local storage.");
-                    loadFromLocalStorage();
-                    document.getElementById('syncStatus').textContent = '☁️ No cloud data found. Using local.';
+    }
+
+    function updateFirebaseStatus(text, connected) {
+        const statusEl = document.getElementById('firebaseStatus');
+        const textEl = document.getElementById('firebaseStatusText');
+        if (statusEl && textEl) {
+            textEl.textContent = text;
+            statusEl.className = connected ? 'firebase-status firebase-connected' : 'firebase-status firebase-disconnected';
+        }
+    }
+
+    async function loadFromFirebase() {
+        if (!isFirebaseConnected || !db) return;
+        
+        try {
+            const doc = await db.collection("tourData").doc("tourData_seanpaul").get();
+            if (doc.exists) {
+                const firebaseData = doc.data();
+                // Merge Firebase data with local data, prioritizing Firebase
+                tourData = { ...tourData, ...firebaseData };
+                if (!tourData.settings) {
+                    tourData.settings = {
+                        kmPerLitre: 8.0,
+                        costPerLitre: 1.75,
+                        heavyFootPercent: 10
+                    };
                 }
-            } catch (error) {
-                console.error("Error fetching from Firebase:", error);
-                document.getElementById('syncStatus').textContent = '⚠️ Cloud read failed. Using local.';
-                loadFromLocalStorage();
+                saveDataLocal();
+                loadSettingsToForm();
+                loadRoutePlannerState();
+                updateAllDisplays();
+                updateFirebaseStatus("✅ Data Loaded from Firebase", true);
             }
-        } else {
-            loadFromLocalStorage();
-        }
-        initializeApp();
-    }
-
-    function loadFromLocalStorage() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            console.log("Loaded data from localStorage.");
-            tourData = JSON.parse(savedData);
+        } catch (error) {
+            console.error("Failed to load from Firebase:", error);
+            updateFirebaseStatus("⚠️ Firebase Load Failed", false);
         }
     }
 
-    function initializeApp() {
-        // Ensure data structure is sound after loading
-        if (!tourData.hotels) tourData.hotels = [];
-        if (!tourData.venues) tourData.venues = [];
-        if (!tourData.expenses) tourData.expenses = [];
-        if (!tourData.routePlannerState) tourData.routePlannerState = [];
-        if (!tourData.routeCache) tourData.routeCache = {};
-        if (!tourData.settings) tourData.settings = { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 };
-
-        loadRoutePlannerState();
-        applySettingsToUI();
-        showTab('calendar');
-        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-    }
-    
-    function saveData() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-            console.log("Data saved to localStorage.");
-            if (db) {
-                db.collection("tourData").doc(STORAGE_KEY).set(tourData)
-                  .then(() => {
-                      console.log("Firebase sync successful.");
-                      document.getElementById('syncStatus').textContent = `☁️ Synced: ${new Date().toLocaleTimeString()}`;
-                  })
-                  .catch((error) => {
-                      console.error("Firebase sync failed:", error);
-                      document.getElementById('syncStatus').textContent = '⚠️ Cloud sync failed.';
-                  });
-            }
-        } catch (e) {
-            console.error("Save failed:", e);
-            alert("Could not save data. Storage might be full.");
-        }
-    }
-
-    function uploadLocalToFirebase() {
-        const localDataString = localStorage.getItem(STORAGE_KEY);
-        if (!localDataString) {
-            return alert("No local data found to upload.");
-        }
-        if (!db) {
-            return alert("Firebase is not connected. Cannot upload.");
-        }
-        if (!confirm("This will overwrite cloud data with the data from this device. Are you sure?")) {
+    async function saveToFirebase(data) {
+        if (!isFirebaseConnected || !db) {
+            console.log("Firebase not connected, skipping save");
             return;
         }
+        
         try {
-            const localData = JSON.parse(localDataString);
-            db.collection("tourData").doc(STORAGE_KEY).set(localData)
-              .then(() => {
-                  alert("Local data successfully uploaded to Firebase!");
-                  document.getElementById('syncStatus').textContent = '☁️ Manual upload complete.';
-                  tourData = localData; // Make sure current state is the uploaded one
-                  updateAllDisplays();
-              })
-              .catch((error) => {
-                  console.error("Manual upload failed:", error);
-                  alert(`Upload failed: ${error.message}`);
-              });
-        } catch(e) {
-            alert(`Error reading local data: ${e.message}`);
+            await db.collection("tourData").doc("tourData_seanpaul").set(data);
+            updateFirebaseStatus("✅ Data Synced to Firebase", true);
+            console.log("Data successfully saved to Firebase");
+        } catch (error) {
+            console.error("Firebase save failed:", error);
+            updateFirebaseStatus("❌ Firebase Save Failed", false);
         }
     }
 
-    // --- Gas Calculation Logic ---
-    function getGasSettings() {
-        const settings = tourData.settings || {};
-        const kmPerLitre = parseFloat(document.getElementById('kmPerLitre').value) || settings.kmPerLitre || 8.5;
-        const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75;
-        const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10;
-        return { kmPerLitre, costPerLitre, heavyFootPercent };
+    function getCurrentGasSettings() {
+        return {
+            kmPerLitre: tourData.settings?.kmPerLitre || 8.0,
+            costPerLitre: tourData.settings?.costPerLitre || 1.75,
+            heavyFootPercent: tourData.settings?.heavyFootPercent || 10
+        };
     }
 
     function calculateGasCost(distanceKm) {
-        const { kmPerLitre, costPerLitre, heavyFootPercent } = getGasSettings();
-        if (kmPerLitre <= 0) return 0;
-        const effectiveKmPerLitre = kmPerLitre / (1 + (heavyFootPercent / 100));
-        const litresUsed = distanceKm / effectiveKmPerLitre;
-        return litresUsed * costPerLitre;
+        const settings = getCurrentGasSettings();
+        const baseGasCost = (distanceKm / settings.kmPerLitre) * settings.costPerLitre;
+        const heavyFootMultiplier = 1 + (settings.heavyFootPercent / 100);
+        return baseGasCost * heavyFootMultiplier;
     }
 
-    function applySettings() {
-        const { kmPerLitre, costPerLitre, heavyFootPercent } = getGasSettings();
-        tourData.settings = { kmPerLitre, costPerLitre, heavyFootPercent };
-        saveData();
-        alert("Settings applied and saved.");
-        
-        // If route results are visible, recalculate and re-render costs
-        if (document.getElementById('routeResults').innerHTML.trim() !== '') {
-            rerenderRouteCosts();
-        }
-    }
-
-    function applySettingsToUI() {
-        const settings = tourData.settings || {};
-        document.getElementById('kmPerLitre').value = settings.kmPerLitre || '';
-        document.getElementById('costPerLitre').value = settings.costPerLitre || '';
-        document.getElementById('heavyFootPercent').value = settings.heavyFootPercent || '';
-    }
-
-    function rerenderRouteCosts() {
-        let grandTotalGas = 0;
-        const daySummaries = document.querySelectorAll('#routeResults .day-summary-box');
-        
-        daySummaries.forEach(daySummary => {
-            let dayTotalDistance = 0;
-            const dayId = daySummary.dataset.dayId;
-            const segments = document.querySelectorAll(`.route-item[data-day-id='${dayId}']`);
-            
-            segments.forEach(segment => {
-                const distanceKm = parseFloat(segment.dataset.distanceKm);
-                dayTotalDistance += distanceKm;
-                const newGasCost = calculateGasCost(distanceKm);
-                segment.querySelector('.gas-cost').textContent = `$${newGasCost.toFixed(0)} CAD`;
-            });
-            
-            const newDayGasCost = calculateGasCost(dayTotalDistance);
-            grandTotalGas += newDayGasCost;
-            daySummary.querySelector('.day-gas-value').textContent = `$${newDayGasCost.toFixed(0)}`;
+    function recalculateAllGasCosts() {
+        // Recalculate gas costs for all cached routes
+        Object.keys(tourData.routeCache).forEach(cacheKey => {
+            const cachedRoute = tourData.routeCache[cacheKey];
+            if (cachedRoute && cachedRoute.data && cachedRoute.data.legs) {
+                let newTotalGas = 0;
+                cachedRoute.data.legs.forEach(leg => {
+                    const legKm = leg.distance.value / 1000;
+                    newTotalGas += calculateGasCost(legKm);
+                });
+                cachedRoute.data.totalGas = newTotalGas;
+            }
         });
-
-        document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0);
-        console.log("Route costs updated with new settings.");
+        
+        // Update displayed route results if they exist
+        updateRouteDisplays();
+        saveDataLocal();
+        if (isFirebaseConnected) saveToFirebase(tourData);
     }
-    
-    // --- UI & Rendering Functions (Existing code, modified for new logic) ---
-    
+
+    function updateRouteDisplays() {
+        // Update stats
+        let grandTotalGas = 0;
+        Object.values(tourData.routeCache).forEach(cached => {
+            if (cached.data && cached.data.totalGas) {
+                grandTotalGas += cached.data.totalGas;
+            }
+        });
+        
+        const totalGasEl = document.getElementById('totalGasStat');
+        if (totalGasEl) {
+            totalGasEl.textContent = ' + grandTotalGas.toFixed(0);
+        }
+
+        // Update individual route segments in the display
+        const routeItems = document.querySelectorAll('.route-item');
+        routeItems.forEach(item => {
+            const routeInfo = item.querySelector('.route-info');
+            if (routeInfo && routeInfo.textContent.includes('Est. Gas:')) {
+                // Extract distance and recalculate
+                const distanceText = routeInfo.textContent.match(/Distance:\s*([0-9.]+)\s*km/);
+                if (distanceText) {
+                    const distanceKm = parseFloat(distanceText[1]);
+                    const newGasCost = calculateGasCost(distanceKm);
+                    routeInfo.innerHTML = routeInfo.innerHTML.replace(/Est\. Gas:\s*\$[0-9.]+/, `Est. Gas: ${newGasCost.toFixed(0)}`);
+                }
+            }
+        });
+    }
+
+    function loadSettingsToForm() {
+        const settings = getCurrentGasSettings();
+        document.getElementById('kmPerLitre').value = settings.kmPerLitre;
+        document.getElementById('costPerLitre').value = settings.costPerLitre;
+        document.getElementById('heavyFootPercent').value = settings.heavyFootPercent;
+    }
+
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
+
+    window.onload = function() {
+        // Initialize Firebase first
+        initializeFirebase();
+        
+        const savedData = localStorage.getItem('tourData');
+        if (savedData) { 
+            tourData = { ...tourData, ...JSON.parse(savedData) }; 
+            if (!tourData.routePlannerState) tourData.routePlannerState = []; 
+            if (!tourData.routeCache) tourData.routeCache = {}; 
+            if (!tourData.settings) {
+                tourData.settings = {
+                    kmPerLitre: 8.0,
+                    costPerLitre: 1.75,
+                    heavyFootPercent: 10
+                };
+            }
+        }
+        
+        loadSettingsToForm();
+        loadRoutePlannerState();
+        showTab('calendar');
+        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        
+        // Auto-upload localStorage to Firebase if we have local data
+        const hasLocalData = savedData && JSON.parse(savedData).hotels?.length > 0;
+        if (hasLocalData) {
+            setTimeout(() => {
+                if (isFirebaseConnected) {
+                    uploadLocalToFirebase();
+                }
+            }, 2000);
+        }
+    };
+
+    function saveDataLocal() { 
+        localStorage.setItem('tourData', JSON.stringify(tourData)); 
+    }
+    
+    function saveData() { 
+        saveDataLocal();
+        if (isFirebaseConnected) {
+            saveToFirebase(tourData);
+        }
+    }
     
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -428,9 +521,118 @@
         updateAllDisplays();
     }
     
-    function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); updateAllDisplays(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
-    function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); updateAllDisplays(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
-    function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, approxCAD: usdCost * 1.35, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); updateAllDisplays(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
+    function addHotel() { 
+        const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; 
+        const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; 
+        const hotel = { 
+            id: Date.now(), 
+            name: document.getElementById('hotelName').value || '', 
+            address: document.getElementById('hotelAddress').value || '', 
+            checkin: document.getElementById('checkinDate').value || '', 
+            checkout: document.getElementById('checkoutDate').value || '', 
+            costUSD: usdCost, 
+            costCAD: cadCost, 
+            approxCAD: usdCost * 1.35, 
+            notes: document.getElementById('hotelNotes').value || '', 
+            type: 'hotel' 
+        }; 
+        if (hotel.name && hotel.address && hotel.checkin) { 
+            tourData.hotels.push(hotel); 
+            saveData(); 
+            updateAllDisplays(); 
+            clearHotelForm(); 
+            alert('Hotel added successfully!'); 
+        } else { 
+            alert('Please fill in hotel name, full address, and check-in date'); 
+        } 
+    }
+    
+    function addVenue() { 
+        const venue = { 
+            id: Date.now(), 
+            name: document.getElementById('venueName').value || '', 
+            address: document.getElementById('venueAddress').value || '', 
+            date: document.getElementById('showDate').value || '', 
+            time: document.getElementById('showTime').value || '', 
+            startInventory: parseInt(document.getElementById('startInventory').value) || 0, 
+            endInventory: parseInt(document.getElementById('endInventory').value) || 0, 
+            totalSales: parseFloat(document.getElementById('totalSales').value) || 0, 
+            notes: document.getElementById('venueNotes').value || '', 
+            type: 'venue' 
+        }; 
+        if (venue.name && venue.address && venue.date) { 
+            tourData.venues.push(venue); 
+            saveData(); 
+            updateAllDisplays(); 
+            clearVenueForm(); 
+            alert('Venue added successfully!'); 
+        } else { 
+            alert('Please fill in venue name, full address, and show date'); 
+        } 
+    }
+    
+    function addExpense() { 
+        const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; 
+        const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; 
+        const expense = { 
+            id: Date.now(), 
+            type: document.getElementById('expenseType').value, 
+            date: document.getElementById('expenseDate').value, 
+            location: document.getElementById('expenseLocation').value, 
+            amountUSD: usdCost, 
+            amountCAD: cadCost, 
+            approxCAD: usdCost * 1.35, 
+            notes: document.getElementById('expenseNotes').value, 
+            category: 'expense' 
+        }; 
+        if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { 
+            tourData.expenses.push(expense); 
+            saveData(); 
+            updateAllDisplays(); 
+            clearExpenseForm(); 
+            alert('Expense added successfully!'); 
+        } else { 
+            alert('Please enter date and amount'); 
+        } 
+    }
+
+    function applySettings() {
+        const km = parseFloat(document.getElementById("kmPerLitre").value);
+        const cost = parseFloat(document.getElementById("costPerLitre").value);
+        const heavy = parseFloat(document.getElementById("heavyFootPercent").value);
+        
+        if (!tourData.settings) tourData.settings = {};
+        
+        if (!isNaN(km) && km > 0) tourData.settings.kmPerLitre = km;
+        if (!isNaN(cost) && cost > 0) tourData.settings.costPerLitre = cost;
+        if (!isNaN(heavy) && heavy >= 0) tourData.settings.heavyFootPercent = heavy;
+        
+        saveData();
+        recalculateAllGasCosts();
+        alert("Fuel settings applied and all gas costs updated!");
+    }
+
+    function uploadLocalToFirebase() {
+        if (!isFirebaseConnected) {
+            alert("Firebase not connected. Please check your connection.");
+            return;
+        }
+        
+        try {
+            const data = localStorage.getItem('tourData');
+            if (!data) {
+                alert("No local data found to upload.");
+                return;
+            }
+            
+            const parsed = JSON.parse(data);
+            saveToFirebase(parsed);
+            alert("✅ All local data uploaded to Firebase successfully!");
+        } catch (e) {
+            console.error("Upload error:", e);
+            alert("❌ Error uploading to Firebase: " + e.message);
+        }
+    }
 
     function saveRoutePlannerState() {
         tourData.routePlannerState = Array.from({ length: routeStopCounter }, (_, i) => {
@@ -440,6 +642,7 @@
         });
         saveData();
     }
+    
     function loadRoutePlannerState() {
         const routeStepsContainer = document.getElementById('routeSteps');
         routeStepsContainer.innerHTML = '';
@@ -521,140 +724,147 @@
         arrow.classList.toggle('collapsed');
     }
 
-    async function generateCustomRoute() {
-        if (isGeneratingRoute) { alert('Route generation is already in progress...'); return; }
-        isGeneratingRoute = true;
+    
+async function generateCustomRoute() {
+    if (isGeneratingRoute) { alert('Route generation is already in progress...'); return; }
+    isGeneratingRoute = true;
 
-        const generateBtn = document.getElementById('generateRouteBtn');
-        const progressDiv = document.getElementById('routeProgress');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const routeResults = document.getElementById('routeResults');
+    const generateBtn = document.getElementById('generateRouteBtn');
+    const progressDiv = document.getElementById('routeProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const routeResults = document.getElementById('routeResults');
 
-        generateBtn.disabled = true;
-        generateBtn.textContent = '🔄 Generating...';
-        progressDiv.style.display = 'block';
-        routeResults.innerHTML = '';
-        progressText.textContent = 'Preparing route...';
-        progressFill.style.width = '0%';
+    generateBtn.disabled = true;
+    generateBtn.textContent = '🔄 Generating...';
+    progressDiv.style.display = 'block';
+    routeResults.innerHTML = '';
+    progressText.textContent = 'Preparing route...';
+    progressFill.style.width = '0%';
 
-        try {
-            const dailySegments = {};
-            for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
-                const fromStopInfo = tourData.routePlannerState[i];
-                const toStopInfo = tourData.routePlannerState[i + 1];
-                if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
+    try {
+        const dailySegments = {};
+        for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
+            const fromStopInfo = tourData.routePlannerState[i];
+            const toStopInfo = tourData.routePlannerState[i + 1];
+            if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
 
-                const date = fromStopInfo.dateValue || 'No Date';
-                if (!dailySegments[date]) dailySegments[date] = [];
-                if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue));
-                dailySegments[date].push(getLocationDetails(toStopInfo.selectValue));
+            const date = fromStopInfo.dateValue || 'No Date';
+            if (!dailySegments[date]) dailySegments[date] = [];
+            if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue));
+            dailySegments[date].push(getLocationDetails(toStopInfo.selectValue));
+        }
+
+        const allDates = Object.keys(dailySegments).sort();
+        if (allDates.length === 0) throw new Error('No valid route segments found.');
+
+        let grandTotalDistanceKM = 0, grandTotalTimeSecs = 0, grandTotalGas = 0, processedDays = 0;
+        routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>';
+
+        for (const date of allDates) {
+            const stopsForDay = dailySegments[date];
+            try {
+                const dayRouteData = await processDayRoute(date, stopsForDay);
+                grandTotalDistanceKM += dayRouteData.totalDistance || 0;
+                grandTotalTimeSecs += dayRouteData.totalTime || 0;
+                grandTotalGas += dayRouteData.totalGas || 0;
+                renderDayRoute(date, dayRouteData, processedDays + 1);
+            } catch (dayError) {
+                renderErrorDay(date, processedDays + 1, dayError.message);
             }
+            processedDays++;
+            const progress = (processedDays / allDates.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`;
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
 
-            const allDates = Object.keys(dailySegments).sort();
-            if (allDates.length === 0) throw new Error('No valid route segments found.');
+        const totalHours = Math.floor(grandTotalTimeSecs / 3600);
+        const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60);
+        document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceKM/1000).toFixed(0)} km`;
+        document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
+        document.getElementById('totalGasStat').textContent = ' + grandTotalGas.toFixed(0);
+        progressText.textContent = '✅ All days completed!';
+    } catch (error) {
+        console.error('Route generation error:', error);
+        routeResults.innerHTML = `<div class="route-item error"><strong>❌ Error:</strong> ${error.message}</div>`;
+        progressText.textContent = '❌ Generation failed';
+    } finally {
+        isGeneratingRoute = false;
+        generateBtn.disabled = false;
+        generateBtn.textContent = '🛣️ Generate Full Tour Route';
+        setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
+    }
+}
 
-            let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0, processedDays = 0;
-            routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>';
+async function processDayRoute(date, stopsForDay) {
+    if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`);
 
-            for (const date of allDates) {
-                const stopsForDay = dailySegments[date];
-                try {
-                    const dayRouteData = await processDayRoute(date, stopsForDay);
-                    grandTotalDistanceMeters += dayRouteData.totalDistance || 0;
-                    grandTotalTimeSecs += dayRouteData.totalTime || 0;
-                    renderDayRoute(date, dayRouteData, processedDays + 1);
-                } catch (dayError) {
-                    renderErrorDay(date, processedDays + 1, dayError.message);
-                }
-                processedDays++;
-                const progress = (processedDays / allDates.length) * 100;
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`;
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
+    const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`;
+    if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 7200000)) {
+        let cachedData = tourData.routeCache[cacheKey].data;
+        // Recalculate gas costs with current settings
+        let newTotalGas = 0;
+        cachedData.legs.forEach(leg => {
+            const legKm = leg.distance.value / 1000;
+            newTotalGas += calculateGasCost(legKm);
+        });
+        cachedData.totalGas = newTotalGas;
+        cachedData.isCached = true;
+        return cachedData;
+    }
 
-            const grandTotalGas = calculateGasCost(grandTotalDistanceMeters / 1000);
-            const totalHours = Math.floor(grandTotalTimeSecs / 3600);
-            const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60);
-            document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`;
-            document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
-            document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0);
-            progressText.textContent = '✅ All days completed!';
-        } catch (error) {
-            console.error('Route generation error:', error);
-            routeResults.innerHTML = `<div class="route-item error"><strong>❌ Error:</strong> ${error.message}</div>`;
-            progressText.textContent = '❌ Generation failed';
-        } finally {
-            isGeneratingRoute = false;
-            generateBtn.disabled = false;
-            generateBtn.textContent = '🛣️ Generate Full Tour Route';
-            setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
+    let totalDistance = 0, totalTime = 0, totalGas = 0;
+    let allLegs = [];
+
+    const MAX_WAYPOINTS = 23;
+    for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) {
+        const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1);
+        if (chunk.length < 2) break;
+
+        const origin = chunk[0].address;
+        const destination = chunk[chunk.length - 1].address;
+        const waypoints = chunk.slice(1, -1).map(s => s.address).join('|');
+
+        const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`);
+        const data = await response.json();
+        if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`);
+
+        const legs = data.routes[0].legs;
+        allLegs.push(...legs);
+        for (let leg of legs) {
+            const legKm = leg.distance.value / 1000;
+            totalDistance += leg.distance.value;
+            totalTime += (leg.duration_in_traffic || leg.duration).value;
+            totalGas += calculateGasCost(legKm);
         }
     }
 
-    async function processDayRoute(date, stopsForDay) {
-        if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`);
+    const dayData = {
+        legs: allLegs,
+        stops: stopsForDay,
+        totalDistance,
+        totalTime,
+        totalGas,
+        isCached: false
+    };
 
-        const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`;
-        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 7200000)) { // 2 hour cache
-            let cachedData = tourData.routeCache[cacheKey].data;
-            cachedData.isCached = true;
-            return cachedData;
-        }
+    tourData.routeCache[cacheKey] = { data: dayData, timestamp: Date.now() };
+    saveData();
+    return dayData;
+}
 
-        let totalDistanceMeters = 0, totalTimeSecs = 0;
-        let allLegs = [];
 
-        const MAX_WAYPOINTS = 23;
-        for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) {
-            const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1);
-            if (chunk.length < 2) break;
-
-            const origin = chunk[0].address;
-            const destination = chunk[chunk.length - 1].address;
-            const waypoints = chunk.slice(1, -1).map(s => s.address).join('|');
-
-            const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
-
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`);
-            const data = await response.json();
-            if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`);
-
-            const legs = data.routes[0].legs;
-            allLegs.push(...legs);
-            for (let leg of legs) {
-                totalDistanceMeters += leg.distance.value;
-                totalTimeSecs += (leg.duration_in_traffic || leg.duration).value;
-            }
-        }
-
-        const dayData = {
-            legs: allLegs,
-            stops: stopsForDay,
-            totalDistance: totalDistanceMeters,
-            totalTime: totalTimeSecs,
-            isCached: false
-        };
-
-        tourData.routeCache[cacheKey] = { data: dayData, timestamp: Date.now() };
-        saveData();
-        return dayData;
-    }
-
-    function renderDayRoute(date, dayData, dayCounter) {
+function renderDayRoute(date, dayData, dayCounter) {
         const routeResults = document.getElementById('routeResults');
-        const dayHours = Math.floor(dayData.totalTime / 3600); 
-        const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60);
-        const dayDistanceKm = dayData.totalDistance / 1000;
-        const dayGasCost = calculateGasCost(dayDistanceKm);
+        const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60);
         
-        const dayId = `day-${dayCounter}`;
         const daySummary = document.createElement('div');
         daySummary.className = 'day-summary-box';
-        daySummary.dataset.dayId = dayId;
-        daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`;
+        daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value">${(dayData.totalGas || 0).toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`;
         routeResults.appendChild(daySummary);
         
         dayData.legs.forEach((leg, index) => {
@@ -663,13 +873,11 @@
             const toStop = dayData.stops[index+1];
             const routeSegment = document.createElement('div');
             routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`;
-            routeSegment.dataset.dayId = dayId;
-            routeSegment.dataset.distanceKm = legKm;
-            routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`;
+            routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br><strong>Est. Gas:</strong> ${gasCost.toFixed(0)} CAD</div>`;
             routeResults.appendChild(routeSegment);
         });
     }
-
+    
     function renderErrorDay(date, dayCounter, errorMessage) {
         const routeResults = document.getElementById('routeResults');
         const errorSummary = document.createElement('div');
@@ -679,16 +887,129 @@
         routeResults.appendChild(errorSummary);
     }
     
-    // --- The rest of the functions (Calendar, Modals, CRUD, etc.) remain largely the same ---
+    function renderCalendar() {
+        const calendarEl = document.getElementById('calendar-grid');
+        const monthYearEl = document.getElementById('month-year');
+        if (!calendarEl || !monthYearEl) return;
+        calendarEl.innerHTML = '';
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`;
+        
+        for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`;
+            
+            const events = getEventsForDate(dateStr);
+            let eventIcons = '';
+            if (events.isVenue) { eventIcons += '🎵'; } 
+            else if (events.isTravel) { eventIcons += '🚗'; }
+            
+            dayHtml += `<div class="day-events">${eventIcons}</div>`;
+            
+            if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`;
+            if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`;
+            if (day % 10 === 0 && !events.isVenue && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`;
+
+            dayHtml += '</div>';
+            calendarEl.innerHTML += dayHtml;
+        }
+    }
     
-    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`; if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`; if (day % 10 === 0 && !events.isVenue && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
-    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr); return { isVenue, isTravel }; }
-    function showDayDetails(dateStr) { const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const stopsForDay = []; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { if(tourData.routePlannerState[i].dateValue === dateStr) { if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue)); stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue)); } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (stopsForDay.length > 1) { const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`; if(tourData.routeCache[cacheKey]) { const dayData = tourData.routeCache[cacheKey].data; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text}</small></div>`; }); } else { html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`; } } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
-    function showPrevDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() - 1); showDayDetails(date.toISOString().split('T')[0]); }
-    function showNextDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() + 1); showDayDetails(date.toISOString().split('T')[0]); }
-    let touchstartX = 0; let touchendX = 0; function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); } function addSwipeListeners(element) { element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true}); element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true}); }
+    function getEventsForDate(dateStr) {
+        let isVenue = tourData.venues.some(v => v.date === dateStr);
+        let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr);
+        return { isVenue, isTravel };
+    }
+
+    function showDayDetails(dateStr) {
+        const modal = document.getElementById('calendarModal');
+        const content = document.getElementById('calendarModalContent');
+        
+        const venuesOnDay = tourData.venues.filter(v => v.date === dateStr);
+        const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout);
+        const stopsForDay = [];
+        for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
+             if(tourData.routePlannerState[i].dateValue === dateStr) {
+                if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue));
+                stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue));
+            }
+        }
+
+        let html = `<div class="modal-header">
+                        <button class="modal-nav prev" onclick="showPrevDay()">◄</button>
+                        <div>Details for ${formatDate(dateStr)}</div>
+                        <button class="modal-nav next" onclick="showNextDay()">►</button>
+                        <span class="close" onclick="closeModal('calendarModal')">&times;</span>
+                    </div>`;
+        if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); }
+        if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); }
+        
+        if (stopsForDay.length > 1) {
+            const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`;
+            if(tourData.routeCache[cacheKey]) {
+                const dayData = tourData.routeCache[cacheKey].data;
+                const dayHours = Math.floor(dayData.totalTime / 3600);
+                const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60);
+                // Recalculate gas with current settings
+                let totalGas = 0;
+                dayData.legs.forEach(leg => {
+                    const legKm = leg.distance.value / 1000;
+                    totalGas += calculateGasCost(legKm);
+                });
+                html += `<h3>🚗 Travel Summary</h3>
+                         <div class="day-summary-box" style="margin-top:0;">
+                            <div class="stats-grid stats-grid-3-col" style="margin-bottom:0;">
+                                <div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div>
+                                <div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div>
+                                <div class="stat-card"><div class="stat-value">${totalGas.toFixed(0)}</div><div class="stat-label">Gas</div></div>
+                            </div>
+                         </div>
+                         <h3>Route Segments</h3>`;
+                dayData.legs.forEach((leg, index) => {
+                    const legKm = leg.distance.value / 1000;
+                    const gasCost = calculateGasCost(legKm);
+                    html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text} | Gas: ${gasCost.toFixed(0)}</small></div>`;
+                });
+            } else {
+                html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`;
+            }
+        }
+        
+        if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; }
+        content.innerHTML = html;
+        modal.style.display = 'block';
+        currentModalDate = dateStr;
+        addSwipeListeners(modal);
+    }
+
+    function showPrevDay() {
+        if (!currentModalDate) return;
+        let date = new Date(currentModalDate + 'T12:00:00Z');
+        date.setDate(date.getDate() - 1);
+        showDayDetails(date.toISOString().split('T')[0]);
+    }
+
+    function showNextDay() {
+        if (!currentModalDate) return;
+        let date = new Date(currentModalDate + 'T12:00:00Z');
+        date.setDate(date.getDate() + 1);
+        showDayDetails(date.toISOString().split('T')[0]);
+    }
+    
+    let touchstartX = 0; let touchendX = 0;
+    function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); }
+    function addSwipeListeners(element) {
+        element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+        element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
+    }
+
     function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }
     function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
+
     function getLocationDetails(locationId) { const [type, id] = locationId.split(':'); const numId = parseInt(id); if (type === 'Hotel') { const hotel = tourData.hotels.find(h => h.id === numId); return hotel ? { ...hotel } : { type: 'Hotel', name: 'N/A', address: 'N/A' }; } else { const venue = tourData.venues.find(v => v.id === numId); return venue ? { ...venue } : { type: 'Venue', name: 'N/A', address: 'N/A' }; } }
     function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; document.getElementById('hotelModal').style.display = 'block'; }
     function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; document.getElementById('venueModal').style.display = 'block'; }
@@ -697,18 +1018,95 @@
     function saveVenueEdit() { const venue = tourData.venues.find(v => v.id === currentEditId); if (!venue) return; venue.name = document.getElementById('editVenueName').value; venue.address = document.getElementById('editVenueAddress').value; venue.date = document.getElementById('editShowDate').value; venue.time = document.getElementById('editShowTime').value; venue.startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; venue.endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; venue.totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; venue.notes = document.getElementById('editVenueNotes').value; saveData(); updateAllDisplays(); closeModal('venueModal'); }
     function deleteHotel() { if (confirm('Are you sure?')) { tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId); saveData(); updateAllDisplays(); closeModal('hotelModal'); } }
     function deleteVenue() { if (confirm('Are you sure?')) { tourData.venues = tourData.venues.filter(v => v.id !== currentEditId); saveData(); updateAllDisplays(); closeModal('venueModal'); } }
+    
     function updateAllDisplays() { updateHotelsDisplay(); updateExpensesDisplay(); updateVenuesDisplay(); updateRouteSelects(); }
-    function updateHotelsDisplay() { const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = ''; const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin)); let totalCAD = 0, totalNights = 0; sortedHotels.forEach(hotel => { totalCAD += hotel.costCAD || (hotel.costUSD * 1.35); if (hotel.checkin && hotel.checkout) totalNights += (new Date(hotel.checkout) - new Date(hotel.checkin)) / 86400000; const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35); const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad'; const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id); hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button></div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; hotelsList.appendChild(hotelCard); }); document.getElementById('hotelCountStat').textContent = tourData.hotels.length; document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0); }
-    function updateExpensesDisplay() { const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0; const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date)); sortedExpenses.forEach(expense => { totalCAD += expense.amountCAD || (expense.amountUSD * 1.35); const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'; row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`; }); document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0); }
-    function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button></div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
+    
+    function updateHotelsDisplay() {
+        const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = '';
+        const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin));
+        let totalCAD = 0, totalNights = 0;
+        sortedHotels.forEach(hotel => {
+            totalCAD += hotel.costCAD || (hotel.costUSD * 1.35);
+            if (hotel.checkin && hotel.checkout) totalNights += (new Date(hotel.checkout) - new Date(hotel.checkin)) / 86400000;
+            const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35); const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad';
+            const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id);
+            hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button></div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`;
+            hotelsList.appendChild(hotelCard);
+        });
+        document.getElementById('hotelCountStat').textContent = tourData.hotels.length;
+        document.getElementById('hotelDaysStat').textContent = Math.round(totalNights);
+        document.getElementById('hotelCostStat').textContent = ' + totalCAD.toFixed(0);
+    }
+
+    function updateExpensesDisplay() {
+        const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0;
+        const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+        sortedExpenses.forEach(expense => {
+            totalCAD += expense.amountCAD || (expense.amountUSD * 1.35);
+            const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad';
+            row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`;
+        });
+        document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = ' + totalCAD.toFixed(0);
+    }
+    
+    function updateVenuesDisplay() {
+        const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = '';
+        const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date));
+        let totalSales = 0;
+        sortedVenues.forEach(venue => {
+            totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory;
+            const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id);
+            venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button></div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`;
+            venuesList.appendChild(venueCard);
+        });
+        document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = ' + totalSales.toLocaleString();
+    }
+
     function deleteItem(type, id) { if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); updateAllDisplays(); } }
     function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); }
     function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => document.getElementById(id).value = ''); }
     function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; }
-    document.addEventListener('DOMContentLoaded', function() { document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; });
+        document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; });
+    });
     window.onclick = function(event) { if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal'); if (event.target === document.getElementById('venueModal')) closeModal('venueModal'); if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal'); }
-    function exportTourData() { const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
-
+    
+    function exportTourData() {
+        const includeHotels = document.getElementById('exportHotels').checked;
+        const includeVenues = document.getElementById('exportVenues').checked;
+        const includeExpenses = document.getElementById('exportExpenses').checked;
+        const includeRoute = document.getElementById('exportRoute').checked;
+        let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']];
+        if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`]));
+        if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`]));
+        if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes]));
+        if (includeRoute) {
+            csvData.push(['---','---','---','---','---','---','---']);
+            csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']);
+            Object.keys(tourData.routeCache).sort().forEach(key => {
+                const dayData = tourData.routeCache[key].data;
+                const date = key.split('_')[0];
+                dayData.legs.forEach((leg, index) => {
+                    const fromStop = dayData.stops[index];
+                    const toStop = dayData.stops[index+1];
+                    const legKm = leg.distance.value / 1000;
+                    const gasCost = calculateGasCost(legKm);
+                    csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]);
+                });
+            });
+        }
+        
+        const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 </script>
 </body>
 </html>
