@@ -60,7 +60,7 @@
         /* --- VISUAL FIX: Gas settings layout --- */
         .form-group-inline {
              display: grid; /* Use grid */
-             grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Responsive grid: minimum 110px, then share space */
+             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid: min 100px, then share space */
              gap: 8px; /* Gap between items */
         }
          .form-group-inline .form-group {
@@ -354,12 +354,11 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-    // Tour name and localStorage keys
+    // Tour name and localStorage key
     const TOUR_NAME = "seanpaul";
     // Key used for current storage (local and Firebase)
     const CURRENT_LOCAL_STORAGE_KEY = `tourData_${TOUR_NAME}`;
-    // Key used in older versions (before tourData_seanpaul)
-    // const OLD_LOCAL_STORAGE_KEY = `tourData`; // Removed as per user request
+    // Old key potentially holding your data (removed the OLD key reference as per user request)
 
 
     // Firebase Configuration
@@ -598,6 +597,7 @@
 
     function populateSettingsForm() {
          const settings = tourData.settings || {}; // Use default if tourData.settings is null/undefined
+         // Use ?? '' to ensure setting value is not null/undefined when setting input value
          document.getElementById('kmPerLitre').value = settings.kmPerLitre ?? '';
          document.getElementById('costPerLitre').value = settings.costPerLitre ?? '';
          document.getElementById('heavyFootPercent').value = settings.heavyFootPercent ?? '';
@@ -644,7 +644,7 @@
         });
 
 
-        // Add listeners for USD inputs to show approx CAD
+        // Add listeners for USD inputs to show approx CAD placeholders
         document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
         document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
 
@@ -817,7 +817,17 @@
                  tourData.routePlannerState = tourData.routePlannerState.map(stop =>
                      stop.selectValue === `Hotel:${id}` ? { selectValue: '', dateValue: stop.dateValue } : stop
                  ).filter(stop => stop.selectValue !== ''); // Remove empty stops resulting from deletion if desired
-                 if (tourData.routePlannerState.length === 0) tourData.routePlannerState = [{ selectValue: '', dateValue: '' }]; // Ensure at least one empty stop
+               // Ensure at least one empty stop remains if the list becomes empty
+              if (tourData.routePlannerState.length === 0) {
+                   tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
+                   routeStopCounter = 1; // Reset counter
+               } else {
+                    routeStopCounter = tourData.routePlannerState.length; // Update counter
+               }
+
+                // Note: Deleting an item currently used in a cached route will make that route display show "N/A" for the stop name.
+                // It does *not* automatically invalidate the cache. The user would need to regenerate the route.
+                // This is acceptable complexity for now.
 
                 updateHotelsDisplay(); // Refresh display
                  updateRouteSelects(); // Update dropdowns
@@ -833,7 +843,13 @@
                  tourData.routePlannerState = tourData.routePlannerState.map(stop =>
                      stop.selectValue === `Venue:${id}` ? { selectValue: '', dateValue: stop.dateValue } : stop
                  ).filter(stop => stop.selectValue !== ''); // Remove empty stops resulting from deletion if desired
-                 if (tourData.routePlannerState.length === 0) tourData.routePlannerState = [{ selectValue: '', dateValue: '' }]; // Ensure at least one empty stop
+               // Ensure at least one empty stop remains if the list becomes empty
+               if (tourData.routePlannerState.length === 0) {
+                    tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
+                    routeStopCounter = 1; // Reset counter
+                } else {
+                     routeStopCounter = tourData.routePlannerState.length; // Update counter
+                }
 
                 updateVenuesDisplay(); // Refresh display
                  updateRouteSelects(); // Update dropdowns
@@ -868,8 +884,22 @@
         tourData.routePlannerState = Array.from({ length: routeStopCounter }, (_, i) => {
             const select = document.getElementById(`routeSelect${i}`);
             const date = document.getElementById(`routeDate${i}`);
+            // Ensure we save the *current* values from the UI elements
             return { selectValue: select ? select.value : '', dateValue: date ? date.value : '' };
         });
+        // Remove trailing empty stops IF they are completely empty (no select, no date)
+        // Keep at least one stop if the list isn't completely cleared
+         while (tourData.routePlannerState.length > 1 &&
+               tourData.routePlannerState[tourData.routePlannerState.length - 1].selectValue === '' &&
+               tourData.routePlannerState[tourData.routePlannerState.length - 1].dateValue === '') {
+              tourData.routePlannerState.pop();
+         }
+         // Re-ensure at least one stop if all were removed
+         if (tourData.routePlannerState.length === 0) {
+             tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
+         }
+         routeStopCounter = tourData.routePlannerState.length; // Sync counter
+
         saveData(); // Now saves to LS and Firebase
     }
     function loadRoutePlannerState() {
@@ -902,17 +932,15 @@
               if(selectEl) selectEl.addEventListener('change', saveRoutePlannerState);
               if(dateEl) dateEl.addEventListener('change', saveRoutePlannerState);
 
-              // Populate the select and set date from the loaded state *for this specific step*
-              // This population logic is now handled primarily by updateRouteSelects after the loop
+              // Population of select options and setting values is handled by updateRouteSelects after the loop
         });
 
 
         updateStopCounter();
          // After creating all stop elements, populate all selects with options and ensure correct values are set
          // updateRouteSelects also sets the date values
-        updateRouteSelects();
-        // Initial display update
-        // updateAllDisplays(); // Called by updateRouteSelects -> saveData -> updateAllDisplays
+        updateRouteSelects(); // This function saves the state as well
+        // Initial display update is handled by showTab which calls updateAllDisplays
     }
 
 
@@ -937,20 +965,15 @@
          if(dateEl) dateEl.addEventListener('change', saveRoutePlannerState);
 
 
-        // Add a new empty state entry for this stop if it doesn't exist
-        // This handles cases where add is called directly vs via load
-        if (tourData.routePlannerState.length <= newIndex) {
-             tourData.routePlannerState[newIndex] = { selectValue: '', dateValue: '' };
-        } else {
-             // If it already exists (e.g., from loaded data), reset it? Or keep it?
-             // Assuming add means add a NEW empty stop at the end.
-             tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
-        }
+        // Add a new empty state entry for this stop at the end
+         tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
 
 
-         updateRouteSelects(); // Update all selects (including the new one) with options and set values
+         updateRouteSelects(); // Update all selects (including the new one) with options and set values - this also saves state
 
-        if (shouldSave) { saveData(); } // Save the updated state
+        // No need to call saveData again if updateRouteSelects does it when shouldSave is true.
+        // If shouldSave is false (called from load), saveData will be called later.
+        // if (shouldSave) { saveData(); }
         // updateAllDisplays is called by showTab or loadData, which should handle the final render sync
     }
 
@@ -1004,7 +1027,7 @@
             const dateInput = document.getElementById(`routeDate${i}`);
 
             if (select) {
-                // Store the current selection and date value before clearing options
+                // Store the current selection and date value from the UI elements
                  const currentSelectValue = select.value;
                  const currentDateValue = dateInput ? dateInput.value : '';
 
@@ -1019,7 +1042,7 @@
                     select.appendChild(option);
                 });
 
-                 // Try to restore the previous value, falling back to tourData.routePlannerState
+                 // Try to restore the previous value from the UI first, falling back to tourData.routePlannerState
                  // Ensure tourData.routePlannerState[i] exists
                  if (!tourData.routePlannerState[i]) {
                       console.warn(`routePlannerState missing entry for index ${i} during select update. Creating placeholder.`);
@@ -1037,7 +1060,7 @@
                  }
 
 
-                 // Try to restore the previous date value, falling back to tourData.routePlannerState
+                 // Try to restore the previous date value from the UI first, falling back to tourData.routePlannerState
                  if (dateInput) {
                       if (currentDateValue) {
                          dateInput.value = currentDateValue;
@@ -1058,14 +1081,15 @@
 
 
             } else {
-                 // If select element doesn't exist for this index, ensure state is cleared or handled
+                 // If select element doesn't exist for this index (shouldn't happen with load logic),
+                 // ensure state is cleared or handled.
                  if (tourData.routePlannerState[i]) {
                       tourData.routePlannerState[i].selectValue = '';
                       tourData.routePlannerState[i].dateValue = '';
                  }
             }
         }
-        saveRoutePlannerState(); // Save the state after updating selects and dates
+        saveRoutePlannerState(); // Save the state after updating selects and dates for ALL stops
     }
 
 
@@ -1148,6 +1172,10 @@
             }
 
             // Group *consecutive* planned segments by date they START on to form route "sequences" for API calls.
+            // A new sequence starts if:
+            // 1. It's the very first segment.
+            // 2. It's the first segment for a new date.
+            // 3. The 'from' stop of the current segment does NOT match the 'to' stop of the previous segment *in the plannedSegments list*.
             const sequencesForGeneration = [];
              let currentSequence = null;
 
@@ -1171,12 +1199,12 @@
                     // OR if the stops are not consecutive with the end of the previous sequence.
                     currentSequence = {
                         date: segment.date, // Date the sequence starts on
-                        stops: [segment.from, segment.to], // Sequence of stops for this API call
+                        stops: [segment.from, segment.to], // Sequence of stops for this API call (includes full location details)
                         plannedSegments: [segment] // Planned segments included in this sequence
                     };
                      sequencesForGeneration.push(currentSequence);
                 } else {
-                    // Add segment to the current sequence if the stops link up and it's the same date.
+                    // Add segment to the current sequence
                     // Only add the 'to' stop to the sequence list (the 'from' is already the last stop).
                     currentSequence.stops.push(segment.to);
                     currentSequence.plannedSegments.push(segment);
@@ -1202,7 +1230,7 @@
 
              routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; // Add main header
              // Re-render any error segments first
-             plannedSegments.filter(s => s.hasError).forEach((segment, index) => {
+             plannedSegments.filter(s => s.hasError).forEach((segment) => {
                  // Render errors here first, sequenceCounter might not be reliable yet
                  routeResults.innerHTML += `<div class="route-item error"><strong>Segment starting ${formatDate(segment.date)} (${getLocationDetails(segment.fromStopId).name} → ${getLocationDetails(segment.toStopId).name}):</strong> ${segment.errorMessage}</div>`;
              });
@@ -1476,7 +1504,7 @@
             } else if (events.isTravel) {
                  eventIcons = '🚗';
             }
-            // Don't show hotel icon if it's *just* a hotel stay day based on new requirement
+            // Don't show hotel icon based on new requirement
 
             dayHtml += `<div class="day-events">${eventIcons}</div>`;
 
@@ -1554,14 +1582,14 @@
               // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
               // Note: This assumes the last stop's ID is present in the planner state and has a date.
                let cacheDayEndDateStr = null;
-               if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
-                    const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
-                    const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id; // Build ID string
-                    const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
-                    if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
-                        cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
-                    }
-               }
+              if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
+                 const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
+                 const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
+                 const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
+                 if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
+                     cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
+                 }
+            }
 
 
               if (cacheDayStartDateStr && cacheDayEndDateStr && cacheDayStartDateStr !== cacheDayEndDateStr) {
@@ -1584,6 +1612,11 @@
     function showDayDetails(dateStr) {
         const modal = document.getElementById('calendarModal');
         const content = document.getElementById('calendarModalContent');
+        if (!modal || !content) {
+             console.error("Calendar modal or content element not found!");
+             return; // Cannot show modal if elements are missing
+        }
+
 
         const venuesOnDay = tourData.venues.filter(v => v.date === dateStr);
         const hotelsOnDay = tourData.hotels.filter(h => {
@@ -1603,8 +1636,8 @@
                         <span class="close" onclick="closeModal('calendarModal')">&times;</span>
                     </div>`;
 
-        if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item venue-card" style="cursor:default; border-left-color:#ffd700;">${v.name} @ ${formatTime(v.time)}<br><small>${v.address ? v.address.substring(0, 50) + (v.address.length > 50 ? '...' : '') : 'N/A'}</small></div>`).join(''); }
-        if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item hotel-card" style="cursor:default; border-left-color:#87CEEB;">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); }
+        if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item venue-card" style="cursor:default; border-left-color:#ffd700;">${v.name ?? 'N/A'} @ ${formatTime(v.time)}<br><small>${v.address ? v.address.substring(0, 50) + (v.address.length > 50 ? '...' : '') : 'N/A'}</small></div>`).join(''); }
+        if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item hotel-card" style="cursor:default; border-left-color:#87CEEB;">${h.name ?? 'N/A'}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); }
 
 
         // Find cached route data sequences that *include* this date as part of their sequence range.
@@ -1618,7 +1651,7 @@
 
             // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
              let cacheDayEndDateStr = null;
-              if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
+             if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
                  const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
                  const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
                  const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
@@ -1670,7 +1703,7 @@
                         const fromStop = sequenceData.stops[legIndex] || { name: 'Unknown From', type: 'Unknown' };
                         const toStop = sequenceData.stops[legIndex + 1] || { name: 'Unknown To', type: 'Unknown' };
                          html += `<div class="route-item" style="border-left-color:${sequenceData.isCached ? '#4CAF50' : '#87CEEB'};">
-                                     <strong>${fromStop.name} → ${toStop.name}</strong>
+                                     <strong>${fromStop.name ?? 'N/A'} → ${toStop.name ?? 'N/A'}</strong>
                                      <br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text} | Est. Gas: $${gasCost.toFixed(0)}</small>
                                      </div>`;
                     });
@@ -1758,15 +1791,31 @@
              alert("Error: Cannot open edit form.");
              return;
         }
+        // Get all input elements within the modal form
+        const nameInput = document.getElementById('editHotelName');
+        const addressInput = document.getElementById('editHotelAddress');
+        const checkinInput = document.getElementById('editCheckinDate');
+        const checkoutInput = document.getElementById('editCheckoutDate');
+        const usdInput = document.getElementById('editHotelCostUSD');
+        const cadInput = document.getElementById('editHotelCostCAD');
+        const notesInput = document.getElementById('editHotelNotes');
+
+        // Check if all necessary input elements are found
+        if (!nameInput || !addressInput || !checkinInput || !checkoutInput || !usdInput || !cadInput || !notesInput) {
+             console.error("One or more hotel modal form elements not found!");
+             // Alert might be disruptive, just log the error and return
+             return; // Cannot populate form if elements are missing
+        }
+
 
         // Use nullish coalescing (??) to provide default empty values for inputs
-        document.getElementById('editHotelName').value = hotel.name ?? '';
-        document.getElementById('editHotelAddress').value = hotel.address ?? '';
-        document.getElementById('editCheckinDate').value = hotel.checkin ?? '';
-        document.getElementById('editCheckoutDate').value = hotel.checkout ?? '';
-        document.getElementById('editHotelCostUSD').value = hotel.costUSD ?? 0;
-        document.getElementById('editHotelCostCAD').value = hotel.costCAD ?? 0; // Populate manual CAD if present
-        document.getElementById('editHotelNotes').value = hotel.notes ?? '';
+        nameInput.value = hotel.name ?? '';
+        addressInput.value = hotel.address ?? '';
+        checkinInput.value = hotel.checkin ?? '';
+        checkoutInput.value = hotel.checkout ?? '';
+        usdInput.value = hotel.costUSD ?? 0;
+        cadInput.value = hotel.costCAD ?? 0; // Populate manual CAD if present
+        notesInput.value = hotel.notes ?? '';
 
         modal.style.display = 'block';
          console.log("Hotel modal opened for ID:", hotelId);
@@ -1787,16 +1836,32 @@
               alert("Error: Cannot open edit form.");
               return;
          }
+          // Get all input elements within the modal form
+         const nameInput = document.getElementById('editVenueName');
+         const addressInput = document.getElementById('editVenueAddress');
+         const dateInput = document.getElementById('editShowDate');
+         const timeInput = document.getElementById('editShowTime');
+         const startInvInput = document.getElementById('editStartInventory');
+         const endInvInput = document.getElementById('editEndInventory');
+         const salesInput = document.getElementById('editTotalSales');
+         const notesInput = document.getElementById('editVenueNotes');
+
+         // Check if all necessary input elements are found
+          if (!nameInput || !addressInput || !dateInput || !timeInput || !startInvInput || !endInvInput || !salesInput || !notesInput) {
+               console.error("One or more venue modal form elements not found!");
+               return; // Cannot populate form if elements are missing
+          }
+
 
          // Use nullish coalescing (??)
-         document.getElementById('editVenueName').value = venue.name ?? '';
-         document.getElementById('editVenueAddress').value = venue.address ?? '';
-         document.getElementById('editShowDate').value = venue.date ?? '';
-         document.getElementById('editShowTime').value = venue.time ?? '';
-         document.getElementById('editStartInventory').value = venue.startInventory ?? 0;
-         document.getElementById('editEndInventory').value = venue.endInventory ?? 0;
-         document.getElementById('editTotalSales').value = venue.totalSales ?? 0;
-         document.getElementById('editVenueNotes').value = venue.notes ?? '';
+         nameInput.value = venue.name ?? '';
+         addressInput.value = venue.address ?? '';
+         dateInput.value = venue.date ?? '';
+         timeInput.value = venue.time ?? '';
+         startInvInput.value = venue.startInventory ?? 0;
+         endInvInput.value = venue.endInventory ?? 0;
+         salesInput.value = venue.totalSales ?? 0;
+         notesInput.value = venue.notes ?? '';
 
          modal.style.display = 'block';
          console.log("Venue modal opened for ID:", venueId);
@@ -1830,7 +1895,7 @@
         const notesInput = document.getElementById('editHotelNotes');
 
          if (!nameInput || !addressInput || !checkinInput || !checkoutInput || !usdInput || !cadInput || !notesInput) {
-              console.error("Hotel modal form elements not found!");
+              console.error("Hotel modal form elements not found during save!");
               alert("Error: Cannot save, form elements missing.");
               return;
          }
@@ -1880,7 +1945,7 @@
          const notesInput = document.getElementById('editVenueNotes');
 
           if (!nameInput || !addressInput || !dateInput || !timeInput || !startInvInput || !endInvInput || !salesInput || !notesInput) {
-               console.error("Venue modal form elements not found!");
+               console.error("Venue modal form elements not found during save!");
                alert("Error: Cannot save, form elements missing.");
                return;
           }
