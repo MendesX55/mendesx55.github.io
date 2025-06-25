@@ -204,7 +204,9 @@ const storageKey = `tourData_${tourName}`;
 <input id="costPerLitre" placeholder="e.g. 1.75" type="number"/>
 <br/><label>Heavy Foot % Increase:</label>
 <input id="heavyFootPercent" placeholder="e.g. 10" type="number"/>
-<br/><button onclick="applySettings()">Apply Settings</button>
+<br/>
+<button onclick="applySettings()">Apply Settings</button>
+<button onclick="uploadLocalToFirebase()">Upload Local → Firebase</button>
 </div>
 </div>
 </div>
@@ -731,10 +733,24 @@ function applySettings() {
   if (!isNaN(cost)) tourData.settings.costPerLitre = cost;
   if (!isNaN(heavy)) tourData.settings.heavyFootPercent = heavy;
   saveTourData();
-  calculateRouteDetails(); // Update live
+  calculateRouteDetails(); // Refresh route math
 }
 
-// Patch all input/save/edit triggers to hook
+function uploadLocalToFirebase() {
+  try {
+    const local = localStorage.getItem(storageKey);
+    if (local && typeof saveToFirebase === "function") {
+      saveToFirebase(JSON.parse(local));
+      alert("Data pushed to Firebase!");
+    } else {
+      alert("Local data not found or Firebase sync not ready.");
+    }
+  } catch (e) {
+    console.error("Upload failed:", e);
+  }
+}
+
+// Hook all input changes
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("input, textarea, select").forEach(el =>
     el.addEventListener("change", saveTourData));
