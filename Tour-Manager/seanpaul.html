@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="black-translucent" name="apple-mobile-app-status-bar-style"/>
 <link href="icon.png" rel="apple-touch-icon"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
@@ -17,9 +16,8 @@
         .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
         .logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
         .container { max-width: 430px; margin: 0 auto; height: calc(100vh - 120px); display: flex; flex-direction: column; }
-        /* TAB FIX: Using flex: 1 to distribute space and make tabs fit, rather than scrolling */
         .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow: hidden; }
-        .tab-btn { flex: 1; padding: 8px 6px; /* Reduced padding to help fit */ background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
+        .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
         .tab-btn span { font-size: 1.5em; }
         .tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
         .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; }
@@ -30,7 +28,6 @@
         .form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        
         .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
         .currency-input { position: relative; }
         .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
@@ -92,46 +89,53 @@
         .day-number { font-weight: bold; }
         .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
         .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .currency-input input { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
 
-.form-row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-.currency-input input {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-
-@media only screen and (max-width: 430px) and (min-device-pixel-ratio: 3) {
-    /* --- Visual Fixes for High-DPI Zoomed Displays --- */
-    
-    /* 1. Ensure tabs fit on one line by adjusting size and spacing */
-    .tab-btn {
-        font-size: 8px;
-        padding: 5px 2px;
-        line-height: 1.1;
-    }
-    .tab-btn span {
-        font-size: 1.2em;
-    }
-
-    /* 2. Prevent summary stats from wrapping incorrectly */
-    .stat-card {
-        padding: 8px 5px;
-    }
-    .stat-value {
-        font-size: 1em;
-        white-space: nowrap;  /* KEY FIX: Prevents "12000 km" from breaking */
-    }
-    .stat-label {
-        font-size: 0.75em;    /* Reduce label font size to prevent it from wrapping */
-    }
-}
-
+        /* --------- iPhone 16 Pro Max Fixes: --------- */
+        @media only screen and (max-width: 430px) and (min-device-pixel-ratio: 3) {
+            .tab-navigation {
+                min-width: 100vw;
+                overflow-x: auto;
+            }
+            .tab-btn {
+                font-size: 7px !important;
+                padding: 2px 1px !important;
+                line-height: 1.05;
+                min-width: 48px;
+            }
+            .tab-btn span {
+                font-size: 1.15em !important;
+            }
+            .stat-card {
+                padding: 6px 2px !important;
+                min-width: 0 !important;
+                max-width: 95px !important;
+            }
+            .stat-value {
+                font-size: 0.89em !important;
+                white-space: nowrap;
+            }
+            .stat-label {
+                font-size: 0.68em !important;
+            }
+            .summary-box, .day-summary-box {
+                padding: 8px !important;
+                font-size: 0.97em !important;
+                max-width: 98vw !important;
+            }
+            .data-table th, .data-table td {
+                font-size: 0.83em !important;
+                padding: 3px !important;
+            }
+            .hotel-card, .venue-card {
+                padding: 9px !important;
+                font-size: 0.95em !important;
+            }
+        }
+        @media (max-width: 450px) and (min-device-pixel-ratio: 3) {
+            html, body { font-size: 14px !important; }
+        }
 </style>
 </head>
 <body>
