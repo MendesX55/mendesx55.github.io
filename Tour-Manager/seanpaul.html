@@ -18,13 +18,15 @@
         .header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
         .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
         .logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
-        .container { max-width: 430px; margin: 0 auto; height: calc(100vh - 120px); display: flex; flex-direction: column; }
+        /* MODIFICATION: Changed from fixed height to flex-grow to correctly fill screen space */
+        .container { max-width: 430px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; }
         /* TAB FIX: Using flex: 1 to distribute space and make tabs fit, rather than scrolling */
         .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow: hidden; }
         .tab-btn { flex: 1; padding: 8px 6px; /* Reduced padding to help fit */ background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
         .tab-btn span { font-size: 1.5em; }
         .tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
-        .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; }
+        /* MODIFICATION: Added safe area padding to the scrolling element itself */
+        .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
         .tab-content.active { display: block; }
         .form-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .form-section h3 { color: #ffd700; margin-bottom: 12px; font-size: 1.1em; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 5px; }
@@ -125,6 +127,7 @@
 }
 
 
+/* MODIFICATION: Body is now a flex container to manage layout */
 html, body {
   height: 100%;
   overflow: hidden;
@@ -135,12 +138,12 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  flex-direction: column;
 }
+/* MODIFICATION: The container no longer scrolls; it just holds the scrolling content */
 .container {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  /* This rule is now in the main style block, changed to flex-grow */
 }
 </style>
 
@@ -201,7 +204,7 @@ html, body {
 </style>
 
 </head>
-<body>
+<body style="display: flex; flex-direction: column;">
 <div style="padding-top: env(safe-area-inset-top); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999;">
   <a href="index.html" style="display: block; padding: 10px 20px; text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
 </div>
@@ -545,7 +548,6 @@ html, body {
     function exportTourData() { const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 
 </script>
-
-<div style="height: env(safe-area-inset-bottom); background-color: #0f3460;"></div>
+<!-- MODIFICATION: Removed the redundant spacer div -->
 </body>
 </html>
