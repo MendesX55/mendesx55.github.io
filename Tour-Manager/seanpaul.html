@@ -57,24 +57,7 @@
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        /* --- VISUAL FIX: Gas settings layout --- */
-        .form-group-inline {
-             display: grid; /* Use grid */
-             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid: min 100px, then share space */
-             gap: 8px; /* Gap between items */
-        }
-         .form-group-inline .form-group {
-             margin-bottom: 0; /* Remove bottom margin from grouped items */
-         }
-         .form-group-inline label {
-             white-space: nowrap; /* Prevent label wrapping if space is tight */
-         }
-         /* Ensure inputs within inline groups still take full width of their container */
-         .form-group-inline .form-group input {
-            width: 100%;
-         }
-         /* --- End VISUAL FIX --- */
-
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
         .currency-input { position: relative; }
         .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
         .currency-input input { padding-left: 30px; }
@@ -92,50 +75,8 @@
         .stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .stat-value { font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 3px; }
         .stat-label { color: #ccc; font-size: 0.8em; }
-        /* Clickable card styles */
-        .venue-card, .hotel-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid #ffd700; /* Default Venue color */
-            cursor: pointer; /* Indicate clickable */
-            transition: all 0.3s ease;
-        }
-        /* Specific color for hotel cards */
-        .hotel-card {
-             border-left-color: #87CEEB; /* Hotel color */
-        }
+        .venue-card, .hotel-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #ffd700; cursor: pointer; transition: all 0.3s ease; }
         .venue-card:hover, .hotel-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-2px); }
-
-        /* Expenses row style - adapted from table */
-        .expense-row {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            margin-bottom: 5px; /* Smaller margin for rows */
-            padding: 8px 12px; /* Padding inside row */
-            border-left: 4px solid #6A5ACD; /* Color for expenses */
-            display: flex; /* Use flex for layout within row */
-            justify-content: space-between; /* Space out content */
-            align-items: center; /* Vertically align items */
-            font-size: 0.9em;
-            cursor: pointer; /* Indicate clickable for potential future editing */
-        }
-         .expense-row > div {
-             flex: 1; /* Allow divs inside to grow/shrink */
-             overflow: hidden; /* Hide overflow */
-             text-overflow: ellipsis; /* Add ellipsis */
-             white-space: nowrap; /* Prevent wrapping */
-             padding-right: 5px; /* Add space between columns */
-         }
-        .expense-row .exp-date { flex-basis: 60px; flex-grow: 0; }
-        .expense-row .exp-type { flex-basis: 50px; flex-grow: 0; }
-        .expense-row .exp-loc { flex-basis: 80px; } /* Location can take more space */
-        .expense-row .exp-usd,
-        .expense-row .exp-cad { flex-basis: 50px; flex-grow: 0; text-align: right; }
-         .expense-row .exp-actions { flex-basis: 30px; flex-grow: 0; padding-right: 0; text-align: right;} /* Actions column */
-
-
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
         .card-title { color: #ffd700; font-weight: bold; flex-grow: 1; word-break: break-word; }
         .card-date { font-weight: bold; color: #fff; white-space: nowrap; flex-shrink: 0; font-size: 11px; }
@@ -174,9 +115,8 @@
         .calendar-day:hover { background: rgba(255,215,0,0.2); }
         .calendar-day.other-month { background: rgba(0,0,0,0.1); color: #666; }
         .day-number { font-weight: bold; }
-        /* Calendar day events/notes container */
-        .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; display: flex; justify-content: center; } /* Center icons */
-        .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; text-align: center; }
+        .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
+        .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -253,7 +193,7 @@
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 <div class="progress-text" id="progressText">Preparing...</div>
 </div>
-<div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #ffd700; font-size: 12px;">Stops: ${routeStopCounter} / Unlimited</span></div>
+<div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #ffd700; font-size: 12px;">Stops: 0 / Unlimited</span></div>
 </div>
 <div id="routeResults"></div>
 </div>
@@ -265,13 +205,13 @@
 <div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label">Total Cost</div></div>
 </div>
 </div>
-<div id="expensesList"></div><!-- Expenses list will be populated here -->
+<table class="data-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Location</th><th>USD</th><th>CAD</th><th>Action</th></tr></thead><tbody id="expensesBody"></tbody></table>
 </div>
 <!-- SETTINGS (INPUT) TAB -->
 <div class="tab-content" id="settings">
 <div class="form-section"><h3>🏨 Hotel Confirmations</h3><div class="form-group"><label>Hotel Name</label><input id="hotelName" placeholder="Hotel name" type="text"/></div><div class="form-group"><label>Address</label><input id="hotelAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="checkinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="checkoutDate" type="date"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="hotelCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="hotelCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="hotelNotes" placeholder="Confirmation number, special requests, etc." rows="2"></textarea></div><button class="btn" onclick="addHotel()">Add Hotel</button></div>
-<div class="form-section"><h3>🎵 Venue Information</h3><div class="form-group"><label>Venue Name</label><input id="venueName" placeholder="Venue name" type="text"/></div><div class="form-group"><label>Address</label><input id="venueAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="showDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="showTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="startInventory" placeholder="0" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="endInventory" placeholder="0" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="totalSales" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</textarea></div><button class="btn" onclick="addVenue()">Add Venue</button></div>
-<div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
+<div class="form-section"><h3>🎵 Venue Information</h3><div class="form-group"><label>Venue Name</label><input id="venueName" placeholder="Venue name" type="text"/></div><div class="form-group"><label>Address</label><input id="venueAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="showDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="showTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="startInventory" placeholder="0" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="endInventory" placeholder="0" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="totalSales" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="venueNotes" placeholder="Stage setup, sound requirements, etc." rows="2"></textarea></div><button class="btn" onclick="addVenue()">Add Venue</button></div>
+<div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</label><textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
 <div class="form-section"><h3>📤 Export Data</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Select which data to include in your CSV file.</p>
 <div class="checkbox-group">
 <label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label>
@@ -283,7 +223,7 @@
 </div>
 <div class="form-section">
     <h3>⛽ Gas Settings</h3>
-    <div class="form-group-inline"> <!-- Use the new class for inline layout -->
+     <div class="form-group-inline"> <!-- Use the new class for inline layout -->
         <div class="form-group"><label for="kmPerLitre">Fuel KM/L:</label><input id="kmPerLitre" placeholder="e.g. 8" type="number" step="0.1"/></div>
         <div class="form-group"><label for="costPerLitre">Cost $/L:</label><input id="costPerLitre" placeholder="e.g. 1.75" type="number" step="0.01"/></div>
         <div class="form-group"><label for="heavyFootPercent">Go FAST %:</label><input id="heavyFootPercent" placeholder="e.g. 10" type="number" step="1"/></div>
@@ -294,83 +234,22 @@
 </div>
 </div>
 <!-- MODALS -->
-<!-- Hotel Edit Modal -->
-<div class="modal" id="hotelModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div>Edit Hotel Details</div>
-            <span class="close" onclick="closeModal('hotelModal')">&times;</span>
-        </div>
-        <div id="hotelEditForm">
-            <div class="form-group"><label for="editHotelName">Hotel Name</label><input id="editHotelName" type="text"/></div>
-            <div class="form-group"><label for="editHotelAddress">Address</label><input id="editHotelAddress" type="text"/></div>
-            <div class="form-row">
-                <div class="form-group"><label for="editCheckinDate">Check-in</label><input id="editCheckinDate" type="date"/></div>
-                <div class="form-group"><label for="editCheckoutDate">Check-out</label><input id="editCheckoutDate" type="date"/></div>
-            </div>
-            <div class="form-row-2">
-                <div class="currency-input form-group"><label for="editHotelCostUSD">USD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostUSD" step="0.01" type="number"/></div>
-                <div class="currency-input form-group"><label for="editHotelCostCAD">Manual CAD</label><span class="currency-prefix">$</span><input id="editHotelCostCAD" step="0.01" type="number"/></div>
-            </div>
-            <div class="form-group"><label for="editHotelNotes">Confirmation Notes</label><textarea id="editHotelNotes" rows="3"></textarea></div>
-            <button class="btn" onclick="saveHotelEdit()">Save Changes</button>
-            <button class="btn btn-danger" onclick="deleteHotel()">Delete Hotel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Venue Edit Modal -->
-<div class="modal" id="venueModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div>Edit Venue Details</div>
-            <span class="close" onclick="closeModal('venueModal')">&times;</span>
-        </div>
-        <div id="venueEditForm">
-            <div class="form-group"><label for="editVenueName">Venue Name</label><input id="editVenueName" type="text"/></div>
-            <div class="form-group"><label for="editVenueAddress">Address</label><input id="editVenueAddress" type="text"/></div>
-            <div class="form-row">
-                <div class="form-group"><label for="editShowDate">Show Date</label><input id="editShowDate" type="date"/></div>
-                <div class="form-group"><label for="editShowTime">Show Time</label><input id="editShowTime" type="time"/></div>
-            </div>
-            <div class="form-row-3">
-                <div class="form-group"><label for="editStartInventory">Start Inventory</label><input id="editStartInventory" type="number"/></div>
-                <div class="form-group"><label for="editEndInventory">End Inventory</label><input id="editEndInventory" type="number"/></div>
-                <div class="form-group currency-input"><label for="editTotalSales">Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div>
-            </div>
-            <div class="form-group"><label for="editVenueNotes">Venue Notes</textarea></div>
-            <button class="btn" onclick="saveVenueEdit()">Save Changes</button>
-            <button class="btn btn-danger" onclick="deleteVenue()">Delete Venue</button>
-        </div>
-    </div>
-</div>
-
-<!-- Calendar Day Details Modal -->
+<div class="modal" id="hotelModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('hotelModal')">×</span><div>Edit Hotel Details</div></div><div id="hotelEditForm"><div class="form-group"><label>Hotel Name</label><input id="editHotelName" type="text"/></div><div class="form-group"><label>Address</label><input id="editHotelAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="editCheckinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="editCheckoutDate" type="date"/></div></div><div class="form-row-2"><div class="currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostUSD" step="0.01" type="number"/></div><div class="currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="editHotelCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="editHotelNotes" rows="3"></textarea></div><button class="btn" onclick="saveHotelEdit()">Save Changes</button><button class="btn btn-danger" onclick="deleteHotel()">Delete Hotel</button></div></div></div>
+<div class="modal" id="venueModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('venueModal')">×</span><div>Edit Venue Details</div></div><div id="venueEditForm"><div class="form-group"><label>Venue Name</label><input id="editVenueName" type="text"/></div><div class="form-group"><label>Address</label><input id="editVenueAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="editShowDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="editShowTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="editStartInventory" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="editEndInventory" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="editVenueNotes" rows="3"></textarea></div><button class="btn" onclick="saveVenueEdit()">Save Changes</button><button class="btn btn-danger" onclick="deleteVenue()">Delete Venue</button></div></div></div>
 <div class="modal" id="calendarModal"><div class="modal-content" id="calendarModalContent"></div></div>
-
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
 <script>
-    // Tour name and localStorage key
+    // Constants
     const TOUR_NAME = "seanpaul";
-    // Key used for current storage (local and Firebase)
     const CURRENT_LOCAL_STORAGE_KEY = `tourData_${TOUR_NAME}`;
-    // Old key potentially holding your data (removed the OLD key reference as per user request)
-
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc'; // Kept from original code
 
     // Firebase Configuration
     // Using the API key from your original code snippet, confirmed as correct.
     const firebaseConfig = {
-      apiKey: "AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc",
+      apiKey: "AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc", // Reverted to the one provided in your initial code snippet
       authDomain: "tour-manager-b2888.firebaseapp.com",
       projectId: "tour-manager-b2888",
-      // measurementId: "G-XXXXXXXXXX", // Add if you have it
-      // storageBucket: "YOUR_STORAGE_BUCKET", // Add if you use it
-      // messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // Add if you use it
-      // appId: "YOUR_APP_ID", // Add if you use it
+      // Add other values from your Firebase project settings if needed
     };
 
     // Initialize Firebase
@@ -380,22 +259,13 @@
         firebaseApp = firebase.initializeApp(firebaseConfig);
         db = firebaseApp.firestore();
         console.log("Firebase initialized.");
-        // Optional: Enable offline persistence
-        // firebase.firestore().enablePersistence()
-        //   .then(() => console.log("Offline persistence enabled"))
-        //   .catch((err) => {
-        //       if (err.code == 'failed-precondition') {
-        //           console.warn('Persistence failed: Multiple tabs open.');
-        //       } else if (err.code == 'unimplemented') {
-        //            console.warn('Persistence not supported.');
-        //       } else {
-        //           console.error("Persistence failed:", err);
-        //       }
-        //   });
+         // Optional: Enable offline persistence (requires indexdb support)
+         // firebase.firestore().enablePersistence().catch((err) => { console.warn('Persistence issue:', err); });
     } catch (error) {
         console.error("Firebase initialization failed:", error);
         db = null; // Ensure db is null if init fails
     }
+
 
     // Global tour data object - initialized with defaults
     let tourData = {
@@ -427,9 +297,11 @@
         const numId = parseInt(id);
         if (type === 'Hotel') {
             const hotel = tourData.hotels.find(h => h.id === numId);
+             // Return a copy to avoid modifying the original object accidentally
             return hotel ? { ...hotel, type: 'Hotel' } : { type: 'Hotel', name: `Hotel ${id}`, address: 'N/A', id: numId }; // Use ID in fallback name
         } else if (type === 'Venue') {
             const venue = tourData.venues.find(v => v.id === numId);
+             // Return a copy
             return venue ? { ...venue, type: 'Venue' } : { type: 'Venue', name: `Venue ${id}`, address: 'N/A', id: numId }; // Use ID in fallback name
         }
          return { type: 'Unknown', name: `ID ${id}`, address: 'N/A', id: numId }; // Generic fallback
@@ -500,7 +372,7 @@
                 try {
                     const parsedCurrentData = JSON.parse(currentLocalDataString);
                      // Basic check if it looks like actual data
-                    if (parsedCurrentData && (parsedCurrentData.hotels?.length > 0 || parsedCurrentData.venues?.length > 0 || parsedCurrentData.expenses?.length > 0 || parsedCurrentData.routePlannerState?.length > 0 || (parsedCurrentData.routeCache && Object.keys(parsedCurrentData.routeCache).length > 0))) {
+                    if (parsedCurrentData && (parsedCurrentData.hotels?.length > 0 || parsedCurrentData.venues?.length > 0 || parsedCurrentData.expenses?.length > 0 || parsedCurrentData.routePlannerState?.length > 0 || (parsedCurrentData.routeCache && Object.keys(parsedCurrentData.routeCache).length > 0) || parsedCurrentData.settings)) { // Also check if settings exist
                         loadedData = parsedCurrentData;
                         source = 'current_localStorage';
                         console.log("Data loaded from CURRENT localStorage key:", CURRENT_LOCAL_STORAGE_KEY);
@@ -520,9 +392,11 @@
         // 3. Update global tourData and ensure structure/types
         if (loadedData) {
              // Merge loaded data with default structure
+             // Keep default settings if loaded settings are null/undefined
             tourData = {
                 ...{ hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } },
-                ...loadedData
+                ...loadedData,
+                 settings: loadedData.settings || { kmPerLitre: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } // Explicitly handle settings merge
             };
         } else {
              // No data found anywhere, use default tourData initialized globally
@@ -598,15 +472,27 @@
     function populateSettingsForm() {
          const settings = tourData.settings || {}; // Use default if tourData.settings is null/undefined
          // Use ?? '' to ensure setting value is not null/undefined when setting input value
-         document.getElementById('kmPerLitre').value = settings.kmPerLitre ?? '';
-         document.getElementById('costPerLitre').value = settings.costPerLitre ?? '';
-         document.getElementById('heavyFootPercent').value = settings.heavyFootPercent ?? '';
+         // Add checks if elements exist before setting value
+         const kmInput = document.getElementById('kmPerLitre');
+         const costInput = document.getElementById('costPerLitre');
+         const heavyInput = document.getElementById('heavyFootPercent');
+
+         if (kmInput) kmInput.value = settings.kmPerLitre ?? '';
+         if (costInput) costInput.value = settings.costPerLitre ?? '';
+         if (heavyInput) heavyInput.value = settings.heavyFootPercent ?? '';
+
     }
 
     function applySettings() {
-        const kmPerLitreInput = document.getElementById("kmPerLitre").value;
-        const costPerLitreInput = document.getElementById("costPerLitre").value;
-        const heavyFootPercentInput = document.getElementById("heavyFootPercent").value;
+        // Add checks if elements exist before getting value
+        const kmInput = document.getElementById("kmPerLitre");
+        const costInput = document.getElementById("costPerLitre");
+        const heavyInput = document.getElementById("heavyFootPercent");
+
+        const kmPerLitreInput = kmInput ? kmInput.value : '';
+        const costPerLitreInput = costInput ? costInput.value : '';
+        const heavyFootPercentInput = heavyInput ? heavyInput.value : '';
+
 
         // Ensure settings object exists
         if (!tourData.settings) tourData.settings = {};
@@ -634,8 +520,12 @@
         // Firebase is initialized before this function runs (globally in <script>)
         await loadData(); // Load data first (from Firebase or localStorage)
 
-        // Set expense date default
-        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        // Set expense date default - Add check if element exists
+        const expenseDateInput = document.getElementById('expenseDate');
+        if (expenseDateInput) {
+             expenseDateInput.value = new Date().toISOString().split('T')[0];
+        }
+
 
         // Add event listeners for forms to auto-save on change
         // These listeners are added AFTER data is loaded, so initial load doesn't trigger saves
@@ -644,9 +534,17 @@
         });
 
 
-        // Add listeners for USD inputs to show approx CAD placeholders
-        document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
-        document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (cadInput) { cadInput.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; } });
+        // Add listeners for USD inputs to show approx CAD placeholders - Add checks if elements exist
+        const hotelCostUSD = document.getElementById('hotelCostUSD');
+        const hotelCostCAD = document.getElementById('hotelCostCAD');
+        if (hotelCostUSD && hotelCostCAD) {
+             hotelCostUSD.addEventListener('input', function() { hotelCostCAD.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; });
+        }
+        const expenseAmountUSD = document.getElementById('expenseAmountUSD');
+        const expenseAmountCAD = document.getElementById('expenseAmountCAD');
+         if (expenseAmountUSD && expenseAmountCAD) {
+             expenseAmountUSD.addEventListener('input', function() { expenseAmountCAD.placeholder = this.value ? `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD` : '0.00'; });
+         }
 
 
         // Initial tab display is handled by loadData -> loadRoutePlannerState -> updateAllDisplays -> showTab('calendar')
@@ -671,23 +569,23 @@
         // Update displays specific to tabs when shown
         // These functions now render based on the current state of tourData, which is loaded on init
         if (tabName === 'calendar') renderCalendar();
-        else if (tabName === 'venues') updateVenuesDisplay(); // This will now attach click listeners
-        else if (tabName === 'hotels') updateHotelsDisplay(); // This will now attach click listeners
+        else if (tabName === 'venues') updateVenuesDisplay(); // This will now attach click listeners (via onclick)
+        else if (tabName === 'hotels') updateHotelsDisplay(); // This will now attach click listeners (via onclick)
         else if (tabName === 'routes') {
             updateRouteSelects(); // Ensure dropdowns are populated
             renderRouteResults(); // Render cached results with current settings
             updateRouteSummaryStats(); // Update total stats with current settings
         }
-        else if (tabName === 'expenses') updateExpensesDisplay(); // This will now attach click listeners
+        else if (tabName === 'expenses') updateExpensesDisplay(); // This will now attach click listeners (via onclick)
          else if (tabName === 'settings') populateSettingsForm(); // Ensure settings form shows current values
     }
 
     // Called from various places to refresh UI elements
     function updateAllDisplays() {
         // These functions now rely on tourData object and render based on its current state
-        updateHotelsDisplay(); // Will attach event listeners
-        updateExpensesDisplay(); // Will attach event listeners
-        updateVenuesDisplay(); // Will attach event listeners
+        updateHotelsDisplay(); // Will attach onclick handlers
+        updateExpensesDisplay(); // Will attach onclick handlers
+        updateVenuesDisplay(); // Will attach onclick handlers
         updateRouteSelects(); // This one only updates the dropdowns, not the results view
         // Route results and summary are updated when the 'routes' tab is shown
         // or when settings are applied via renderRouteResults() and updateRouteSummaryStats()
@@ -867,9 +765,33 @@
         }
     }
 
-     function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('hotelCostCAD').placeholder = '0.00'; }
-    function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => document.getElementById(id).value = ''); }
-    function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; document.getElementById('expenseAmountCAD').placeholder = '0.00';}
+     function clearHotelForm() {
+         const elements = ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'];
+         elements.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+         });
+         const cadInput = document.getElementById('hotelCostCAD');
+         if (cadInput) cadInput.placeholder = '0.00';
+    }
+    function clearVenueForm() {
+         const elements = ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'];
+         elements.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+         });
+    }
+    function clearExpenseForm() {
+         const elements = ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'];
+         elements.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+         });
+         const expenseDateInput = document.getElementById('expenseDate');
+         if (expenseDateInput) expenseDateInput.value = new Date().toISOString().split('T')[0];
+         const cadInput = document.getElementById('expenseAmountCAD');
+         if (cadInput) cadInput.placeholder = '0.00';
+    }
 
 
     // --- Route Builder Logic ---
@@ -904,6 +826,7 @@
     }
     function loadRoutePlannerState() {
         const routeStepsContainer = document.getElementById('routeSteps');
+        if (!routeStepsContainer) return; // Safety check
         routeStepsContainer.innerHTML = '';
         // Ensure routePlannerState is an array, default to empty if null/undefined
         if (!Array.isArray(tourData.routePlannerState)) {
@@ -944,10 +867,15 @@
     }
 
 
-    function updateStopCounter() { document.getElementById('routeStopCount').textContent = `Stops: ${routeStopCounter} / Unlimited`; }
+    function updateStopCounter() {
+        const countEl = document.getElementById('routeStopCount');
+        if (countEl) countEl.textContent = `Stops: ${routeStopCounter} / Unlimited`;
+    }
 
     function addRouteStop(shouldSave = true) {
         const routeStepsContainer = document.getElementById('routeSteps');
+        if (!routeStepsContainer) return; // Safety check
+
         const newIndex = routeStopCounter;
         const newStep = document.createElement('div');
         newStep.className = 'route-step';
@@ -999,7 +927,8 @@
             tourData.routeCache = {}; // Also clear cache on full route clear
             saveData(); // Now saves to LS and Firebase
             loadRoutePlannerState(); // Resets to a single empty stop and updates display
-            document.getElementById('routeResults').innerHTML = ''; // Clear displayed results
+            const routeResults = document.getElementById('routeResults');
+             if (routeResults) routeResults.innerHTML = ''; // Clear displayed results
             updateRouteSummaryStats(); // Reset route summary stats
         }
     }
@@ -1075,7 +1004,6 @@
                  }
 
                  // Ensure the tourData.routePlannerState reflects the final UI values after refresh
-                 // This step might be redundant if the logic above is correct, but adds robustness.
                  tourData.routePlannerState[i].selectValue = select ? select.value : '';
                  if (dateInput) tourData.routePlannerState[i].dateValue = dateInput.value;
 
@@ -1096,8 +1024,10 @@
     function toggleRouteBuilder() {
         const content = document.getElementById('route-builder-content');
         const arrow = document.getElementById('routeBuilderToggleArrow');
-        content.classList.toggle('collapsed');
-        arrow.classList.toggle('collapsed');
+        if (content && arrow) {
+            content.classList.toggle('collapsed');
+            arrow.classList.toggle('collapsed');
+        }
     }
 
     async function generateCustomRoute() {
@@ -1109,6 +1039,15 @@
         const progressFill = document.getElementById('progressFill');
         const progressText = document.getElementById('progressText');
         const routeResults = document.getElementById('routeResults');
+
+         // Check if required elements exist
+         if (!generateBtn || !progressDiv || !progressFill || !progressText || !routeResults) {
+             console.error("Missing required route generation UI elements.");
+             alert("Error: UI elements for route generation are missing.");
+             isGeneratingRoute = false;
+             return;
+         }
+
 
         generateBtn.disabled = true;
         generateBtn.textContent = '🔄 Generating...';
@@ -1162,7 +1101,7 @@
                           toStopId: toStopInfo.selectValue,
                           plannerIndex: i,
                           hasError: true,
-                          errorMessage: `Invalid address: ${fromLocation.address === 'N/A' ? fromLocation.name : ''} ${toLocation.address === 'N/A' ? toLocation.name : ''}`.trim()
+                          errorMessage: `Invalid address: ${fromLocation.address === 'N/A' ? (fromLocation.name || fromStopInfo.selectValue) : ''} ${toLocation.address === 'N/A' ? (toLocation.name || toStopInfo.selectValue) : ''}`.trim() || 'Invalid address'
                       });
                  }
             }
@@ -1182,14 +1121,13 @@
             plannedSegments.forEach((segment, index) => {
                  // Skip segments marked with errors for API generation
                  if (segment.hasError) {
-                      // Render error for this specific segment instead of trying to group
-                       renderErrorDay(segment.date, sequencesForGeneration.length + 1, `Cannot route: ${segment.errorMessage}`);
+                      // Error message for this specific segment will be rendered later
                       return; // Skip this segment in grouping
                  }
 
                  const prevSequence = currentSequence; // Keep track of the last built sequence
                  const isNewDate = !prevSequence || segment.date !== prevSequence.date;
-                 // Check if this segment's start stop matches the end stop of the *last segment added to the current sequence*
+                 // Check if this segment's start stop matches the end stop of the *last stop added to the current sequence's stops list*
                  const isConsecutiveStopInSequence = prevSequence && prevSequence.stops && prevSequence.stops.length > 0 && segment.from.id === prevSequence.stops[prevSequence.stops.length - 1].id;
 
 
@@ -1212,15 +1150,10 @@
             });
 
 
-            if (sequencesForGeneration.length === 0) {
-                 // This might happen if ALL planned segments had invalid addresses
-                 if (plannedSegments.length > 0 && plannedSegments.every(s => s.hasError)) {
-                      // All planned segments had errors, messages already rendered
-                       progressText.textContent = '❌ Generation failed (all segments had errors)';
-                       setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
-                       return; // Stop processing
-                 }
-                 throw new Error('No routable sequences found after processing planned segments.');
+            if (sequencesForGeneration.length === 0 && plannedSegments.every(s => !s.hasError)) {
+                 // If no sequences were generated BUT there were planned segments without errors,
+                 // something went wrong with the grouping logic or the planner state is invalid.
+                 throw new Error('Could not form routable sequences from planned segments. Check stop order and dates.');
             }
 
             let processedSequences = 0;
@@ -1229,8 +1162,8 @@
 
 
              routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; // Add main header
-             // Re-render any error segments first
-             plannedSegments.filter(s => s.hasError).forEach((segment) => {
+             // Render any error segments first
+             plannedSegments.filter(s => s.hasError).forEach((segment, index) => {
                  // Render errors here first, sequenceCounter might not be reliable yet
                  routeResults.innerHTML += `<div class="route-item error"><strong>Segment starting ${formatDate(segment.date)} (${getLocationDetails(segment.fromStopId).name} → ${getLocationDetails(segment.toStopId).name}):</strong> ${segment.errorMessage}</div>`;
              });
@@ -1338,6 +1271,8 @@
     // sequenceCounter: The Nth sequence being rendered (for display in header)
     function renderRouteSequence(date, sequenceData, sequenceCounter) {
         const routeResults = document.getElementById('routeResults');
+        if (!routeResults) return; // Safety check
+
         // Ensure sequenceData structure is valid
          if (!sequenceData || !Array.isArray(sequenceData.legs) || !Array.isArray(sequenceData.stops) || sequenceData.legs.length === 0 || sequenceData.stops.length < 2) {
              console.warn("Attempted to render invalid sequence data:", sequenceData);
@@ -1376,7 +1311,7 @@
             const routeSegment = document.createElement('div');
             // Add 'show-day' class if the *end* of this segment (leg) is a Venue
             routeSegment.className = `route-item ${sequenceData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`;
-            routeSegment.innerHTML = `<div class="route-header"><strong>${fromStop.name} → ${toStop.name}</strong></div>
+            routeSegment.innerHTML = `<div class="route-header"><strong>${fromStop.name ?? 'N/A'} → ${toStop.name ?? 'N/A'}</strong></div>
                                      <div class="route-info">
                                          <strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br>
                                          <strong>Est. Gas:</strong> $${gasCost.toFixed(0)} CAD
@@ -1389,6 +1324,8 @@
     // Re-render the route results displayed on the page based on current tourData.routeCache
     function renderRouteResults() {
          const routeResults = document.getElementById('routeResults');
+         if (!routeResults) return; // Safety check
+
          routeResults.innerHTML = ''; // Clear current display
          if (!tourData.routeCache || Object.keys(tourData.routeCache).length === 0) {
              routeResults.innerHTML = '<p style="text-align: center; color: #ccc;">Generate a route using the planner above.</p>';
@@ -1452,14 +1389,20 @@
         const totalHours = Math.floor(grandTotalTimeSecs / 3600);
         const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60);
 
-        document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`;
-        document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
-        document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0);
+        const totalDistanceStat = document.getElementById('totalDistanceStat');
+        const totalTimeStat = document.getElementById('totalTimeStat');
+        const totalGasStat = document.getElementById('totalGasStat');
+
+        if (totalDistanceStat) totalDistanceStat.textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`;
+        if (totalTimeStat) totalTimeStat.textContent = `${totalHours}h ${totalMinutes}m`;
+        if (totalGasStat) totalGasStat.textContent = '$' + grandTotalGas.toFixed(0);
     }
 
 
     function renderErrorDay(date, sequenceCounter, errorMessage) { // Renamed from renderErrorDay to clarify it's per sequence
         const routeResults = document.getElementById('routeResults');
+        if (!routeResults) return; // Safety check
+
         const errorSummary = document.createElement('div');
         errorSummary.className = 'day-summary-box'; // Use day-summary style
         errorSummary.style.borderColor = '#e74c3c';
@@ -1561,45 +1504,39 @@
          let isTravel = false;
 
          // A day is a travel day if its date is the *start date* of any cached route sequence with legs
+         // or if it falls within the date range of a multi-day cached route sequence.
          Object.keys(tourData.routeCache).forEach(key => {
               const cacheDayStartDateStr = key.split('_')[0];
               // Ensure cache entry and data are valid and represent a route
                const cacheEntry = tourData.routeCache[key];
-               if (cacheDayStartDateStr === dateStr && cacheEntry && cacheEntry.data && Array.isArray(cacheEntry.data.legs) && cacheEntry.data.legs.length > 0) {
-                    isTravel = true;
+               if (!cacheEntry || !cacheEntry.data || !Array.isArray(cacheEntry.data.legs) || cacheEntry.data.legs.length === 0 || !Array.isArray(cacheEntry.data.stops) || cacheEntry.data.stops.length < 2) {
+                    return; // Skip invalid cache entry
                }
-         });
+               const sequenceData = cacheEntry.data;
 
-          // Also consider days that fall *within* the range of any cached multi-day route sequence
-         Object.keys(tourData.routeCache).forEach(key => {
-              const cacheDayStartDateStr = key.split('_')[0];
-              // Ensure cache entry and data are valid
-              if (!tourData.routeCache[key] || !tourData.routeCache[key].data || !Array.isArray(tourData.routeCache[key].data.stops) || tourData.routeCache[key].data.stops.length < 2) {
-                   return; // Skip invalid cache entry
-              }
-              const sequenceData = tourData.routeCache[key].data;
-
-              // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
-              // Note: This assumes the last stop's ID is present in the planner state and has a date.
+               // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
                let cacheDayEndDateStr = null;
-              if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
-                 const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
-                 const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
-                 const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
-                 if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
-                     cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
-                 }
-            }
+                if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
+                   const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
+                   // Make sure lastStopInSequence has type and id before building string
+                   if (lastStopInSequence && lastStopInSequence.type && lastStopInSequence.id != null) {
+                       const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
+                       const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
+                       if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
+                           cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
+                       }
+                   }
+              }
 
 
-              if (cacheDayStartDateStr && cacheDayEndDateStr && cacheDayStartDateStr !== cacheDayEndDateStr) {
+              if (cacheDayStartDateStr && cacheDayEndDateStr) {
                    const cacheStart = new Date(cacheDayStartDateStr + 'T00:00:00');
                    const cacheEnd = new Date(cacheDayEndDateStr + 'T00:00:00');
                    const current = new Date(dateStr + 'T00:00:00');
 
-                   // If the current date is strictly between the cache start and end dates (non-inclusive of start, inclusive of end)
-                   if (current > cacheStart && current <= cacheEnd) {
-                       isTravel = true; // It's an intermediate or end travel day covered by cache
+                   // If the current date is within the range [cacheStart, cacheEnd] inclusive
+                   if (current >= cacheStart && current <= cacheEnd) {
+                       isTravel = true; // It's a travel day covered by cache
                    }
               }
          });
@@ -1651,12 +1588,15 @@
 
             // Find the date for the LAST stop in the cached sequence (by looking up the stop ID in planner state)
              let cacheDayEndDateStr = null;
-             if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
+              if (Array.isArray(tourData.routePlannerState)) { // Ensure plannerState is an array
                  const lastStopInSequence = sequenceData.stops[sequenceData.stops.length - 1];
-                 const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
-                 const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
-                 if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
-                     cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
+                 // Make sure lastStopInSequence has type and id before building string
+                 if (lastStopInSequence && lastStopInSequence.type && lastStopInSequence.id != null) {
+                     const lastStopId = lastStopInSequence.type + ':' + lastStopInSequence.id;
+                     const lastStopPlannerEntry = tourData.routePlannerState.find(r => r.selectValue === lastStopId);
+                     if (lastStopPlannerEntry && lastStopPlannerEntry.dateValue) {
+                         cacheDayEndDateStr = lastStopPlannerEntry.dateValue;
+                     }
                  }
             }
 
@@ -1746,7 +1686,7 @@
          // Allow swipe only if the modal content itself is NOT scrollable
          const modalContentEl = document.getElementById('calendarModalContent');
          // Check if the modal content height exceeds its container height (allowing scroll)
-         const isContentScrollable = modalContentEl.scrollHeight > modalContentEl.clientHeight;
+         const isContentScrollable = modalContentEl && modalContentEl.scrollHeight > modalContentEl.clientHeight; // Add null check
 
          if (!isContentScrollable) {
             if (touchendX < touchstartX - 50) showNextDay();
@@ -1757,6 +1697,7 @@
      }
 
     function addSwipeListeners(element) {
+         if (!element) return; // Safety check
         // Ensure listeners are not duplicated by removing them first
         const handleTouchStart = (e) => { touchstartX = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e) => { touchendX = e.changedTouches[0].screenX; handleSwipe(); };
@@ -2024,10 +1965,12 @@
 
     // --- Display Functions ---
     // updateHotelsDisplay, updateExpensesDisplay, updateVenuesDisplay
-    // Refactored to use programmatic element creation and addEventListener
+    // These functions generate HTML string with onclick attributes as in the original code
+
 
     function updateHotelsDisplay() {
         const hotelsList = document.getElementById('hotelsList');
+        if (!hotelsList) return; // Safety check
         hotelsList.innerHTML = ''; // Clear current list
 
         const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin));
@@ -2049,91 +1992,70 @@
 
             const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad';
 
-            const hotelCard = document.createElement('div');
-            hotelCard.className = 'hotel-card';
-            // Add click listener to open modal
-            hotelCard.addEventListener('click', () => openHotelModal(hotel.id));
-
-            hotelCard.innerHTML = `
-                <div class="card-header">
-                    <strong class="card-title">${hotel.name ?? 'N/A'}</strong>
-                    <small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small>
+            // Use onclick attributes directly in the generated HTML string (as in original code)
+            const hotelCardHtml = `
+                <div class="hotel-card" onclick="openHotelModal(${hotel.id})">
+                    <div class="card-header">
+                        <strong class="card-title">${hotel.name ?? 'N/A'}</strong>
+                        <small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small>
+                    </div>
+                    <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address ? hotel.address.substring(0, 50) + (hotel.address.length > 50 ? '...' : '') : 'N/A'}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>USD: ${(hotel.costUSD ?? 0).toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span>
+                        <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button>
+                    </div>
+                    ${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}
                 </div>
-                <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address ? hotel.address.substring(0, 50) + (hotel.address.length > 50 ? '...' : '') : 'N/A'}</div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>USD: ${(hotel.costUSD ?? 0).toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span>
-                    <button class="btn btn-small btn-danger delete-btn">×</button> <!-- Delete button here -->
-                </div>
-                ${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}
             `;
-            hotelsList.appendChild(hotelCard);
-
-             // Find the delete button within the newly created card and add its listener
-            const deleteButton = hotelCard.querySelector('.delete-btn');
-             if (deleteButton) {
-                  deleteButton.addEventListener('click', (event) => {
-                      event.stopPropagation(); // Prevent the card click event from firing
-                      deleteItem('hotel', hotel.id); // Call delete function with type and ID
-                  });
-             }
+            hotelsList.innerHTML += hotelCardHtml; // Append HTML string
         });
 
 
-        document.getElementById('hotelCountStat').textContent = tourData.hotels.length;
-        document.getElementById('hotelDaysStat').textContent = Math.round(totalNights);
-        document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0);
+        const hotelCountStat = document.getElementById('hotelCountStat');
+        const hotelDaysStat = document.getElementById('hotelDaysStat');
+        const hotelCostStat = document.getElementById('hotelCostStat');
+
+        if (hotelCountStat) hotelCountStat.textContent = tourData.hotels.length;
+        if (hotelDaysStat) hotelDaysStat.textContent = Math.round(totalNights);
+        if (hotelCostStat) hotelCostStat.textContent = '$' + totalCAD.toFixed(0);
     }
 
 
     function updateExpensesDisplay() {
-        const expensesList = document.getElementById('expensesList');
-         expensesList.innerHTML = ''; // Clear current list
+        const tbody = document.getElementById('expensesBody');
+        if (!tbody) return; // Safety check
+        tbody.innerHTML = ''; // Clear current rows
 
         let totalCAD = 0;
         const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
 
         sortedExpenses.forEach(expense => {
-             const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35);
+            const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35);
             totalCAD += displayCAD;
 
-             const expenseRow = document.createElement('div');
-             expenseRow.className = 'expense-row';
-             // expenseRow.addEventListener('click', () => openExpenseModal(expense.id)); // Uncomment if you add an expense edit modal
-
-             // Add content divs
-             const dateDiv = document.createElement('div'); dateDiv.className = 'exp-date'; dateDiv.textContent = formatDate(expense.date); expenseRow.appendChild(dateDiv);
-
-             const typeDiv = document.createElement('div'); typeDiv.className = 'exp-type'; typeDiv.textContent = expense.type ?? 'N/A'; expenseRow.appendChild(typeDiv);
-
-             const locDiv = document.createElement('div'); locDiv.className = 'exp-loc'; locDiv.textContent = (expense.location || 'N/A').substring(0, 15) + ((expense.location || '').length > 15 ? '...' : ''); expenseRow.appendChild(locDiv);
-
-             const usdDiv = document.createElement('div'); usdDiv.className = 'exp-usd'; usdDiv.textContent = (expense.amountUSD ?? 0).toFixed(0); expenseRow.appendChild(usdDiv);
-
-             const cadDiv = document.createElement('div'); cadDiv.className = `exp-cad ${expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'}`; cadDiv.textContent = `${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}`; expenseRow.appendChild(cadDiv);
-
-             const actionsDiv = document.createElement('div'); actionsDiv.className = 'exp-actions';
-             const deleteButton = document.createElement('button');
-             deleteButton.className = 'btn btn-small btn-danger delete-btn';
-             deleteButton.textContent = '×';
-             // Add click listener for delete
-             deleteButton.addEventListener('click', (event) => {
-                  event.stopPropagation(); // Prevent potential row click logic if added later
-                  deleteItem('expense', expense.id); // Call delete function with type and ID
-             });
-             actionsDiv.appendChild(deleteButton);
-             expenseRow.appendChild(actionsDiv);
-
-
-             expensesList.appendChild(expenseRow);
+            // Use innerHTML for row creation (as in original code)
+            const row = tbody.insertRow();
+            const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad';
+             row.innerHTML = `
+                 <td>${formatDate(expense.date)}</td>
+                 <td>${expense.type ?? 'N/A'}</td>
+                 <td>${(expense.location || 'N/A').substring(0, 15)}${(expense.location || '').length > 15 ? '...' : ''}</td>
+                 <td>${(expense.amountUSD ?? 0).toFixed(0)}</td>
+                 <td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td>
+                 <td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>
+             `;
         });
 
-        document.getElementById('expenseCountStat').textContent = tourData.expenses.length;
-        document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0);
+        const expenseCountStat = document.getElementById('expenseCountStat');
+        const expenseCostStat = document.getElementById('expenseCostStat');
+         if (expenseCountStat) expenseCountStat.textContent = tourData.expenses.length;
+         if (expenseCostStat) expenseCostStat.textContent = '$' + totalCAD.toFixed(0);
     }
 
 
     function updateVenuesDisplay() {
         const venuesList = document.getElementById('venuesList');
+        if (!venuesList) return; // Safety check
         venuesList.innerHTML = ''; // Clear current list
 
         const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -2143,41 +2065,32 @@
             totalSales += venue.totalSales;
             const soldItems = (venue.startInventory != null && venue.endInventory != null) ? (parseInt(venue.startInventory) || 0) - (parseInt(venue.endInventory) || 0) : 'N/A';
 
-            const venueCard = document.createElement('div');
-            venueCard.className = 'venue-card';
-             // Add click listener to open modal
-            venueCard.addEventListener('click', () => openVenueModal(venue.id));
+             // Use onclick attributes directly in the generated HTML string (as in original code)
+            const venueCardHtml = `
+                <div class="venue-card" onclick="openVenueModal(${venue.id})">
+                    <div class="card-header">
+                        <strong class="card-title">${venue.name ?? 'N/A'}</strong>
+                        <small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small>
+                    </div>
+                    <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address ? venue.address.substring(0, 50) + (venue.address.length > 50 ? '...' : '') : 'N/A'}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 12px;">Inventory: Start ${venue.startInventory ?? 'N/A'} | End ${venue.endInventory ?? 'N/A'} | Sold ${soldItems}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #4CAF50; font-weight: bold;">Sales: ${(venue.totalSales ?? 0).toLocaleString()} USD</span>
+                        <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button>
+                    </div>
+                    ${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}
+                </div>
+            `;
+            venuesList.innerHTML += venueCardHtml; // Append HTML string
 
-
-             venueCard.innerHTML = `
-                 <div class="card-header">
-                     <strong class="card-title">${venue.name ?? 'N/A'}</strong>
-                     <small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small>
-                 </div>
-                 <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address ? venue.address.substring(0, 50) + (venue.address.length > 50 ? '...' : '') : 'N/A'}</div>
-                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                     <span style="font-size: 12px;">Inventory: Start ${venue.startInventory ?? 'N/A'} | End ${venue.endInventory ?? 'N/A'} | Sold ${soldItems}</span>
-                 </div>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                     <span style="color: #4CAF50; font-weight: bold;">Sales: ${(venue.totalSales ?? 0).toLocaleString()} USD</span>
-                     <button class="btn btn-small btn-danger delete-btn">×</button> <!-- Delete button here -->
-                 </div>
-                 ${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}
-             `;
-            venuesList.appendChild(venueCard);
-
-             // Find the delete button within the newly created card and add its listener
-             const deleteButton = venueCard.querySelector('.delete-btn');
-              if (deleteButton) {
-                  deleteButton.addEventListener('click', (event) => {
-                      event.stopPropagation(); // Prevent the card click event from firing
-                      deleteItem('venue', venue.id); // Call delete function with type and ID
-                  });
-              }
         });
 
-        document.getElementById('venueCountStat').textContent = tourData.venues.length;
-        document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString();
+        const venueCountStat = document.getElementById('venueCountStat');
+        const venueSalesStat = document.getElementById('venueSalesStat');
+        if (venueCountStat) venueCountStat.textContent = tourData.venues.length;
+        if (venueSalesStat) venueSalesStat.textContent = '$' + totalSales.toLocaleString();
     }
 
 
@@ -2247,8 +2160,6 @@
         document.body.removeChild(link);
     }
 
-    // Ensure initial load happens
-    // loadData() is called by window.onload
 </script>
 </body>
 </html>
