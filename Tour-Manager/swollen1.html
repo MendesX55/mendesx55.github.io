@@ -10,7 +10,9 @@
 <title>Tour Management - PREVAIL × MADCHILD × Rob The Viking</title>
 <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-color: #0f3460; padding-bottom: env(safe-area-inset-bottom); }
+        html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-color: #0f3460; padding-bottom: env(safe-area-inset-bottom); 
+  background-color: #0f3460;
+}
         body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
         .header { background: linear-gradient(90deg, #0f2027, #203a43, #2c5364); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
         .header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
@@ -543,5 +545,7 @@ html, body {
     function exportTourData() { const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) swollen1_tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) swollen1_tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) swollen1_tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(swollen1_tourData.routeCache).sort().forEach(key => { const dayData = swollen1_tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 
 </script>
+
+<div style="height: env(safe-area-inset-bottom); background-color: #0f3460;"></div>
 </body>
 </html>
