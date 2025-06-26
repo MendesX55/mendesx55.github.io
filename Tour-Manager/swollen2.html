@@ -303,52 +303,62 @@
     }
 
     async function initializeFirebaseAndSync() {
-        try {
-            updateSyncStatus("Connecting...");
-            if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-            db = firebase.firestore();
-            auth = firebase.auth();
-            
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-            await auth.signInAnonymously();
-            
-            updateSyncStatus("Syncing...");
-            const docRef = db.collection("tourData").doc(STORAGE_KEY);
-            
-            const localData = loadFromLocalStorage();
-            const cloudDoc = await docRef.get();
-            const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
+    try {
+        updateSyncStatus("Connecting...");
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        auth = firebase.auth();
+        
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        await auth.signInAnonymously();
+        
+        updateSyncStatus("Syncing...");
+        const docRef = db.collection("tourData").doc(STORAGE_KEY);
+        
+        const localData = loadFromLocalStorage();
+        const cloudDoc = await docRef.get();
+        const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
 
-            if (cloudData) {
-                if ((localData.lastModified || 0) > cloudData.lastModified) {
-                    console.log("Local data is newer. Pushing to cloud to resolve conflict.");
-                    tourData = localData;
-                    await saveData(); 
-                } else {
-                    console.log("Cloud data is newer or same. Accepting cloud state.");
-                    tourData = { ...defaultData, ...cloudData };
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-                }
-            } else if (localData.lastModified > 0) {
+        // NEW LOGIC: Prioritize cloud data, only use local if it's genuinely newer
+        if (cloudData) {
+            const localHasRealData = localData.lastModified > 0 && 
+                (localData.hotels?.length > 0 || localData.venues?.length > 0 || localData.expenses?.length > 0);
+            
+            if (localHasRealData && localData.lastModified > cloudData.lastModified) {
+                console.log("Local data is newer and has real content. Pushing to cloud.");
+                tourData = localData;
+                await saveData(); 
+            } else {
+                console.log("Using cloud data (either no local data or cloud is newer).");
+                tourData = { ...defaultData, ...cloudData };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+            }
+        } else {
+            // No cloud data exists
+            const localHasRealData = localData.lastModified > 0 && 
+                (localData.hotels?.length > 0 || localData.venues?.length > 0 || localData.expenses?.length > 0);
+            
+            if (localHasRealData) {
                 console.log("No cloud document but local data exists. Creating cloud document from local.");
                 tourData = localData;
                 await saveData();
             } else {
-                 console.log("No local or cloud data. Starting fresh.");
-                 tourData = JSON.parse(JSON.stringify(defaultData));
+                console.log("No local or cloud data. Starting fresh.");
+                tourData = JSON.parse(JSON.stringify(defaultData));
             }
-
-            initializeAppUI();
-            attachLiveListener(docRef);
-
-        } catch (e) {
-            console.error("Firebase Auth/Initialization failed:", e);
-            updateSyncStatus("⚠️ Cloud Sync Failed");
-            // Fallback to offline mode
-            tourData = loadFromLocalStorage();
-            initializeAppUI();
         }
+
+        initializeAppUI();
+        attachLiveListener(docRef);
+
+    } catch (e) {
+        console.error("Firebase Auth/Initialization failed:", e);
+        updateSyncStatus("⚠️ Cloud Sync Failed");
+        // Fallback to offline mode
+        tourData = loadFromLocalStorage();
+        initializeAppUI();
     }
+}
     
     function attachLiveListener(docRef) {
         if (firebaseListener) firebaseListener(); 
