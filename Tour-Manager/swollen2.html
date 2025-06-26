@@ -283,6 +283,127 @@
     let currentModalDate = null;
     let db, auth;
     let firebaseListener = null;
+    
+    // --- ACCESS CONTROL SYSTEM ---
+let userRole = 'viewer'; // Default to read-only for safety
+const ACCESS_CODES = {
+    'SEANPAUL2025': 'admin',
+    'VIEWONLY': 'viewer'
+};
+
+function checkUserAccess() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    const code = urlParams.get('code');
+    
+    if (code && ACCESS_CODES[code]) {
+        userRole = ACCESS_CODES[code];
+        console.log(`✅ Access granted: ${userRole.toUpperCase()}`);
+        
+        // Update page title to show mode
+        document.title = userRole === 'admin' ? 
+            '🎤 Tour Manager - ADMIN' : 
+            '👀 Tour Manager - Viewer';
+            
+        return true;
+    }
+    
+    // No valid access - default to viewer
+    userRole = 'viewer';
+    document.title = '👀 Tour Manager - Viewer';
+    console.log('🔒 Read-only access (no valid code)');
+    return false;
+}
+
+function isAdmin() {
+    return userRole === 'admin';
+}
+
+function hideElementForViewers(elementId) {
+    if (!isAdmin()) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = 'none';
+        }
+    }
+}
+
+function disableButtonForViewers(elementId) {
+    if (!isAdmin()) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.disabled = true;
+            element.textContent = element.textContent + ' (Admin Only)';
+            element.style.opacity = '0.5';
+        }
+    }
+}
+
+// Modify the initializeFirebaseAndSync function - ADD this line at the very beginning:
+// checkUserAccess(); // Add this as the FIRST line in initializeFirebaseAndSync()
+
+// Modify the initializeAppUI function - ADD these lines at the end:
+function initializeAppUI() {
+    checkUserAccess(); // Check access first
+    
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.getElementById('app-content').style.display = 'flex';
+    document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+    updateAllDisplays();
+    showTab('calendar');
+    
+    // NEW: Apply access restrictions
+    applyAccessRestrictions();
+}
+
+function applyAccessRestrictions() {
+    if (!isAdmin()) {
+        // Hide all add/edit forms
+        hideElementForViewers('hotelForm');
+        hideElementForViewers('venueForm'); 
+        hideElementForViewers('expenseForm');
+        
+        // Hide route builder controls
+        hideElementForViewers('route-builder-content');
+        hideElementForViewers('generateRouteBtn');
+        hideElementForViewers('clearRouteBtn');
+        hideElementForViewers('autoFillBtn');
+        
+        // Hide export section
+        hideElementForViewers('exportSection');
+        
+        // Hide settings
+        hideElementForViewers('settingsSection');
+        
+        // Add viewer notice
+        const appContent = document.getElementById('app-content');
+        if (appContent) {
+            const notice = document.createElement('div');
+            notice.innerHTML = `
+                <div style="background: rgba(255,193,7,0.2); border: 1px solid #ffc107; 
+                           padding: 10px; margin: 10px; border-radius: 5px; text-align: center;">
+                    👀 <strong>Viewer Mode</strong> - You're viewing live tour data (read-only)
+                </div>
+            `;
+            appContent.insertBefore(notice, appContent.firstChild);
+        }
+        
+        console.log('🔒 Applied viewer restrictions');
+    } else {
+        console.log('🔓 Admin mode - full access');
+    }
+}
+
+// Override saveData function to prevent accidental saves from viewers
+const originalSaveData = saveData;
+function saveData() {
+    if (!isAdmin()) {
+        console.log('🚫 Save blocked - viewer mode');
+        return Promise.resolve();
+    }
+    return originalSaveData();
+}
+
 
     // --- NEW HYBRID DATA MODEL ---
     document.addEventListener('DOMContentLoaded', async () => {
