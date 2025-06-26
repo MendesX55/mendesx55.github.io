@@ -329,10 +329,13 @@
                     tourData = { ...defaultData, ...cloudData };
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 }
-            } else {
-                console.log("No cloud document. Using local data and creating cloud document.");
+            } else if (localData.lastModified > 0) {
+                console.log("No cloud document but local data exists. Creating cloud document from local.");
                 tourData = localData;
                 await saveData();
+            } else {
+                 console.log("No local or cloud data. Starting fresh.");
+                 tourData = JSON.parse(JSON.stringify(defaultData));
             }
 
             initializeAppUI();
@@ -341,7 +344,9 @@
         } catch (e) {
             console.error("Firebase Auth/Initialization failed:", e);
             updateSyncStatus("⚠️ Cloud Sync Failed");
-            initializeAppUI(); // Fallback to offline mode
+            // Fallback to offline mode
+            tourData = loadFromLocalStorage();
+            initializeAppUI();
         }
     }
     
@@ -365,6 +370,7 @@
         document.getElementById('loadingOverlay').style.display = 'none';
         document.getElementById('app-content').style.display = 'flex';
         document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        updateAllDisplays();
         showTab('calendar');
     }
     
@@ -391,6 +397,7 @@
         if (statusEl) statusEl.textContent = message;
     }
     
+    // Emergency Recovery Function
     function clearRouteCache() {
         if (!confirm("This will clear the route cache to fix size limit errors. You will need to re-generate the route afterwards. Continue?")) {
             return;
