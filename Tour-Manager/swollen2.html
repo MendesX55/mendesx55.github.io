@@ -234,7 +234,6 @@
             </div>
             <div class="form-section"><h3>📤 Data Management</h3>
                 <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">If data won't save due to size, clear the route cache first.</p>
-                <!-- MODIFICATION: Emergency Cache Clear Button -->
                 <button class="btn btn-danger" onclick="clearRouteCache()">Clear Route Cache & Save</button>
                 <p style="font-size: 13px; color: #ccc; margin: 15px 0 10px;">Export a backup of your data.</p>
                 <div class="checkbox-group">
@@ -348,12 +347,15 @@
     function attachLiveListener(docRef) {
         firebaseListener = docRef.onSnapshot((doc) => {
             const cloudData = doc.exists() ? doc.data() : defaultData;
+            
             if (cloudData.lastModified > tourData.lastModified) {
                 console.log("Live update is newer. Applying changes.");
                 tourData = { ...defaultData, ...cloudData };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 updateAllDisplays();
                 updateSyncStatus(`☁️ Updated: ${new Date().toLocaleTimeString()}`);
+            } else {
+                console.log("Live update is older or same as local. Ignoring.");
             }
         });
         updateSyncStatus("☁️ Live Sync Active");
@@ -368,8 +370,10 @@
     
     function saveData() {
         if (!db) { console.error("DB not ready, save aborted."); return Promise.resolve(); }
+        
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+        
         return db.collection("tourData").doc(STORAGE_KEY).set(tourData)
             .then(() => {
                 console.log("Firebase write successful at " + new Date(tourData.lastModified).toLocaleTimeString());
@@ -387,7 +391,7 @@
         if (statusEl) statusEl.textContent = message;
     }
     
-    // --- Emergency Recovery Functions ---
+    // Emergency Recovery Function
     function clearRouteCache() {
         if (!confirm("This will clear the route cache to fix size limit errors. You will need to re-generate the route afterwards. Continue?")) {
             return;
@@ -403,7 +407,7 @@
             });
     }
 
-    // --- Route Planner & Core App Functions (Unchanged from previous correct version) ---
+    // --- Route Planner & Core App Functions ---
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
         routeStepsContainer.innerHTML = '';
