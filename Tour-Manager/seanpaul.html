@@ -232,8 +232,11 @@
 <button class="btn" onclick="applySettings()" style="margin-top: 15px;">Apply Settings</button>
 </div>
 <div class="form-section"><h3>📤 Data Management</h3>
-<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Export data to a CSV file.</p>
-<div class="checkbox-group">
+<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">If data is missing or won't save, clear the bloated cache.</p>
+<!-- MODIFICATION: Added Emergency Cache Clear Button -->
+<button class="btn btn-danger" onclick="clearRouteCache()">Clear Route Cache & Save</button>
+<button class="btn btn-danger" onclick="forceUploadLocalToFirebase()" style="margin-top: 10px; background: linear-gradient(45deg, #d35400, #e67e22);">FORCE UPLOAD Local → Cloud</button>
+<div class="checkbox-group" style="margin-top: 15px;">
 <label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label>
 <label class="checkbox-item"><input checked="" id="exportVenues" type="checkbox"/> Venues</label>
 <label class="checkbox-item"><input checked="" id="exportExpenses" type="checkbox"/> Expenses</label>
@@ -252,12 +255,10 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-<!-- MODIFICATION: Added Firebase Auth SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
 <script>
     // --- App Configuration ---
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc';
     const TOUR_NAME = "seanpaul";
     const STORAGE_KEY = `tourData_${TOUR_NAME}`; 
     const FIREBASE_CONFIG = {
@@ -281,13 +282,12 @@
     let db, auth;
     let firebaseListener = null;
 
-    // --- Data Loading and Initialization (NEW HYBRID MODEL) ---
+    // --- NEW HYBRID DATA MODEL ---
     document.addEventListener('DOMContentLoaded', async () => {
-        // 1. Load instantly from local storage for speed
+        updateSyncStatus("Loading local data...");
         loadFromLocalStorage();
-        // 2. Initialize the UI with whatever data we have
         initializeAppUI();
-        // 3. Connect to Firebase and start the smart sync process
+        
         await initializeFirebaseAndSync();
     });
     
@@ -297,7 +297,7 @@
             try {
                 const localData = JSON.parse(localDataString);
                 tourData = { ...defaultData, ...localData };
-                console.log("Loaded data from localStorage.");
+                console.log("Loaded data from localStorage for instant UI.");
             } catch (e) {
                 console.error("Failed to parse local data, starting fresh.", e);
                 tourData = JSON.parse(JSON.stringify(defaultData));
@@ -307,60 +307,67 @@
 
     async function initializeFirebaseAndSync() {
         try {
+            updateSyncStatus("Connecting to cloud...");
             if (!firebase.apps.length) {
                 firebase.initializeApp(FIREBASE_CONFIG);
             }
             db = firebase.firestore();
             auth = firebase.auth();
             
-            // Set persistence to LOCAL to work in PWA sandboxed environment
             await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            // Wait for sign-in to complete before setting up the listener
             await auth.signInAnonymously();
             console.log("Firebase Anonymous Auth successful.");
+            
+            updateSyncStatus("Cloud connected. Syncing...");
 
-            if (firebaseListener) firebaseListener(); // Unsubscribe from previous listeners
+            if (firebaseListener) firebaseListener();
 
             const docRef = db.collection("tourData").doc(STORAGE_KEY);
-            let isInitialSync = true;
+            const cloudDoc = await docRef.get();
+            
+            console.log("Performing initial smart sync with Firebase.");
+            const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
 
-            firebaseListener = docRef.onSnapshot((doc) => {
-                const cloudData = doc.exists() ? doc.data() : null;
-                
-                if (isInitialSync) {
-                    console.log("Performing initial smart sync with Firebase.");
-                    if (cloudData) {
-                        if (tourData.lastModified > cloudData.lastModified) {
-                            console.log("Local data is newer. Pushing to cloud.");
-                            saveData(); // Push the newer local data
-                        } else {
-                            console.log("Cloud data is newer or same. Accepting cloud state.");
-                            tourData = { ...defaultData, ...cloudData };
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-                            updateAllDisplays(); // Refresh UI with new cloud data
-                        }
-                    } else {
-                        console.log("No cloud document. Saving local state to create it.");
-                        saveData();
-                    }
-                    isInitialSync = false;
+            if (cloudData) {
+                if (tourData.lastModified > cloudData.lastModified) {
+                    console.log("Local data is newer. Pushing to cloud.");
+                    await saveData(); 
                 } else {
-                    console.log("Received live update from another client.");
-                    if( (cloudData ? cloudData.lastModified : 0) > tourData.lastModified) {
-                        tourData = { ...defaultData, ...cloudData };
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-                        updateAllDisplays(); // Refresh UI with new cloud data
-                    }
+                    console.log("Cloud data is newer or same. Accepting cloud state.");
+                    tourData = { ...defaultData, ...cloudData };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 }
-                document.getElementById('syncStatus').textContent = `☁️ Live Sync Active`;
-            }, (error) => {
-                console.error("Firebase listener error:", error);
-                document.getElementById('syncStatus').textContent = '⚠️ Sync Error!';
-            });
+            } else {
+                console.log("No cloud document. Saving local state to create it.");
+                await saveData();
+            }
+
+            attachLiveListener(docRef);
+            updateAllDisplays();
 
         } catch (e) {
             console.error("Firebase Auth/Initialization failed:", e);
-            document.getElementById('syncStatus').textContent = '⚠️ Cloud Disabled';
+            updateSyncStatus("⚠️ Cloud Sync Failed");
         }
+    }
+    
+    function attachLiveListener(docRef) {
+        firebaseListener = docRef.onSnapshot((doc) => {
+                console.log("Received live data update.");
+            const cloudData = doc.exists() ? doc.data() : defaultData;
+            
+            if (cloudData.lastModified > tourData.lastModified) {
+                console.log("Live update is newer. Applying changes.");
+                tourData = { ...defaultData, ...cloudData };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+                updateAllDisplays();
+                document.getElementById('syncStatus').textContent = `☁️ Updated: ${new Date().toLocaleTimeString()}`;
+            } else {
+                console.log("Live update is older or same as local. Ignoring.");
+            }
+        });
+        updateSyncStatus("☁️ Live Sync Active");
     }
 
     function initializeAppUI() {
@@ -369,22 +376,73 @@
     }
     
     function saveData() {
-        if (!db) {
-            console.error("Firebase not initialized. Cannot save.");
-            return;
-        }
-        tourData.lastModified = Date.now();
+        if (!db) return Promise.reject("Firebase not initialized.");
         
+        tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-
-        db.collection("tourData").doc(STORAGE_KEY).set(tourData)
+        
+        return db.collection("tourData").doc(STORAGE_KEY).set(tourData)
             .then(() => {
                 console.log("Firebase write successful at " + new Date(tourData.lastModified).toLocaleTimeString());
-                document.getElementById('syncStatus').textContent = `☁️ Synced: ${new Date().toLocaleTimeString()}`;
+                updateSyncStatus(`☁️ Synced: ${new Date().toLocaleTimeString()}`);
             })
             .catch((error) => {
                 console.error("Firebase write failed:", error);
-                document.getElementById('syncStatus').textContent = '⚠️ Save Failed!';
+                updateSyncStatus('⚠️ Save Failed!');
+                throw error;
+            });
+    }
+    
+    function updateSyncStatus(message) {
+        const statusEl = document.getElementById('syncStatus');
+        if (statusEl) statusEl.textContent = message;
+    }
+    
+    // --- Emergency Recovery Functions ---
+    function forceUploadLocalToFirebase() {
+        if (!confirm("This will IRREVERSIBLY overwrite the cloud data with the data from THIS BROWSER'S local storage. This is for recovery purposes. Are you absolutely sure?")) {
+            return;
+        }
+
+        const localDataString = localStorage.getItem(STORAGE_KEY);
+        if (!localDataString) {
+            alert("Error: No local data found in this browser to upload.");
+            return;
+        }
+
+        try {
+            let localDataToPush = JSON.parse(localDataString);
+            localDataToPush.lastModified = Date.now(); // Stamp it as the newest
+            
+            console.log("FORCE UPLOADING local data to Firebase:", localDataToPush);
+
+            db.collection("tourData").doc(STORAGE_KEY).set(localDataToPush)
+              .then(() => {
+                  alert("✅ Success! Local data has been forced to the cloud. The app will now work correctly on all devices.");
+                  tourData = localDataToPush;
+                  updateAllDisplays();
+              })
+              .catch((error) => {
+                  alert(`❌ UPLOAD FAILED: ${error.message}`);
+                  console.error("Force upload failed:", error);
+              });
+        } catch(e) {
+            alert(`❌ Error reading local data: ${e.message}`);
+        }
+    }
+
+    function clearRouteCache() {
+        if (!confirm("This will clear the route cache to fix size limit errors. You will need to re-generate the route afterwards. Continue?")) {
+            return;
+        }
+        tourData.routeCache = {};
+        saveData()
+            .then(() => {
+                alert("✅ Route cache cleared successfully! You can now save changes. Please re-generate your route.");
+                document.getElementById('routeResults').innerHTML = ''; // Clear display
+            })
+            .catch(e => {
+                alert("Failed to clear cache. Error: " + e.message);
             });
     }
 
@@ -449,7 +507,7 @@
                 selectValue: select ? select.value : '',
                 dateValue: date ? date.value : ''
             };
-            if(newState.selectValue !== oldState.selectValue || newState.dateValue !== oldState.dateValue) {
+            if(!oldState || newState.selectValue !== oldState.selectValue || newState.dateValue !== oldState.dateValue) {
                 changed = true;
             }
             return newState;
@@ -516,12 +574,57 @@
     function autoFillRoute() { if (!confirm('This will replace your current route plan. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
     function toggleRouteBuilder() { const content = document.getElementById('route-builder-content'); const arrow = document.getElementById('routeBuilderToggleArrow'); content.classList.toggle('collapsed'); arrow.classList.toggle('collapsed'); }
     async function generateCustomRoute() { saveRoutePlannerState(); if (isGeneratingRoute) { alert('Route generation in progress...'); return; } isGeneratingRoute = true; const generateBtn = document.getElementById('generateRouteBtn'); const progressDiv = document.getElementById('routeProgress'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); const routeResults = document.getElementById('routeResults'); generateBtn.disabled = true; generateBtn.textContent = '🔄 Generating...'; progressDiv.style.display = 'block'; routeResults.innerHTML = ''; progressText.textContent = 'Preparing route...'; progressFill.style.width = '0%'; try { const dailySegments = {}; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { const fromStopInfo = tourData.routePlannerState[i]; const toStopInfo = tourData.routePlannerState[i + 1]; if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue; const date = fromStopInfo.dateValue || 'No Date'; if (!dailySegments[date]) dailySegments[date] = []; if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue)); dailySegments[date].push(getLocationDetails(toStopInfo.selectValue)); } const allDates = Object.keys(dailySegments).sort(); if (allDates.length === 0) throw new Error('No valid route segments found.'); let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0, processedDays = 0; routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; for (const date of allDates) { const stopsForDay = dailySegments[date]; try { const dayRouteData = await processDayRoute(date, stopsForDay); grandTotalDistanceMeters += dayRouteData.totalDistance || 0; grandTotalTimeSecs += dayRouteData.totalTime || 0; renderDayRoute(date, dayRouteData, processedDays + 1); } catch (dayError) { renderErrorDay(date, processedDays + 1, dayError.message); } processedDays++; const progress = (processedDays / allDates.length) * 100; progressFill.style.width = `${progress}%`; progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`; await new Promise(resolve => setTimeout(resolve, 300)); } const grandTotalGas = calculateGasCost(grandTotalDistanceMeters / 1000); const totalHours = Math.floor(grandTotalTimeSecs / 3600); const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60); document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`; document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`; document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); progressText.textContent = '✅ All days completed!'; } catch (error) { console.error('Route generation error:', error); routeResults.innerHTML = `<div class="route-item error"><strong>❌ Error:</strong> ${error.message}</div>`; progressText.textContent = '❌ Generation failed'; } finally { isGeneratingRoute = false; generateBtn.disabled = false; generateBtn.textContent = '🛣️ Generate Full Tour Route'; setTimeout(() => { progressDiv.style.display = 'none'; }, 3000); } }
-    async function processDayRoute(date, stopsForDay) { if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 7200000)) { let cachedData = tourData.routeCache[cacheKey].data; cachedData.isCached = true; return cachedData; } let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = []; const MAX_WAYPOINTS = 23; for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); if (chunk.length < 2) break; const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address; const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; const response = await fetch(url); if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); const data = await response.json(); if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); const legs = data.routes[0].legs; allLegs.push(...legs); for (let leg of legs) { totalDistanceMeters += leg.distance.value; totalTimeSecs += (leg.duration_in_traffic || leg.duration).value; } } const dayData = { legs: allLegs, stops: stopsForDay, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, isCached: false }; tourData.routeCache[cacheKey] = { data: dayData, timestamp: Date.now() }; saveData(); return dayData; }
-    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`; routeResults.appendChild(routeSegment); }); }
+    
+    // MODIFICATION: Slimmed down the cache object
+    async function processDayRoute(date, stopsForDay) { 
+        if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); 
+        const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; 
+        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 86400000)) { // 24hr cache
+             let cachedData = tourData.routeCache[cacheKey]; 
+             cachedData.isCached = true; 
+             return cachedData; 
+        } 
+        let totalDistanceMeters = 0, totalTimeSecs = 0; 
+        let allLegs = []; 
+        const MAX_WAYPOINTS = 23; 
+        for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { 
+            const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); 
+            if (chunk.length < 2) break; 
+            const origin = chunk[0].address; 
+            const destination = chunk[chunk.length - 1].address; 
+            const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); 
+            const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; 
+            const response = await fetch(url); 
+            if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); 
+            const data = await response.json(); 
+            if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); 
+            const legs = data.routes[0].legs; 
+            const processedLegs = legs.map(leg => ({
+                distanceText: leg.distance.text,
+                durationText: (leg.duration_in_traffic || leg.duration).text,
+                distanceValue: leg.distance.value,
+                durationValue: (leg.duration_in_traffic || leg.duration).value
+            }));
+            allLegs.push(...processedLegs); 
+            for (let leg of processedLegs) { 
+                totalDistanceMeters += leg.distanceValue; 
+                totalTimeSecs += leg.durationValue; 
+            } 
+        } 
+        const dayData = { legs: allLegs, stops: stopsForDay, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, isCached: false }; 
+        tourData.routeCache[cacheKey] = { legs: allLegs, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, stops: stopsForDay, timestamp: Date.now() }; 
+        saveData(); 
+        return dayData; 
+    }
+    
+    // MODIFICATION: Updated to use slim cache properties
+    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`; routeResults.appendChild(routeSegment); }); }
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
     function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
     function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr); return { isVenue, isTravel }; }
-    function showDayDetails(dateStr) { saveRoutePlannerState(false); const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const stopsForDay = []; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { if(tourData.routePlannerState[i].dateValue === dateStr) { if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue)); stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue)); } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (stopsForDay.length > 1) { const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`; if(tourData.routeCache[cacheKey]) { const dayData = tourData.routeCache[cacheKey].data; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text}</small></div>`; }); } else { html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`; } } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
+    
+    // MODIFICATION: Updated to use slim cache properties
+    function showDayDetails(dateStr) { saveRoutePlannerState(false); const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const stopsForDay = []; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { if(tourData.routePlannerState[i].dateValue === dateStr) { if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue)); stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue)); } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (stopsForDay.length > 1) { const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`; if(tourData.routeCache[cacheKey]) { const dayData = tourData.routeCache[cacheKey]; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distanceText} | Time: ${leg.durationText}</small></div>`; }); } else { html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`; } } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
     function showPrevDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() - 1); showDayDetails(date.toISOString().split('T')[0]); }
     function showNextDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() + 1); showDayDetails(date.toISOString().split('T')[0]); }
     let touchstartX = 0; let touchendX = 0; function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); } function addSwipeListeners(element) { element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true}); element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true}); }
@@ -545,7 +648,7 @@
     function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; }
     document.addEventListener('DOMContentLoaded', function() { document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); });
     window.onclick = function(event) { if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal'); if (event.target === document.getElementById('venueModal')) closeModal('venueModal'); if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal'); }
-    function exportTourData() { saveRoutePlannerState(false); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+    function exportTourData() { saveRoutePlannerState(false); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 
 </script>
 </body>
