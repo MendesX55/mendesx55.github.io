@@ -72,7 +72,6 @@
         .route-step-number { background: #ffd700; color: #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
         .route-step-inputs { flex-grow: 1; display: flex; gap: 5px; min-width: 0; }
         .route-step-inputs select { flex-grow: 1; min-width: 0; padding: 8px; border-radius: 6px; border: none; background: rgba(255,255,255,0.9); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        /* MODIFICATION: Made date input narrower */
         .route-step-inputs input[type="date"] { width: 100px; flex-shrink: 0; padding: 4px; font-size: 12px; }
         .route-control-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 28px; height: 28px; font-size: 18px; font-weight: bold; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 2px; }
         .route-control-btn.remove { background: rgba(231, 76, 60, 0.4); }
@@ -233,7 +232,7 @@
 <button class="btn" onclick="applySettings()" style="margin-top: 15px;">Apply Settings</button>
 </div>
 <div class="form-section"><h3>📤 Data Management</h3>
-<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Export data or sync with the cloud.</p>
+<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Export data to a CSV file.</p>
 <div class="checkbox-group">
 <label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label>
 <label class="checkbox-item"><input checked="" id="exportVenues" type="checkbox"/> Venues</label>
@@ -241,7 +240,6 @@
 <label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label>
 </div>
 <button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
-<button class="btn" onclick="uploadLocalToFirebase()" style="margin-top: 10px;">Upload Local → Firebase</button>
 <p id="syncStatus" style="font-size: 12px; text-align: center; color: #ccc; margin-top: 10px;"></p>
 </div>
 </div>
@@ -259,8 +257,7 @@
     // --- App Configuration ---
     const GOOGLE_MAPS_API_KEY = 'AIzaSyDk14v_vZFteu3J3ltcs5jXu03AiVqZUZc';
     const TOUR_NAME = "seanpaul";
-    const OLD_STORAGE_KEY = 'tourData';
-    const STORAGE_KEY = `tourData_${TOUR_NAME}`;
+    const STORAGE_KEY = `tourData_${TOUR_NAME}`; 
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBpv5P-dtJnJMOG3uugWyv70mQdkz5iuCo",
       authDomain: "tour-manager-b2888.firebaseapp.com",
@@ -268,144 +265,139 @@
     };
 
     // --- Global State ---
-    let tourData = { hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, settings: { litresPer100km: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 } };
+    const defaultData = { 
+        hotels: [], venues: [], expenses: [], routePlannerState: [], routeCache: {}, 
+        settings: { litresPer100km: 12, costPerLitre: 1.75, heavyFootPercent: 10 },
+        lastModified: 0
+    };
+    let tourData = JSON.parse(JSON.stringify(defaultData)); // Deep copy to start
     let currentEditId = null;
     let isGeneratingRoute = false;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let currentModalDate = null;
     let db;
+    let firebaseListener = null; // To hold the unsubscribe function
 
-    // --- CRITICAL: Data Migration and Loading ---
+    // --- Data Loading and Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
-        migrateOldData(); 
-        try {
-            firebase.initializeApp(FIREBASE_CONFIG);
-            db = firebase.firestore();
-        } catch (e) {
-            console.error("Firebase initialization failed:", e);
-            document.getElementById('syncStatus').textContent = '⚠️ Cloud Sync Disabled';
-        }
-        loadInitialData();
+        // 1. Load instantly from local storage for speed
+        loadFromLocalStorage();
+        // 2. Initialize the UI with whatever data we have
+        initializeAppUI();
+        // 3. Connect to Firebase and start the smart sync process
+        initializeFirebaseAndSync();
     });
     
-    function migrateOldData() {
-        const oldData = localStorage.getItem(OLD_STORAGE_KEY);
-        if (oldData) {
-            console.log('!!! Found old data format. Migrating... !!!');
+    function loadFromLocalStorage() {
+        const localDataString = localStorage.getItem(STORAGE_KEY);
+        if (localDataString) {
             try {
-                if (!localStorage.getItem(STORAGE_KEY)) {
-                    localStorage.setItem(STORAGE_KEY, oldData);
-                }
-                localStorage.removeItem(OLD_STORAGE_KEY);
-                alert('Success! Your locally saved data has been updated to the new, cloud-sync format.');
+                const localData = JSON.parse(localDataString);
+                // Merge with default to ensure all keys exist
+                tourData = { ...defaultData, ...localData };
+                console.log("Loaded data from localStorage.");
             } catch (e) {
-                console.error('Migration failed:', e);
-                alert('A critical error occurred while updating your data format. Please contact support.');
+                console.error("Failed to parse local data, starting fresh.", e);
+                tourData = JSON.parse(JSON.stringify(defaultData));
             }
         }
     }
-    
-    async function loadInitialData() {
-        let loadedFromSource = 'nothing';
-        if (db) {
-            try {
-                const docRef = db.collection("tourData").doc(STORAGE_KEY);
-                const doc = await docRef.get();
-                if (doc.exists) {
-                    const cloudData = doc.data();
-                    tourData = { ...tourData, ...cloudData };
-                    loadedFromSource = 'Firebase';
+
+    function initializeFirebaseAndSync() {
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(FIREBASE_CONFIG);
+            }
+            db = firebase.firestore();
+            
+            // Unsubscribe from any previous listener to prevent duplicates
+            if (firebaseListener) firebaseListener();
+
+            const docRef = db.collection("tourData").doc(STORAGE_KEY);
+            let isInitialSync = true;
+
+            firebaseListener = docRef.onSnapshot((doc) => {
+                if (isInitialSync) {
+                    // This is the first data received from the cloud after launch
+                    console.log("Performing initial smart sync with Firebase.");
+                    const cloudData = doc.exists() ? doc.data() : null;
+
+                    if (cloudData) {
+                        // Intelligent merge: a newer local timestamp means offline work that must be preserved.
+                        if (tourData.lastModified > cloudData.lastModified) {
+                            console.log("Local data is newer. Pushing to cloud.");
+                            saveData(); // Push the newer local data to the cloud
+                        } else {
+                            console.log("Cloud data is newer or same. Accepting cloud state.");
+                            tourData = { ...defaultData, ...cloudData }; // Accept cloud state
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData)); // Sync local with cloud
+                        }
+                    } else {
+                        // No document in the cloud, so the current (local) data is king. Push it.
+                        console.log("No cloud document. Saving local state to create it.");
+                        saveData();
+                    }
+                    isInitialSync = false;
+                } else {
+                    // This is a live update from another client. Accept it.
+                    console.log("Received live update from another client.");
+                    const cloudData = doc.exists() ? doc.data() : JSON.parse(JSON.stringify(defaultData));
+                    tourData = { ...defaultData, ...cloudData };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 }
-            } catch (error) {
-                console.error("Error fetching from Firebase, will try local storage:", error);
-            }
-        }
+                
+                updateAllDisplays(); // Refresh the UI with the definitive data
+                document.getElementById('syncStatus').textContent = `☁️ Live Sync Active`;
 
-        if (loadedFromSource !== 'Firebase') {
-            const localData = localStorage.getItem(STORAGE_KEY);
-            if (localData) {
-                try {
-                    const parsedData = JSON.parse(localData);
-                    tourData = { ...tourData, ...parsedData };
-                    loadedFromSource = 'LocalStorage';
-                } catch(e) { console.error("Error parsing local data", e); }
-            }
+            }, (error) => {
+                console.error("Firebase listener error:", error);
+                document.getElementById('syncStatus').textContent = '⚠️ Sync Error!';
+            });
+
+        } catch (e) {
+            console.error("Firebase initialization failed:", e);
+            document.getElementById('syncStatus').textContent = '⚠️ Cloud Disabled';
         }
-        
-        console.log(`Data loaded from: ${loadedFromSource}`);
-        document.getElementById('syncStatus').textContent = `☁️ Data from ${loadedFromSource}`;
-        initializeApp();
     }
 
-    function initializeApp() {
-        if (!tourData.hotels) tourData.hotels = [];
-        if (!tourData.venues) tourData.venues = [];
-        if (!tourData.expenses) tourData.expenses = [];
-        if (!tourData.routePlannerState) tourData.routePlannerState = [];
-        if (!tourData.routeCache) tourData.routeCache = {};
-        if (!tourData.settings) tourData.settings = { litresPer100km: 8.5, costPerLitre: 1.75, heavyFootPercent: 10 };
-
-        loadRoutePlannerState();
-        applySettingsToUI();
-        showTab('calendar');
+    function initializeAppUI() {
         document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-        
-        if (tourData.hotels.length > 0 || tourData.venues.length > 0) {
-            saveData(); 
-        }
+        showTab('calendar');
     }
     
     function saveData() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-            if (db) {
-                db.collection("tourData").doc(STORAGE_KEY).set(tourData)
-                  .then(() => {
-                      console.log("Firebase sync successful.");
-                      document.getElementById('syncStatus').textContent = `☁️ Synced: ${new Date().toLocaleTimeString()}`;
-                  })
-                  .catch((error) => {
-                      console.error("Firebase sync failed:", error);
-                      document.getElementById('syncStatus').textContent = '⚠️ Cloud sync failed.';
-                  });
-            }
-        } catch (e) {
-            console.error("Save failed:", e);
-            alert("Could not save data. Storage might be full.");
+        if (!db) {
+            console.error("Firebase not initialized. Cannot save.");
+            return;
         }
-    }
 
-    function uploadLocalToFirebase() {
-        if (!db) return alert("Firebase is not connected. Cannot upload.");
-        if (!confirm("This will overwrite cloud data with the data from this device. Are you sure?")) return;
+        // 1. Stamp with current time for smart merge
+        tourData.lastModified = Date.now();
         
-        saveRoutePlannerState();
-        const localDataString = localStorage.getItem(STORAGE_KEY);
-        if (!localDataString) return alert("No local data found to upload.");
+        // 2. Save to localStorage for instant persistence and offline safety
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
 
-        try {
-            const localData = JSON.parse(localDataString);
-            db.collection("tourData").doc(STORAGE_KEY).set(localData)
-              .then(() => {
-                  alert("Local data successfully uploaded to Firebase!");
-                  document.getElementById('syncStatus').textContent = '☁️ Manual upload complete.';
-                  tourData = localData; 
-                  updateAllDisplays();
-              })
-              .catch((error) => {
-                  console.error("Manual upload failed:", error);
-                  alert(`Upload failed: ${error.message}`);
-              });
-        } catch(e) {
-            alert(`Error reading local data: ${e.message}`);
-        }
+        // 3. Save to Firebase for cloud backup and multi-device sync
+        db.collection("tourData").doc(STORAGE_KEY).set(tourData)
+            .then(() => {
+                console.log("Firebase write successful.");
+                document.getElementById('syncStatus').textContent = `☁️ Synced: ${new Date().toLocaleTimeString()}`;
+            })
+            .catch((error) => {
+                console.error("Firebase write failed:", error);
+                document.getElementById('syncStatus').textContent = '⚠️ Save Failed!';
+            });
     }
 
-    // --- Route Planner Refactor ---
-
+    // --- Route Planner ---
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
+        const currentState = tourData.routePlannerState.map((_, i) => ({
+            select: document.getElementById(`routeSelect${i}`)?.value,
+            date: document.getElementById(`routeDate${i}`)?.value,
+        }));
+        
         routeStepsContainer.innerHTML = '';
 
         if (!tourData.routePlannerState || tourData.routePlannerState.length === 0) {
@@ -416,12 +408,11 @@
             const newStep = document.createElement('div');
             newStep.className = 'route-step';
             newStep.id = `routeStep${index}`;
-            // MODIFICATION: Changed date input width from 120px to 100px
             newStep.innerHTML = `
                 <div class="route-step-number">${index + 1}</div>
                 <div class="route-step-inputs">
-                    <select id="routeSelect${index}" onchange="saveRoutePlannerState(true)"></select>
-                    <input type="date" id="routeDate${index}" onchange="saveRoutePlannerState(true)" style="width: 100px;">
+                    <select id="routeSelect${index}" onchange="saveRoutePlannerState()"></select>
+                    <input type="date" id="routeDate${index}" onchange="saveRoutePlannerState()">
                 </div>
                 <button class="route-control-btn" onclick="addStopAfter(${index})">+</button>
                 <button class="route-control-btn remove" onclick="removeStopAt(${index})">×</button>
@@ -434,10 +425,10 @@
     }
 
     function addStopAfter(index) {
-        saveRoutePlannerState(); 
+        saveRoutePlannerState(false); // Update tourData object but don't save yet
         tourData.routePlannerState.splice(index + 1, 0, { selectValue: '', dateValue: '' });
         renderRouteBuilder();
-        saveData();
+        saveData(); // Now save the final state
     }
 
     function removeStopAt(index) {
@@ -445,14 +436,14 @@
             alert("Cannot remove the only stop.");
             return;
         }
-        saveRoutePlannerState();
+        saveRoutePlannerState(false); 
         tourData.routePlannerState.splice(index, 1);
         renderRouteBuilder();
         saveData();
     }
 
     function addRouteStop() {
-        saveRoutePlannerState();
+        saveRoutePlannerState(false);
         tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
         renderRouteBuilder();
         saveData();
@@ -460,7 +451,7 @@
 
     function removeRouteStop() {
         if (tourData.routePlannerState.length > 1) {
-            saveRoutePlannerState();
+            saveRoutePlannerState(false);
             tourData.routePlannerState.pop();
             renderRouteBuilder();
             saveData();
@@ -469,106 +460,89 @@
         }
     }
     
-    function loadRoutePlannerState() {
-        if (!tourData.routePlannerState || tourData.routePlannerState.length === 0) {
-            tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
-        }
-        renderRouteBuilder();
-    }
-    
-    function saveRoutePlannerState(shouldSaveData = false) {
-        tourData.routePlannerState = tourData.routePlannerState.map((_, index) => {
+    function saveRoutePlannerState(andSave = true) {
+        let changed = false;
+        const newPlannerState = tourData.routePlannerState.map((oldState, index) => {
             const select = document.getElementById(`routeSelect${index}`);
             const date = document.getElementById(`routeDate${index}`);
-            return {
+            const newState = {
                 selectValue: select ? select.value : '',
                 dateValue: date ? date.value : ''
             };
+            if(newState.selectValue !== oldState.selectValue || newState.dateValue !== oldState.dateValue) {
+                changed = true;
+            }
+            return newState;
         });
-        if (shouldSaveData) {
-            saveData();
+
+        if (changed) {
+            tourData.routePlannerState = newPlannerState;
+            if(andSave) {
+              saveData();
+            }
         }
     }
 
-    function updateStopCounter() {
-        document.getElementById('routeStopCount').textContent = `Stops: ${tourData.routePlannerState.length} / Unlimited`;
-    }
-
+    function updateStopCounter() { document.getElementById('routeStopCount').textContent = `Stops: ${tourData.routePlannerState.length} / Unlimited`; }
     function updateRouteSelects() {
-        // MODIFICATION: Using optgroup for better readability
         const hotels = tourData.hotels.map(h => ({ id: h.id, name: h.name, type: 'Hotel' }));
         const venues = tourData.venues.map(v => ({ id: v.id, name: v.name, type: 'Venue' }));
-
         tourData.routePlannerState.forEach((savedState, i) => {
             const select = document.getElementById(`routeSelect${i}`);
             if (select) {
                 let placeholderText = (i === 0) ? '-- Select Starting Point --' : '-- Select Next Stop --';
                 select.innerHTML = `<option value="">${placeholderText}</option>`;
-
-                // Hotel Group
-                if (hotels.length > 0) {
-                    const hotelGroup = document.createElement('optgroup');
-                    hotelGroup.label = '🏨 Hotels';
-                    hotels.forEach(location => {
-                        const option = document.createElement('option');
-                        option.value = `${location.type}:${location.id}`;
-                        option.textContent = location.name; // No more prefix!
-                        hotelGroup.appendChild(option);
-                    });
-                    select.appendChild(hotelGroup);
-                }
-
-                // Venue Group
-                if (venues.length > 0) {
-                    const venueGroup = document.createElement('optgroup');
-                    venueGroup.label = '🎵 Venues';
-                    venues.forEach(location => {
-                        const option = document.createElement('option');
-                        option.value = `${location.type}:${location.id}`;
-                        option.textContent = location.name; // No more prefix!
-                        venueGroup.appendChild(option);
-                    });
-                    select.appendChild(venueGroup);
-                }
-                
-                select.value = savedState.selectValue;
-                document.getElementById(`routeDate${i}`).value = savedState.dateValue;
+                if (hotels.length > 0) { const hotelGroup = document.createElement('optgroup'); hotelGroup.label = '🏨 Hotels'; hotels.forEach(location => { const option = document.createElement('option'); option.value = `${location.type}:${location.id}`; option.textContent = location.name; hotelGroup.appendChild(option); }); select.appendChild(hotelGroup); }
+                if (venues.length > 0) { const venueGroup = document.createElement('optgroup'); venueGroup.label = '🎵 Venues'; venues.forEach(location => { const option = document.createElement('option'); option.value = `${location.type}:${location.id}`; option.textContent = location.name; venueGroup.appendChild(option); }); select.appendChild(venueGroup); }
+                select.value = savedState.selectValue; document.getElementById(`routeDate${i}`).value = savedState.dateValue;
             }
         });
     }
 
-    // --- End Route Planner Refactor ---
-
+    // --- Core App Functions (with saveData() calls) ---
     function getGasSettings() {
-    const settings = tourData.settings || {};
-    const litresPer100km = parseFloat(document.getElementById('litresPer100km').value) || settings.litresPer100km || 12;
-    const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75;
-    const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10;
-    return { litresPer100km, costPerLitre, heavyFootPercent }; }
+        const settings = tourData.settings || {};
+        const litresPer100km = parseFloat(document.getElementById('litresPer100km').value) || settings.litresPer100km || 12;
+        const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75;
+        const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10;
+        return { litresPer100km, costPerLitre, heavyFootPercent }; 
+    }
     function calculateGasCost(distanceKm) {
-    const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings();
-    if (litresPer100km <= 0) return 0;
-    const adjustedLitresPer100km = litresPer100km * (1 + (heavyFootPercent / 100));
-    const litresUsed = (distanceKm / 100) * adjustedLitresPer100km;
-    return litresUsed * costPerLitre; }
-    function applySettings() { const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings(); tourData.settings = { litresPer100km, costPerLitre, heavyFootPercent }; saveData(); alert("Settings applied and saved."); if (document.getElementById('routeResults').innerHTML.trim() !== '') { rerenderRouteCosts(); } }
-    function applySettingsToUI() { const settings = tourData.settings || {}; document.getElementById('litresPer100km').value = settings.litresPer100km || ''; document.getElementById('costPerLitre').value = settings.costPerLitre || ''; document.getElementById('heavyFootPercent').value = settings.heavyFootPercent || ''; }
+        const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings();
+        if (litresPer100km <= 0) return 0;
+        const adjustedLitresPer100km = litresPer100km * (1 + (heavyFootPercent / 100));
+        const litresUsed = (distanceKm / 100) * adjustedLitresPer100km;
+        return litresUsed * costPerLitre; 
+    }
+    function applySettings() { 
+        const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings(); 
+        tourData.settings = { litresPer100km, costPerLitre, heavyFootPercent }; 
+        saveData(); 
+        alert("Settings applied and saved."); 
+        if (document.getElementById('routeResults').innerHTML.trim() !== '') { rerenderRouteCosts(); } 
+    }
+    function applySettingsToUI() { 
+        const settings = tourData.settings || {}; 
+        document.getElementById('litresPer100km').value = settings.litresPer100km || ''; 
+        document.getElementById('costPerLitre').value = settings.costPerLitre || ''; 
+        document.getElementById('heavyFootPercent').value = settings.heavyFootPercent || ''; 
+    }
     function rerenderRouteCosts() { let grandTotalGas = 0; const daySummaries = document.querySelectorAll('#routeResults .day-summary-box'); daySummaries.forEach(daySummary => { let dayTotalDistance = 0; const dayId = daySummary.dataset.dayId; const segments = document.querySelectorAll(`.route-item[data-day-id='${dayId}']`); segments.forEach(segment => { const distanceKm = parseFloat(segment.dataset.distanceKm); dayTotalDistance += distanceKm; const newGasCost = calculateGasCost(distanceKm); segment.querySelector('.gas-cost').textContent = `$${newGasCost.toFixed(0)} CAD`; }); const newDayGasCost = calculateGasCost(dayTotalDistance); grandTotalGas += newDayGasCost; daySummary.querySelector('.day-gas-value').textContent = `$${newDayGasCost.toFixed(0)}`; }); document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); }
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
-    function showTab(tabName) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(tabName).classList.add('active'); const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`); if (activeButton) activeButton.classList.add('active'); if (tabName === 'calendar') renderCalendar(); updateAllDisplays(); }
-    function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); updateAllDisplays(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
-    function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); updateAllDisplays(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
-    function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); updateAllDisplays(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
-    function clearAllStops() {  tourData.routePlannerState = []; tourData.routeCache = {}; loadRoutePlannerState(); document.getElementById('routeResults').innerHTML = ''; saveData(); }
-    function autoFillRoute() { if (!confirm('This will replace your current route plan with one auto-filled from all hotels and venues, sorted by date. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); loadRoutePlannerState(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
+    function showTab(tabName) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(tabName).classList.add('active'); const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`); if (activeButton) activeButton.classList.add('active'); updateAllDisplays(); }
+    function addHotel() { const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
+    function addVenue() { const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
+    function addExpense() { const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
+    function clearAllStops() {  tourData.routePlannerState = []; tourData.routeCache = {}; renderRouteBuilder(); saveData(); document.getElementById('routeResults').innerHTML = ''; }
+    function autoFillRoute() { if (!confirm('This will replace your current route plan with one auto-filled from all hotels and venues, sorted by date. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
     function toggleRouteBuilder() { const content = document.getElementById('route-builder-content'); const arrow = document.getElementById('routeBuilderToggleArrow'); content.classList.toggle('collapsed'); arrow.classList.toggle('collapsed'); }
     async function generateCustomRoute() { saveRoutePlannerState(); if (isGeneratingRoute) { alert('Route generation is already in progress...'); return; } isGeneratingRoute = true; const generateBtn = document.getElementById('generateRouteBtn'); const progressDiv = document.getElementById('routeProgress'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); const routeResults = document.getElementById('routeResults'); generateBtn.disabled = true; generateBtn.textContent = '🔄 Generating...'; progressDiv.style.display = 'block'; routeResults.innerHTML = ''; progressText.textContent = 'Preparing route...'; progressFill.style.width = '0%'; try { const dailySegments = {}; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { const fromStopInfo = tourData.routePlannerState[i]; const toStopInfo = tourData.routePlannerState[i + 1]; if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue; const date = fromStopInfo.dateValue || 'No Date'; if (!dailySegments[date]) dailySegments[date] = []; if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue)); dailySegments[date].push(getLocationDetails(toStopInfo.selectValue)); } const allDates = Object.keys(dailySegments).sort(); if (allDates.length === 0) throw new Error('No valid route segments found.'); let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0, processedDays = 0; routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; for (const date of allDates) { const stopsForDay = dailySegments[date]; try { const dayRouteData = await processDayRoute(date, stopsForDay); grandTotalDistanceMeters += dayRouteData.totalDistance || 0; grandTotalTimeSecs += dayRouteData.totalTime || 0; renderDayRoute(date, dayRouteData, processedDays + 1); } catch (dayError) { renderErrorDay(date, processedDays + 1, dayError.message); } processedDays++; const progress = (processedDays / allDates.length) * 100; progressFill.style.width = `${progress}%`; progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`; await new Promise(resolve => setTimeout(resolve, 300)); } const grandTotalGas = calculateGasCost(grandTotalDistanceMeters / 1000); const totalHours = Math.floor(grandTotalTimeSecs / 3600); const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60); document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`; document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`; document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); progressText.textContent = '✅ All days completed!'; } catch (error) { console.error('Route generation error:', error); routeResults.innerHTML = `<div class="route-item error"><strong>❌ Error:</strong> ${error.message}</div>`; progressText.textContent = '❌ Generation failed'; } finally { isGeneratingRoute = false; generateBtn.disabled = false; generateBtn.textContent = '🛣️ Generate Full Tour Route'; setTimeout(() => { progressDiv.style.display = 'none'; }, 3000); } }
     async function processDayRoute(date, stopsForDay) { if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 7200000)) { let cachedData = tourData.routeCache[cacheKey].data; cachedData.isCached = true; return cachedData; } let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = []; const MAX_WAYPOINTS = 23; for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); if (chunk.length < 2) break; const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address; const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; const response = await fetch(url); if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); const data = await response.json(); if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); const legs = data.routes[0].legs; allLegs.push(...legs); for (let leg of legs) { totalDistanceMeters += leg.distance.value; totalTimeSecs += (leg.duration_in_traffic || leg.duration).value; } } const dayData = { legs: allLegs, stops: stopsForDay, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, isCached: false }; tourData.routeCache[cacheKey] = { data: dayData, timestamp: Date.now() }; saveData(); return dayData; }
     function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distance.text} | <strong>Time (traffic):</strong> ${(leg.duration_in_traffic || leg.duration).text}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`; routeResults.appendChild(routeSegment); }); }
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
-    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; if (dateStr === '2025-07-08') dayHtml += `<div class="day-note">🎂 My Birthday!</div>`; if (dateStr === '2025-07-16') dayHtml += `<div class="day-note">Break at Home</div>`; if (day % 10 === 0 && !events.isVenue && !events.isTravel) dayHtml += `<div class="day-note">Keep it up!</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
-    function getEventsForDate(dateStr) { saveRoutePlannerState(); let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr); return { isVenue, isTravel }; }
+    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
+    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr); return { isVenue, isTravel }; }
     function showDayDetails(dateStr) { saveRoutePlannerState(); const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const stopsForDay = []; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { if(tourData.routePlannerState[i].dateValue === dateStr) { if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue)); stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue)); } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (stopsForDay.length > 1) { const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`; if(tourData.routeCache[cacheKey]) { const dayData = tourData.routeCache[cacheKey].data; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distance.text} | Time: ${(leg.duration_in_traffic || leg.duration).text}</small></div>`; }); } else { html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`; } } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
     function showPrevDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() - 1); showDayDetails(date.toISOString().split('T')[0]); }
     function showNextDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() + 1); showDayDetails(date.toISOString().split('T')[0]); }
@@ -579,21 +553,21 @@
     function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; document.getElementById('hotelModal').style.display = 'block'; }
     function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; document.getElementById('venueModal').style.display = 'block'; }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; currentEditId = null; }
-    function saveHotelEdit() { const hotel = tourData.hotels.find(h => h.id === currentEditId); if (!hotel) return; hotel.name = document.getElementById('editHotelName').value; hotel.address = document.getElementById('editHotelAddress').value; hotel.checkin = document.getElementById('editCheckinDate').value; hotel.checkout = document.getElementById('editCheckoutDate').value; hotel.costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; hotel.costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; hotel.notes = document.getElementById('editHotelNotes').value; saveData(); updateAllDisplays(); closeModal('hotelModal'); }
-    function saveVenueEdit() { const venue = tourData.venues.find(v => v.id === currentEditId); if (!venue) return; venue.name = document.getElementById('editVenueName').value; venue.address = document.getElementById('editVenueAddress').value; venue.date = document.getElementById('editShowDate').value; venue.time = document.getElementById('editShowTime').value; venue.startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; venue.endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; venue.totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; venue.notes = document.getElementById('editVenueNotes').value; saveData(); updateAllDisplays(); closeModal('venueModal'); }
-    function deleteHotel() { if (confirm('Are you sure?')) { tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId); saveData(); updateAllDisplays(); closeModal('hotelModal'); } }
-    function deleteVenue() { if (confirm('Are you sure?')) { tourData.venues = tourData.venues.filter(v => v.id !== currentEditId); saveData(); updateAllDisplays(); closeModal('venueModal'); } }
-    function updateAllDisplays() { updateHotelsDisplay(); updateExpensesDisplay(); updateVenuesDisplay(); renderRouteBuilder(); }
+    function saveHotelEdit() { const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId); if (hotelIndex === -1) return; tourData.hotels[hotelIndex].name = document.getElementById('editHotelName').value; tourData.hotels[hotelIndex].address = document.getElementById('editHotelAddress').value; tourData.hotels[hotelIndex].checkin = document.getElementById('editCheckinDate').value; tourData.hotels[hotelIndex].checkout = document.getElementById('editCheckoutDate').value; tourData.hotels[hotelIndex].costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; tourData.hotels[hotelIndex].costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; tourData.hotels[hotelIndex].notes = document.getElementById('editHotelNotes').value; saveData(); closeModal('hotelModal'); }
+    function saveVenueEdit() { const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId); if (venueIndex === -1) return; tourData.venues[venueIndex].name = document.getElementById('editVenueName').value; tourData.venues[venueIndex].address = document.getElementById('editVenueAddress').value; tourData.venues[venueIndex].date = document.getElementById('editShowDate').value; tourData.venues[venueIndex].time = document.getElementById('editShowTime').value; tourData.venues[venueIndex].startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; tourData.venues[venueIndex].endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; tourData.venues[venueIndex].totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; tourData.venues[venueIndex].notes = document.getElementById('editVenueNotes').value; saveData(); closeModal('venueModal'); }
+    function deleteHotel() { if (confirm('Are you sure?')) { tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId); saveData(); closeModal('hotelModal'); } }
+    function deleteVenue() { if (confirm('Are you sure?')) { tourData.venues = tourData.venues.filter(v => v.id !== currentEditId); saveData(); closeModal('venueModal'); } }
+    function updateAllDisplays() { updateHotelsDisplay(); updateExpensesDisplay(); updateVenuesDisplay(); renderRouteBuilder(); renderCalendar(); applySettingsToUI(); }
     function updateHotelsDisplay() { const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = ''; const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin)); let totalCAD = 0, totalNights = 0; sortedHotels.forEach(hotel => { totalCAD += hotel.costCAD || (hotel.costUSD * 1.35); if (hotel.checkin && hotel.checkout) totalNights += (new Date(hotel.checkout) - new Date(hotel.checkin)) / 86400000; const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35); const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad'; const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id); hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button></div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; hotelsList.appendChild(hotelCard); }); document.getElementById('hotelCountStat').textContent = tourData.hotels.length; document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0); }
     function updateExpensesDisplay() { const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0; const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date)); sortedExpenses.forEach(expense => { totalCAD += expense.amountCAD || (expense.amountUSD * 1.35); const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'; row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`; }); document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0); }
     function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button></div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
-    function deleteItem(type, id) { if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); updateAllDisplays(); } }
+    function deleteItem(type, id) { if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); } }
     function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); }
     function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => document.getElementById(id).value = ''); }
     function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; }
     document.addEventListener('DOMContentLoaded', function() { document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); });
     window.onclick = function(event) { if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal'); if (event.target === document.getElementById('venueModal')) closeModal('venueModal'); if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal'); }
-    function exportTourData() { saveRoutePlannerState(); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+    function exportTourData() { saveRoutePlannerState(false); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key].data; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distance.value / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distance.text, (leg.duration_in_traffic || leg.duration).text, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 
 </script>
 </body>
