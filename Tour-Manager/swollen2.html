@@ -302,6 +302,64 @@
         return JSON.parse(JSON.stringify(defaultData));
     }
 
+    // MISSING FUNCTION - THIS WAS YOUR PROBLEM!
+    async function initializeFirebaseAndSync() {
+        try {
+            updateSyncStatus("Connecting...");
+            
+            if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.firestore();
+            auth = firebase.auth();
+            
+            updateSyncStatus("Loading data...");
+            const docRef = db.collection("tourData").doc(STORAGE_KEY);
+            
+            // Try to read cloud data first
+            try {
+                const cloudDoc = await docRef.get();
+                if (cloudDoc.exists) {
+                    const cloudData = cloudDoc.data();
+                    console.log("✅ Found cloud data:", {
+                        hotels: cloudData.hotels?.length || 0,
+                        venues: cloudData.venues?.length || 0,
+                        expenses: cloudData.expenses?.length || 0
+                    });
+                    
+                    tourData = { ...defaultData, ...cloudData };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+                    updateSyncStatus("✅ Loaded from cloud");
+                    initializeAppUI();
+                    
+                    // Try auth for live sync
+                    try {
+                        await auth.signInAnonymously();
+                        attachLiveListener(docRef);
+                        updateSyncStatus("☁️ Live sync active");
+                    } catch (authError) {
+                        console.warn("Auth failed:", authError);
+                        updateSyncStatus("📖 Data loaded (read-only)");
+                    }
+                    return;
+                } else {
+                    console.log("No cloud document exists");
+                }
+            } catch (readError) {
+                console.warn("Cloud read failed:", readError);
+            }
+            
+            // Fallback to local
+            console.log("Using localStorage fallback");
+            tourData = loadFromLocalStorage();
+            updateSyncStatus("💾 Local data only");
+            initializeAppUI();
+            
+        } catch (e) {
+            console.error("Complete failure:", e);
+            updateSyncStatus("⚠️ Offline mode");
+            tourData = loadFromLocalStorage();
+            initializeAppUI();
+        }
+    }
     
     function attachLiveListener(docRef) {
         if (firebaseListener) firebaseListener(); 
@@ -328,7 +386,13 @@
     }
     
     function saveData() {
-        if (!db || !auth.currentUser) { return Promise.resolve(); }
+        if (!db || !auth.currentUser) { 
+            // Offline mode - just save locally
+            tourData.lastModified = Date.now();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+            updateSyncStatus("💾 Saved Locally (Offline)");
+            return Promise.resolve(); 
+        }
         
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
@@ -367,7 +431,6 @@
     }
 
     // --- Route Planner & Core App Functions ---
-    // (The rest of the JS is identical to the previous version, it has not been repeated here for brevity but is included in the full HTML file.)
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
         routeStepsContainer.innerHTML = '';
