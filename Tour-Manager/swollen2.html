@@ -315,12 +315,10 @@
             updateSyncStatus("Syncing...");
             const docRef = db.collection("tourData").doc(STORAGE_KEY);
             
-            // Fetch both versions of data
             const localData = loadFromLocalStorage();
             const cloudDoc = await docRef.get();
             const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
 
-            // Decide which data is definitive
             if (cloudData) {
                 if ((localData.lastModified || 0) > cloudData.lastModified) {
                     console.log("Local data is newer. Pushing to cloud to resolve conflict.");
@@ -343,13 +341,12 @@
         } catch (e) {
             console.error("Firebase Auth/Initialization failed:", e);
             updateSyncStatus("⚠️ Cloud Sync Failed");
-            // Fallback to offline mode
-            initializeAppUI();
+            initializeAppUI(); // Fallback to offline mode
         }
     }
     
     function attachLiveListener(docRef) {
-        if (firebaseListener) firebaseListener(); // Unsubscribe from old listener
+        if (firebaseListener) firebaseListener(); 
         firebaseListener = docRef.onSnapshot((doc) => {
             const cloudData = doc.exists() ? doc.data() : defaultData;
             
@@ -372,7 +369,7 @@
     }
     
     function saveData() {
-        if (!db || !auth.currentUser) { console.error("DB/Auth not ready, save aborted."); return Promise.resolve(); }
+        if (!db || !auth.currentUser) { return Promise.resolve(); }
         
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
@@ -394,7 +391,6 @@
         if (statusEl) statusEl.textContent = message;
     }
     
-    // Emergency Recovery Function
     function clearRouteCache() {
         if (!confirm("This will clear the route cache to fix size limit errors. You will need to re-generate the route afterwards. Continue?")) {
             return;
