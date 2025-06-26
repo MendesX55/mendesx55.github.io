@@ -286,9 +286,7 @@
 
     // --- NEW HYBRID DATA MODEL ---
     document.addEventListener('DOMContentLoaded', async () => {
-        loadFromLocalStorage();
         await initializeFirebaseAndSync();
-        initializeAppUI();
     });
     
     function loadFromLocalStorage() {
@@ -296,36 +294,37 @@
         if (localDataString) {
             try {
                 const localData = JSON.parse(localDataString);
-                tourData = { ...defaultData, ...localData };
-                console.log("Loaded data from localStorage for instant UI.");
+                return { ...defaultData, ...localData };
             } catch (e) {
-                console.error("Failed to parse local data, starting fresh.", e);
-                tourData = JSON.parse(JSON.stringify(defaultData));
+                console.error("Failed to parse local data.", e);
             }
         }
+        return JSON.parse(JSON.stringify(defaultData));
     }
 
     async function initializeFirebaseAndSync() {
         try {
-            updateSyncStatus("Connecting to cloud...");
+            updateSyncStatus("Connecting...");
             if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
             db = firebase.firestore();
             auth = firebase.auth();
             
             await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
             await auth.signInAnonymously();
-            console.log("Firebase Anonymous Auth successful.");
             
-            updateSyncStatus("Cloud connected. Syncing...");
-            if (firebaseListener) firebaseListener();
-
+            updateSyncStatus("Syncing...");
             const docRef = db.collection("tourData").doc(STORAGE_KEY);
+            
+            // Fetch both versions of data
+            const localData = loadFromLocalStorage();
             const cloudDoc = await docRef.get();
             const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
 
+            // Decide which data is definitive
             if (cloudData) {
-                if ((tourData.lastModified || 0) > cloudData.lastModified) {
+                if ((localData.lastModified || 0) > cloudData.lastModified) {
                     console.log("Local data is newer. Pushing to cloud to resolve conflict.");
+                    tourData = localData;
                     await saveData(); 
                 } else {
                     console.log("Cloud data is newer or same. Accepting cloud state.");
@@ -333,18 +332,24 @@
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 }
             } else {
-                console.log("No cloud document. Saving local state to create it.");
+                console.log("No cloud document. Using local data and creating cloud document.");
+                tourData = localData;
                 await saveData();
             }
 
+            initializeAppUI();
             attachLiveListener(docRef);
+
         } catch (e) {
             console.error("Firebase Auth/Initialization failed:", e);
             updateSyncStatus("⚠️ Cloud Sync Failed");
+            // Fallback to offline mode
+            initializeAppUI();
         }
     }
     
     function attachLiveListener(docRef) {
+        if (firebaseListener) firebaseListener(); // Unsubscribe from old listener
         firebaseListener = docRef.onSnapshot((doc) => {
             const cloudData = doc.exists() ? doc.data() : defaultData;
             
@@ -354,22 +359,20 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 updateAllDisplays();
                 updateSyncStatus(`☁️ Updated: ${new Date().toLocaleTimeString()}`);
-            } else {
-                console.log("Live update is older or same as local. Ignoring.");
             }
         });
         updateSyncStatus("☁️ Live Sync Active");
     }
 
     function initializeAppUI() {
-        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('loadingOverlay').style.display = 'none';
         document.getElementById('app-content').style.display = 'flex';
+        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
         showTab('calendar');
     }
     
     function saveData() {
-        if (!db) { console.error("DB not ready, save aborted."); return Promise.resolve(); }
+        if (!db || !auth.currentUser) { console.error("DB/Auth not ready, save aborted."); return Promise.resolve(); }
         
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
@@ -408,6 +411,7 @@
     }
 
     // --- Route Planner & Core App Functions ---
+    // (The rest of the JS is identical to the previous version, it has not been repeated here for brevity but is included in the full HTML file.)
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
         routeStepsContainer.innerHTML = '';
