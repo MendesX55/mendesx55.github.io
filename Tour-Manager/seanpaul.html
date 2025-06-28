@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
@@ -9,113 +8,107 @@
 <meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
 <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-color: #0f3460; }
-        body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
-        .header { background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
-        .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-        .logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
-        .container { max-width: 430px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-        .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow: hidden; }
-        .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
-        .tab-btn span { font-size: 1.5em; }
-        .tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
-        .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
-        .tab-content.active { display: block; }
-        .form-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .form-section h3 { color: #ffd700; margin-bottom: 12px; font-size: 1.1em; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 5px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-        .currency-input { position: relative; }
-        .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
-        .currency-input input { padding-left: 30px; }
-        .btn { background: linear-gradient(45deg, #ff6b35, #f7931e); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin: 5px 0; width: 100%; -webkit-tap-highlight-color: transparent; }
-        .btn:active { transform: scale(0.98); }
-        .btn-small { padding: 6px 12px; font-size: 11px; width: auto; }
-        .btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
-        .route-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #87CEEB; }
-        .route-item.show-day { border-left-color: #ff6b35; }
-        .route-item.cached { border-left-color: #4CAF50; }
-        .route-item.error { border-left-color: #e74c3c; }
-        .stats-grid { display: grid; gap: 8px; margin-bottom: 15px; }
-        .stats-grid-2-col { grid-template-columns: 1fr 1fr; }
-        .stats-grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
-        .stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .stat-value { font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 3px; }
-        .stat-label { color: #ccc; font-size: 0.8em; }
-        .venue-card, .hotel-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #ffd700; cursor: pointer; transition: all 0.3s ease; }
-        .venue-card:hover, .hotel-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-2px); }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-        .card-title { color: #ffd700; font-weight: bold; flex-grow: 1; word-break: break-word; }
-        .card-date { font-weight: bold; color: #fff; white-space: nowrap; flex-shrink: 0; font-size: 11px; }
-        .summary-box { background: #16213e; border: 1px solid rgba(255,215,0,0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; position: sticky; top: -15px; z-index: 10; }
-        .day-summary-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; padding: 12px; margin-top: 20px; margin-bottom: 10px; }
-        .day-summary-box h4 { color: #ffd700; text-align: center; margin-bottom: 10px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        .modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); margin: 10% auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid rgba(255,215,0,0.3); max-height: 80vh; overflow-y: auto; }
-        .modal-header { color: #ffd700; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-nav { background: none; border: none; color: #ffd700; font-size: 2em; cursor: pointer; padding: 0 10px; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close:hover { color: #fff; }
-        .route-selector { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .route-selector h3 { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        #route-builder-content.collapsed { display: none; }
-        .toggle-arrow { font-size: 1.2em; transition: transform 0.3s ease; }
-        .toggle-arrow.collapsed { transform: rotate(-90deg); }
-        .route-controls-bottom { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
-        
-        .route-step { display: flex; align-items: center; margin-bottom: 10px; gap: 5px; }
-        .route-step-number { background: #ffd700; color: #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
-        .route-step-inputs { flex-grow: 1; display: flex; gap: 5px; min-width: 0; }
-        .route-step-inputs select { flex-grow: 1; min-width: 0; padding: 8px; border-radius: 6px; border: none; background: rgba(255,255,255,0.9); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .route-step-inputs input[type="date"] { width: 100px; flex-shrink: 0; padding: 4px; font-size: 12px; }
-        .route-control-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 28px; height: 28px; font-size: 18px; font-weight: bold; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 2px; }
-        .route-control-btn.remove { background: rgba(231, 76, 60, 0.4); }
-
-        .progress-bar-container { position: relative; }
-        .progress-bar { background: rgba(255,255,255,0.1); border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { background: linear-gradient(90deg, #4CAF50, #8BC34A); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px; }
-        .progress-text { position: absolute; width: 100%; text-align: center; line-height: 20px; font-size: 11px; font-weight: bold; color: #fff; top: 0; left: 0; }
-        input[type="date"], input[type="time"], input[type="number"], select { height: 42px !important; font-size: 16px; padding: 10px; box-sizing: border-box; }
-        .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .checkbox-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; }
-        .checkbox-item input { width: 20px; height: 20px; margin-right: 10px; }
-        .settings-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end; }
-        .settings-row .form-group { margin-bottom: 0; }
-        #calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        #calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-        #month-year { font-size: 1.2em; font-weight: bold; }
-        #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .calendar-day { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); min-height: 80px; border-radius: 8px; padding: 5px; font-size: 0.8em; cursor: pointer; transition: background-color 0.3s; }
-        .calendar-day:hover { background: rgba(255,215,0,0.2); }
-        .calendar-day.other-month { background: rgba(0,0,0,0.1); color: #666; }
-        .day-number { font-weight: bold; }
-        .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
-        .day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
-
-        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .currency-input input { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
-
-        @media only screen and (max-width: 430px) and (min-device-pixel-ratio: 3) {
-            .tab-btn { font-size: 8px; padding: 5px 2px; }
-            .tab-btn span { font-size: 1em; }
-            .stat-card { padding: 8px; }
-            .stat-value { font-size: 1em; }
-        }
-
-        html, body {
-            height: 100%; overflow: hidden; touch-action: none; overscroll-behavior: none;
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            display: flex; flex-direction: column;
-        }
-</style>
-
-<style>
-/* iPhone 16 Pro Max and iOS 26 scaling/layout fix */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-color: #0f3460; }
+body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.login-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,215,0,0.3); }
+.login-box h2 { color: #ffd700; margin-bottom: 20px; font-size: 1.5em; }
+.login-box input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; }
+.login-box button { background: linear-gradient(45deg, #ff6b35, #f7931e); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin: 10px 0; }
+.access-urls { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; font-size: 12px; }
+.header { background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
+.header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
+.artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
+.logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
+.container { max-width: 430px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow: hidden; }
+.tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
+.tab-btn span { font-size: 1.5em; }
+.tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
+.tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+.tab-content.active { display: block; }
+.form-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+.form-section h3 { color: #ffd700; margin-bottom: 12px; font-size: 1.1em; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 5px; }
+.form-group { margin-bottom: 10px; }
+.form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.currency-input { position: relative; }
+.currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
+.currency-input input { padding-left: 30px; }
+.btn { background: linear-gradient(45deg, #ff6b35, #f7931e); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin: 5px 0; width: 100%; -webkit-tap-highlight-color: transparent; }
+.btn:active { transform: scale(0.98); }
+.btn-small { padding: 6px 12px; font-size: 11px; width: auto; }
+.btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+.route-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #87CEEB; }
+.route-item.show-day { border-left-color: #ff6b35; }
+.route-item.cached { border-left-color: #4CAF50; }
+.route-item.error { border-left-color: #e74c3c; }
+.stats-grid { display: grid; gap: 8px; margin-bottom: 15px; }
+.stats-grid-2-col { grid-template-columns: 1fr 1fr; }
+.stats-grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
+.stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.stat-value { font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 3px; }
+.stat-label { color: #ccc; font-size: 0.8em; }
+.venue-card, .hotel-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #ffd700; cursor: pointer; transition: all 0.3s ease; }
+.venue-card:hover, .hotel-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-2px); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.card-title { color: #ffd700; font-weight: bold; flex-grow: 1; word-break: break-word; }
+.card-date { font-weight: bold; color: #fff; white-space: nowrap; flex-shrink: 0; font-size: 11px; }
+.summary-box { background: #16213e; border: 1px solid rgba(255,215,0,0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; position: sticky; top: -15px; z-index: 10; }
+.day-summary-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; padding: 12px; margin-top: 20px; margin-bottom: 10px; }
+.day-summary-box h4 { color: #ffd700; text-align: center; margin-bottom: 10px; }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+.modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); margin: 5% auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid rgba(255,215,0,0.3); max-height: 90vh; overflow-y: auto; }
+.modal-header { color: #ffd700; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.modal-nav { background: none; border: none; color: #ffd700; font-size: 2em; cursor: pointer; padding: 0 10px; }
+.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.close:hover { color: #fff; }
+.route-selector { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+.route-selector h3 { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+#route-builder-content.collapsed { display: none; }
+.toggle-arrow { font-size: 1.2em; transition: transform 0.3s ease; }
+.toggle-arrow.collapsed { transform: rotate(-90deg); }
+.route-controls-bottom { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
+.route-step { display: flex; align-items: center; margin-bottom: 10px; gap: 5px; }
+.route-step-number { background: #ffd700; color: #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.route-step-inputs { flex-grow: 1; display: flex; gap: 5px; min-width: 0; }
+.route-step-inputs select { flex-grow: 1; min-width: 0; padding: 8px; border-radius: 6px; border: none; background: rgba(255,255,255,0.9); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-step-inputs input[type="date"] { width: 100px; flex-shrink: 0; padding: 4px; font-size: 12px; }
+.route-control-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 28px; height: 28px; font-size: 18px; font-weight: bold; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 2px; }
+.route-control-btn.remove { background: rgba(231, 76, 60, 0.4); }
+.progress-bar-container { position: relative; }
+.progress-bar { background: rgba(255,255,255,0.1); border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #4CAF50, #8BC34A); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px; }
+.progress-text { position: absolute; width: 100%; text-align: center; line-height: 20px; font-size: 11px; font-weight: bold; color: #fff; top: 0; left: 0; }
+input[type="date"], input[type="time"], input[type="number"], select { height: 42px !important; font-size: 16px; padding: 10px; box-sizing: border-box; }
+.checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+.checkbox-item { display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; }
+.checkbox-item input { width: 20px; height: 20px; margin-right: 10px; }
+.settings-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end; }
+.settings-row .form-group { margin-bottom: 0; }
+#calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+#calendar-header button { background: #ff6b35; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+#month-year { font-size: 1.2em; font-weight: bold; }
+#calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.calendar-day { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); min-height: 80px; border-radius: 8px; padding: 5px; font-size: 0.8em; cursor: pointer; transition: background-color 0.3s; }
+.calendar-day:hover { background: rgba(255,215,0,0.2); }
+.calendar-day.other-month { background: rgba(0,0,0,0.1); color: #666; }
+.day-number { font-weight: bold; }
+.day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
+.day-note { font-size: 9px; font-style: italic; color: #ccc; margin-top: 5px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.currency-input input { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; color: white; font-size: 1.5em; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+.data-table th, .data-table td { padding: 6px 4px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.data-table th { background: rgba(255,255,255,0.1); color: #ffd700; font-weight: bold; }
+html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-behavior: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+.settings-menu { display: flex; flex-direction: column; gap: 10px; }
+.settings-menu-item { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 15px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; text-align: left; }
+.settings-menu-item:hover { background: rgba(255,215,0,0.2); }
 @media only screen and (max-width: 430px) and (min-device-pixel-ratio: 3) {
   .tab-btn { font-size: 8px !important; padding: 4px 2px !important; min-width: 48px !important; }
   .tab-btn span { font-size: 1.2em !important; }
@@ -128,131 +121,144 @@
   html, body { font-size: 14px !important; overflow-x: hidden !important; }
 }
 </style>
-
 </head>
 <body style="display: flex; flex-direction: column;">
-<div style="padding-top: env(safe-area-inset-top); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999;">
-  <a href="index.html" style="display: block; padding: 10px 20px; text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
+
+<div class="login-screen" id="loginScreen" style="display: none;">
+    <div class="login-box">
+        <h2>🎤 Tour Access</h2>
+        <input id="accessCode" placeholder="Enter access code" type="password"/>
+        <button onclick="attemptLogin()">Access Tour Data</button>
+        <div class="access-urls">
+            <h4>Access Codes:</h4>
+            <div style="font-size: 11px; color: #ccc;">Admin: SEANPAUL2025<br/>Viewer: VIEWONLY</div>
+        </div>
+    </div>
 </div>
-<div class="header">
-<h1>🎤 TOUR MANAGER 🎤</h1>
-<div class="artist-logos">
-<div class="logo-placeholder">SEAN PAUL</div>
-<div class="logo-placeholder">WIZ KHALIFA</div>
-<div class="logo-placeholder">DABABY</div>
+
+<div class="loading-overlay" id="loadingOverlay">Connecting &amp; Syncing...</div>
+
+<div id="app-content" style="display: none; flex-direction: column; height: 100%;">
+    <div style="padding-top: env(safe-area-inset-top); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999;">
+        <a href="index.html" style="display: block; padding: 10px 20px; text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
+    </div>
+    <div class="header">
+        <h1>🎤 TOUR MANAGER 🎤</h1>
+        <div class="artist-logos">
+            <div class="logo-placeholder">SEAN PAUL</div>
+            <div class="logo-placeholder">WIZ KHALIFA</div>
+            <div class="logo-placeholder">DABABY</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="showTab('calendar')"><span>🗓️</span>CALENDAR</button>
+            <button class="tab-btn" onclick="showTab('venues')"><span>🎵</span>VENUES</button>
+            <button class="tab-btn" onclick="showTab('hotels')"><span>🏨</span>HOTELS</button>
+            <button class="tab-btn" onclick="showTab('routes')"><span>🚗</span>ROUTES</button>
+            <button class="tab-btn" onclick="showTab('expenses')"><span>💰</span>EXPENSES</button>
+            <button class="tab-btn" id="settingsTabBtn" onclick="showTab('settings')"><span>⚙️</span>SETTINGS</button>
+        </div>
+        
+        <div class="tab-content active" id="calendar">
+            <div id="calendar-header">
+                <button onclick="prevMonth()">◄ Prev</button>
+                <div id="month-year"></div>
+                <button onclick="nextMonth()">Next ►</button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #ffd700; font-size: 0.8em; padding-bottom: 5px;">
+                <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+            </div>
+            <div id="calendar-grid"></div>
+        </div>
+        <div class="tab-content" id="venues">
+            <div class="summary-box">
+                <div class="stats-grid stats-grid-2-col">
+                    <div class="stat-card"><div class="stat-value" id="venueCountStat">0</div><div class="stat-label">Total Shows</div></div>
+                    <div class="stat-card"><div class="stat-value" id="venueSalesStat">$0</div><div class="stat-label">Total Sales (USD)</div></div>
+                </div>
+            </div>
+            <div id="venuesList"></div>
+        </div>
+        <div class="tab-content" id="hotels">
+            <div class="summary-box">
+                <div class="stats-grid stats-grid-3-col">
+                    <div class="stat-card"><div class="stat-value" id="hotelCountStat">0</div><div class="stat-label">Total Hotels</div></div>
+                    <div class="stat-card"><div class="stat-value" id="hotelDaysStat">0</div><div class="stat-label">Total Days</div></div>
+                    <div class="stat-card"><div class="stat-value" id="hotelCostStat">$0</div><div class="stat-label">Total Cost</div></div>
+                </div>
+            </div>
+            <div id="hotelsList"></div>
+        </div>
+        <div class="tab-content" id="routes">
+            <div class="summary-box">
+                <div class="stats-grid stats-grid-3-col">
+                    <div class="stat-card"><div class="stat-value" id="totalDistanceStat">0 km</div><div class="stat-label">Total Distance</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalTimeStat">0h</div><div class="stat-label">Drive Time</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalGasStat">$0</div><div class="stat-label">Est. Gas</div></div>
+                </div>
+            </div>
+            <div id="routeResults"></div>
+        </div>
+        <div class="tab-content" id="expenses">
+            <div class="summary-box">
+                <div class="stats-grid stats-grid-2-col">
+                    <div class="stat-card"><div class="stat-value" id="expenseCountStat">0</div><div class="stat-label">Total Expenses</div></div>
+                    <div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label">Total Cost</div></div>
+                </div>
+            </div>
+            <table class="data-table" id="expensesTable"><thead style="position: sticky; top: -1px;"><tr><th>Date</th><th>Type</th><th>Location</th><th>USD</th><th>CAD</th><th>Action</th></tr></thead><tbody id="expensesBody"></tbody></table>
+        </div>
+        <div class="tab-content" id="settings">
+             <div class="settings-menu">
+                <button class="settings-menu-item" onclick="openSettingsModal('route-builder')">🗺️ Build/Edit Tour Route</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('add-hotel')">🏨 Add Hotel Confirmation</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('add-venue')">🎵 Add Venue/Show</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('add-expense')">💰 Add Expense</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('gas-settings')">⛽ Gas/Vehicle Settings</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('data-management')">📤 Data Management</button>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-<div class="container">
-<div class="tab-navigation">
-<button class="tab-btn active" onclick="showTab('calendar')"><span>🗓️</span>CALENDAR</button>
-<button class="tab-btn" onclick="showTab('venues')"><span>🎵</span>VENUES</button>
-<button class="tab-btn" onclick="showTab('hotels')"><span>🏨</span>HOTELS</button>
-<button class="tab-btn" onclick="showTab('routes')"><span>🚗</span>ROUTES</button>
-<button class="tab-btn" onclick="showTab('expenses')"><span>💰</span>EXPENSES</button>
-<button class="tab-btn" onclick="showTab('settings')"><span>⚙️</span>SETTINGS</button>
-</div>
-<!-- CALENDAR TAB -->
-<div class="tab-content active" id="calendar">
-<div id="calendar-header">
-<button onclick="prevMonth()">◄ Prev</button>
-<div id="month-year"></div>
-<button onclick="nextMonth()">Next ►</button>
-</div>
-<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #ffd700; font-size: 0.8em; padding-bottom: 5px;">
-<div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-</div>
-<div id="calendar-grid"></div>
-</div>
-<!-- VENUES TAB -->
-<div class="tab-content" id="venues">
-<div class="summary-box">
-<div class="stats-grid stats-grid-2-col">
-<div class="stat-card"><div class="stat-value" id="venueCountStat">0</div><div class="stat-label">Total Shows</div></div>
-<div class="stat-card"><div class="stat-value" id="venueSalesStat">$0</div><div class="stat-label">Total Sales (USD)</div></div>
-</div>
-</div>
-<div id="venuesList"></div>
-</div>
-<!-- HOTELS TAB -->
-<div class="tab-content" id="hotels">
-<div class="summary-box">
-<div class="stats-grid stats-grid-3-col">
-<div class="stat-card"><div class="stat-value" id="hotelCountStat">0</div><div class="stat-label">Total Hotels</div></div>
-<div class="stat-card"><div class="stat-value" id="hotelDaysStat">0</div><div class="stat-label">Total Days</div></div>
-<div class="stat-card"><div class="stat-value" id="hotelCostStat">$0</div><div class="stat-label">Total Cost</div></div>
-</div>
-</div>
-<div id="hotelsList"></div>
-</div>
-<!-- ROUTES TAB -->
-<div class="tab-content" id="routes">
-<div class="summary-box">
-<div class="stats-grid stats-grid-3-col">
-<div class="stat-card"><div class="stat-value" id="totalDistanceStat">0 km</div><div class="stat-label">Total Distance</div></div>
-<div class="stat-card"><div class="stat-value" id="totalTimeStat">0h</div><div class="stat-label">Drive Time</div></div>
-<div class="stat-card"><div class="stat-value" id="totalGasStat">$0</div><div class="stat-label">Est. Gas</div></div>
-</div>
-</div>
-<div class="route-selector">
-<h3 onclick="toggleRouteBuilder()">🗺️ Build Full Tour Itinerary <span class="toggle-arrow" id="routeBuilderToggleArrow">▼</span></h3>
-<div id="route-builder-content">
-<div id="routeSteps"><!-- Route steps will be generated by JS --></div>
-<div class="route-controls-bottom"><button class="btn btn-small" onclick="addRouteStop()">+ Add Stop</button><button class="btn btn-small" onclick="removeRouteStop()">- Remove Last</button><button class="btn btn-small" onclick="clearAllStops()">Clear All</button><button class="btn btn-small" onclick="autoFillRoute()">Auto-Fill</button></div>
-</div>
-<button class="btn" id="generateRouteBtn" onclick="generateCustomRoute()">🛣️ Generate Full Tour Route</button>
-<div class="progress-bar-container" id="routeProgress" style="display: none;">
-<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="progress-text" id="progressText">Preparing...</div>
-</div>
-<div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #ffd700; font-size: 12px;">Stops: 0 / Unlimited</span></div>
-</div>
-<div id="routeResults"></div>
-</div>
-<!-- EXPENSES TAB -->
-<div class="tab-content" id="expenses">
-<div class="summary-box">
-<div class="stats-grid stats-grid-2-col">
-<div class="stat-card"><div class="stat-value" id="expenseCountStat">0</div><div class="stat-label">Total Expenses</div></div>
-<div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label">Total Cost</div></div>
-</div>
-</div>
-<table class="data-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Location</th><th>USD</th><th>CAD</th><th>Action</th></tr></thead><tbody id="expensesBody"></tbody></table>
-</div>
-<!-- SETTINGS (INPUT) TAB -->
-<div class="tab-content" id="settings">
-<div class="form-section"><h3>🏨 Hotel Confirmations</h3><div class="form-group"><label>Hotel Name</label><input id="hotelName" placeholder="Hotel name" type="text"/></div><div class="form-group"><label>Address</label><input id="hotelAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="checkinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="checkoutDate" type="date"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="hotelCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="hotelCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="hotelNotes" placeholder="Confirmation number, special requests, etc." rows="2"></textarea></div><button class="btn" onclick="addHotel()">Add Hotel</button></div>
-<div class="form-section"><h3>🎵 Venue Information</h3><div class="form-group"><label>Venue Name</label><input id="venueName" placeholder="Venue name" type="text"/></div><div class="form-group"><label>Address</label><input id="venueAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="showDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="showTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="startInventory" placeholder="0" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="endInventory" placeholder="0" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="totalSales" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="venueNotes" placeholder="Stage setup, sound requirements, etc." rows="2"></textarea></div><button class="btn" onclick="addVenue()">Add Venue</button></div>
-<div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</label><textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
-<div class="form-section"><h3>⚙️ App Settings</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Configure gas cost calculations.</p>
-<div class="settings-row">
-<div class="form-group"><label for="litresPer100km">Fuel L/100km</label><input id="litresPer100km" placeholder="e.g. 12" type="number"/></div>
-<div class="form-group"><label for="costPerLitre">Cost $/L</label><input id="costPerLitre" placeholder="e.g. 1.75" type="number"/></div>
-<div class="form-group"><label for="heavyFootPercent">Go FAST %</label><input id="heavyFootPercent" placeholder="e.g. 10" type="number"/></div>
-</div>
-<button class="btn" onclick="applySettings()" style="margin-top: 15px;">Apply Settings</button>
-</div>
-<div class="form-section"><h3>📤 Data Management</h3>
-<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">If data is missing or won't save, clear the bloated cache.</p>
-<!-- MODIFICATION: Added Emergency Cache Clear Button -->
-<button class="btn btn-danger" onclick="clearRouteCache()">Clear Route Cache & Save</button>
-<button class="btn btn-danger" onclick="forceUploadLocalToFirebase()" style="margin-top: 10px; background: linear-gradient(45deg, #d35400, #e67e22);">FORCE UPLOAD Local → Cloud</button>
-<div class="checkbox-group" style="margin-top: 15px;">
-<label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label>
-<label class="checkbox-item"><input checked="" id="exportVenues" type="checkbox"/> Venues</label>
-<label class="checkbox-item"><input checked="" id="exportExpenses" type="checkbox"/> Expenses</label>
-<label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label>
-</div>
-<button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button>
-<p id="syncStatus" style="font-size: 12px; text-align: center; color: #ccc; margin-top: 10px;"></p>
-</div>
-</div>
-</div>
-<!-- MODALS -->
+
 <div class="modal" id="hotelModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('hotelModal')">×</span><div>Edit Hotel Details</div></div><div id="hotelEditForm"><div class="form-group"><label>Hotel Name</label><input id="editHotelName" type="text"/></div><div class="form-group"><label>Address</label><input id="editHotelAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="editCheckinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="editCheckoutDate" type="date"/></div></div><div class="form-row-2"><div class="currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostUSD" step="0.01" type="number"/></div><div class="currency-input"><label>CAD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="editHotelNotes" rows="3"></textarea></div><button class="btn" onclick="saveHotelEdit()">Save Changes</button><button class="btn btn-danger" onclick="deleteHotel()">Delete Hotel</button></div></div></div>
 <div class="modal" id="venueModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('venueModal')">×</span><div>Edit Venue Details</div></div><div id="venueEditForm"><div class="form-group"><label>Venue Name</label><input id="editVenueName" type="text"/></div><div class="form-group"><label>Address</label><input id="editVenueAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="editShowDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="editShowTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="editStartInventory" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="editEndInventory" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="editVenueNotes" rows="3"></textarea></div><button class="btn" onclick="saveVenueEdit()">Save Changes</button><button class="btn btn-danger" onclick="deleteVenue()">Delete Venue</button></div></div></div>
 <div class="modal" id="calendarModal"><div class="modal-content" id="calendarModalContent"></div></div>
+<div class="modal" id="settingsModal"><div class="modal-content"><div class="modal-header"><span id="settingsModalTitle">Settings</span><span class="close" onclick="closeModal('settingsModal')">×</span></div><div id="settingsModalContent"></div></div></div>
 
-<!-- Firebase SDK -->
+<div id="form-templates" style="display: none;">
+    <div id="add-hotel-template">
+        <div class="form-section"><h3>🏨 Hotel Confirmations</h3><div class="form-group"><label>Hotel Name</label><input id="hotelName" placeholder="Hotel name" type="text"/></div><div class="form-group"><label>Address</label><input id="hotelAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="checkinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="checkoutDate" type="date"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="hotelCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="hotelCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="hotelNotes" placeholder="Confirmation number, special requests, etc." rows="2"></textarea></div><button class="btn" onclick="addHotel()">Add Hotel</button></div>
+    </div>
+    <div id="add-venue-template">
+        <div class="form-section"><h3>🎵 Venue Information</h3><div class="form-group"><label>Venue Name</label><input id="venueName" placeholder="Venue name" type="text"/></div><div class="form-group"><label>Address</label><input id="venueAddress" placeholder="Full address" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="showDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="showTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="startInventory" placeholder="0" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="endInventory" placeholder="0" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="totalSales" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="venueNotes" placeholder="Stage setup, sound requirements, etc." rows="2"></textarea></div><button class="btn" onclick="addVenue()">Add Venue</button></div>
+    </div>
+    <div id="add-expense-template">
+        <div class="form-section"><h3>💰 Expenses</h3><div class="form-row"><div class="form-group"><label>Type</label><select id="expenseType"><option value="gas">Gas</option><option value="food">Food</option><option value="tolls">Tolls</option><option value="parking">Parking</option><option value="misc">Miscellaneous</option></select></div><div class="form-group"><label>Date</label><input id="expenseDate" type="date"/></div></div><div class="form-group"><label>Location</label><input id="expenseLocation" placeholder="Where was this expense?" type="text"/></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="expenseAmountUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="expenseAmountCAD" placeholder="0.00" step="0.01" type="number"/></div></div><div class="form-group"><label>Notes</label><textarea id="expenseNotes" placeholder="Additional notes" rows="2"></textarea></div><button class="btn" onclick="addExpense()">Add Expense</button></div>
+    </div>
+    <div id="route-builder-template">
+        <div class="route-selector">
+            <div id="route-builder-content">
+                <div id="routeSteps"></div>
+                <div class="route-controls-bottom"><button class="btn btn-small" onclick="addRouteStop()">+ Add Stop</button><button class="btn btn-small" onclick="removeRouteStop()">- Remove Last</button><button class="btn btn-small" onclick="clearAllStops()">Clear All</button><button class="btn btn-small" onclick="autoFillRoute()">Auto-Fill</button></div>
+            </div>
+            <button class="btn" id="generateRouteBtn" onclick="generateCustomRoute()">🛣️ Generate Full Tour Route</button>
+            <div class="progress-bar-container" id="routeProgress" style="display: none;">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-text" id="progressText">Preparing...</div>
+            </div>
+            <div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #ffd700; font-size: 12px;">Stops: 0 / Unlimited</span></div>
+        </div>
+    </div>
+    <div id="gas-settings-template">
+        <div class="form-section"><h3>⚙️ App Settings</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">Configure gas cost calculations.</p><div class="settings-row"><div class="form-group"><label for="litresPer100km">Fuel L/100km</label><input id="litresPer100km" placeholder="e.g. 12" type="number"/></div><div class="form-group"><label for="costPerLitre">Cost $/L</label><input id="costPerLitre" placeholder="e.g. 1.75" type="number"/></div><div class="form-group"><label for="heavyFootPercent">Go FAST %</label><input id="heavyFootPercent" placeholder="e.g. 10" type="number"/></div></div><button class="btn" onclick="applySettings()" style="margin-top: 15px;">Apply Settings</button></div>
+    </div>
+    <div id="data-management-template">
+        <div class="form-section"><h3>📤 Data Management</h3><p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">If data won't save due to size, clear the route cache first.</p><button class="btn btn-danger" onclick="clearRouteCache()">Clear Route Cache &amp; Save</button><p style="font-size: 13px; color: #ccc; margin: 15px 0 10px;">Export a backup of your data.</p><div class="checkbox-group"><label class="checkbox-item"><input checked="" id="exportHotels" type="checkbox"/> Hotels</label><label class="checkbox-item"><input checked="" id="exportVenues" type="checkbox"/> Venues</label><label class="checkbox-item"><input checked="" id="exportExpenses" type="checkbox"/> Expenses</label><label class="checkbox-item"><input id="exportRoute" type="checkbox"/> Full Route Itinerary</label></div><button class="btn" onclick="exportTourData()">Export Selected Data to CSV</button><p id="syncStatus" style="font-size: 12px; text-align: center; color: #ccc; margin-top: 10px;"></p></div>
+    </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -281,106 +287,208 @@
     let currentModalDate = null;
     let db, auth;
     let firebaseListener = null;
-
-    // --- NEW HYBRID DATA MODEL ---
-    document.addEventListener('DOMContentLoaded', async () => {
-        updateSyncStatus("Loading local data...");
-        loadFromLocalStorage();
-        initializeAppUI();
-        
-        await initializeFirebaseAndSync();
-    });
     
+    // --- ACCESS CONTROL SYSTEM ---
+    let userRole = 'viewer';
+    const ACCESS_CODES = {
+        'SEANPAUL2025': 'admin',
+        'VIEWONLY': 'viewer'
+    };
+
+    function initializeAccessControl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code && ACCESS_CODES[code]) {
+            userRole = ACCESS_CODES[code];
+            localStorage.setItem('tourAccess', JSON.stringify({ tour: TOUR_NAME, role: userRole, timestamp: Date.now() }));
+            return;
+        }
+        const storedAccess = localStorage.getItem('tourAccess');
+        if (storedAccess) {
+            try {
+                const accessData = JSON.parse(storedAccess);
+                const hoursSinceLogin = (Date.now() - accessData.timestamp) / (1000 * 60 * 60);
+                if (accessData.tour === TOUR_NAME && hoursSinceLogin < 24 && accessData.role) {
+                    userRole = accessData.role;
+                    return;
+                } else {
+                    localStorage.removeItem('tourAccess');
+                }
+            } catch (e) {
+                console.log('Invalid stored access data, removing.');
+                localStorage.removeItem('tourAccess');
+            }
+        }
+        showLogin();
+    }
+
+    function showLogin() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('app-content').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+        setTimeout(() => { document.getElementById('accessCode').focus(); }, 100);
+        document.getElementById('accessCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { attemptLogin(); }
+        });
+    }
+
+    function attemptLogin() {
+        const enteredCode = document.getElementById('accessCode').value.trim();
+        if (ACCESS_CODES[enteredCode]) {
+            userRole = ACCESS_CODES[enteredCode];
+            localStorage.setItem('tourAccess', JSON.stringify({ tour: TOUR_NAME, role: userRole, timestamp: Date.now() }));
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('accessCode').value = '';
+            initializeFirebaseAndSync();
+        } else {
+            alert('Invalid access code. Please try again.');
+            document.getElementById('accessCode').value = '';
+            document.getElementById('accessCode').focus();
+        }
+    }
+
+    function isAdmin() {
+        return userRole === 'admin';
+    }
+
+    function applyAccessRestrictions() {
+        if (!isAdmin()) {
+            document.getElementById('settingsTabBtn').style.display = 'none';
+
+            // Hide delete buttons from item cards/rows
+            const deleteIcons = document.querySelectorAll('.btn-danger');
+            deleteIcons.forEach(btn => {
+                if(btn.closest('.card-header') || btn.closest('td')) {
+                   btn.style.display = 'none';
+                }
+            });
+
+            // Disable editing on modals
+            const modalInputs = document.querySelectorAll('#hotelModal input, #hotelModal textarea, #venueModal input, #venueModal textarea');
+            modalInputs.forEach(input => input.disabled = true);
+            document.querySelectorAll('#hotelModal .btn, #venueModal .btn').forEach(btn => btn.style.display = 'none');
+
+
+            const container = document.querySelector('.container');
+            if (container && !document.querySelector('.viewer-notice')) {
+                const notice = document.createElement('div');
+                notice.className = 'viewer-notice';
+                notice.innerHTML = `<div style="background: rgba(255,193,7,0.2); border: 1px solid #ffc107; padding: 10px; margin: 10px; border-radius: 5px; text-align: center;">👀 <strong>Viewer Mode</strong> - Read-only access<br><small>Access expires in 24 hours</small></div>`;
+                container.insertBefore(notice, container.firstChild);
+            }
+            document.title = '👀 Tour Manager - Viewer';
+            const header = document.querySelector('.header h1');
+            if (header) { header.textContent = '👀 TOUR MANAGER - VIEWER'; }
+            console.log('🔒 Applied viewer restrictions');
+        } else {
+            console.log('🔓 Admin mode - full access');
+            document.title = '🎤 Tour Manager - Admin';
+        }
+    }
+
+    // --- App Initialization & Data Sync ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        initializeAccessControl();
+        if (document.getElementById('loginScreen').style.display !== 'flex') {
+            await initializeFirebaseAndSync();
+        }
+    });
+
     function loadFromLocalStorage() {
         const localDataString = localStorage.getItem(STORAGE_KEY);
         if (localDataString) {
             try {
                 const localData = JSON.parse(localDataString);
-                tourData = { ...defaultData, ...localData };
-                console.log("Loaded data from localStorage for instant UI.");
+                return { ...defaultData, ...localData };
             } catch (e) {
-                console.error("Failed to parse local data, starting fresh.", e);
-                tourData = JSON.parse(JSON.stringify(defaultData));
+                console.error("Failed to parse local data.", e);
             }
         }
+        return JSON.parse(JSON.stringify(defaultData));
     }
 
     async function initializeFirebaseAndSync() {
         try {
-            updateSyncStatus("Connecting to cloud...");
-            if (!firebase.apps.length) {
-                firebase.initializeApp(FIREBASE_CONFIG);
-            }
+            updateSyncStatus("Connecting...");
+            if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
             db = firebase.firestore();
             auth = firebase.auth();
-            
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-            // Wait for sign-in to complete before setting up the listener
-            await auth.signInAnonymously();
-            console.log("Firebase Anonymous Auth successful.");
-            
-            updateSyncStatus("Cloud connected. Syncing...");
-
-            if (firebaseListener) firebaseListener();
-
+            updateSyncStatus("Loading data...");
             const docRef = db.collection("tourData").doc(STORAGE_KEY);
-            const cloudDoc = await docRef.get();
-            
-            console.log("Performing initial smart sync with Firebase.");
-            const cloudData = cloudDoc.exists() ? cloudDoc.data() : null;
-
-            if (cloudData) {
-                if (tourData.lastModified > cloudData.lastModified) {
-                    console.log("Local data is newer. Pushing to cloud.");
-                    await saveData(); 
-                } else {
-                    console.log("Cloud data is newer or same. Accepting cloud state.");
+            try {
+                const cloudDoc = await docRef.get();
+                if (cloudDoc.exists) {
+                    const cloudData = cloudDoc.data();
+                    console.log("✅ Found cloud data:", { hotels: cloudData.hotels?.length || 0, venues: cloudData.venues?.length || 0, expenses: cloudData.expenses?.length || 0 });
                     tourData = { ...defaultData, ...cloudData };
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+                    updateSyncStatus("✅ Loaded from cloud");
+                    initializeAppUI();
+                    try {
+                        await auth.signInAnonymously();
+                        attachLiveListener(docRef);
+                        updateSyncStatus("☁️ Live sync active");
+                    } catch (authError) {
+                        console.warn("Auth failed:", authError);
+                        updateSyncStatus("📖 Data loaded (read-only)");
+                    }
+                    return;
+                } else {
+                    console.log("No cloud document exists");
                 }
-            } else {
-                console.log("No cloud document. Saving local state to create it.");
-                await saveData();
+            } catch (readError) {
+                console.warn("Cloud read failed:", readError);
             }
-
-            attachLiveListener(docRef);
-            updateAllDisplays();
-
+            console.log("Using localStorage fallback");
+            tourData = loadFromLocalStorage();
+            updateSyncStatus("💾 Local data only");
+            initializeAppUI();
         } catch (e) {
-            console.error("Firebase Auth/Initialization failed:", e);
-            updateSyncStatus("⚠️ Cloud Sync Failed");
+            console.error("Complete failure:", e);
+            updateSyncStatus("⚠️ Offline mode");
+            tourData = loadFromLocalStorage();
+            initializeAppUI();
         }
     }
     
     function attachLiveListener(docRef) {
+        if (firebaseListener) firebaseListener(); 
         firebaseListener = docRef.onSnapshot((doc) => {
-                console.log("Received live data update.");
             const cloudData = doc.exists() ? doc.data() : defaultData;
-            
             if (cloudData.lastModified > tourData.lastModified) {
                 console.log("Live update is newer. Applying changes.");
                 tourData = { ...defaultData, ...cloudData };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
                 updateAllDisplays();
-                document.getElementById('syncStatus').textContent = `☁️ Updated: ${new Date().toLocaleTimeString()}`;
-            } else {
-                console.log("Live update is older or same as local. Ignoring.");
+                updateSyncStatus(`☁️ Updated: ${new Date().toLocaleTimeString()}`);
             }
         });
         updateSyncStatus("☁️ Live Sync Active");
     }
 
     function initializeAppUI() {
-        document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('app-content').style.display = 'flex';
+        updateAllDisplays();
+        renderCachedRoute();
         showTab('calendar');
+        applyAccessRestrictions();
     }
     
     function saveData() {
-        if (!db) return Promise.reject("Firebase not initialized.");
-        
+        if (!isAdmin()) {
+            console.log('🚫 Save blocked - viewer mode');
+            return Promise.resolve();
+        }
+        if (!db || !auth.currentUser) { 
+            tourData.lastModified = Date.now();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+            updateSyncStatus("💾 Saved Locally (Offline)");
+            return Promise.resolve(); 
+        }
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-        
         return db.collection("tourData").doc(STORAGE_KEY).set(tourData)
             .then(() => {
                 console.log("Firebase write successful at " + new Date(tourData.lastModified).toLocaleTimeString());
@@ -388,7 +496,7 @@
             })
             .catch((error) => {
                 console.error("Firebase write failed:", error);
-                updateSyncStatus('⚠️ Save Failed!');
+                updateSyncStatus(`⚠️ Save Failed! Error: ${error.code}`);
                 throw error;
             });
     }
@@ -398,40 +506,8 @@
         if (statusEl) statusEl.textContent = message;
     }
     
-    // --- Emergency Recovery Functions ---
-    function forceUploadLocalToFirebase() {
-        if (!confirm("This will IRREVERSIBLY overwrite the cloud data with the data from THIS BROWSER'S local storage. This is for recovery purposes. Are you absolutely sure?")) {
-            return;
-        }
-
-        const localDataString = localStorage.getItem(STORAGE_KEY);
-        if (!localDataString) {
-            alert("Error: No local data found in this browser to upload.");
-            return;
-        }
-
-        try {
-            let localDataToPush = JSON.parse(localDataString);
-            localDataToPush.lastModified = Date.now(); // Stamp it as the newest
-            
-            console.log("FORCE UPLOADING local data to Firebase:", localDataToPush);
-
-            db.collection("tourData").doc(STORAGE_KEY).set(localDataToPush)
-              .then(() => {
-                  alert("✅ Success! Local data has been forced to the cloud. The app will now work correctly on all devices.");
-                  tourData = localDataToPush;
-                  updateAllDisplays();
-              })
-              .catch((error) => {
-                  alert(`❌ UPLOAD FAILED: ${error.message}`);
-                  console.error("Force upload failed:", error);
-              });
-        } catch(e) {
-            alert(`❌ Error reading local data: ${e.message}`);
-        }
-    }
-
     function clearRouteCache() {
+        if (!isAdmin()) return;
         if (!confirm("This will clear the route cache to fix size limit errors. You will need to re-generate the route afterwards. Continue?")) {
             return;
         }
@@ -439,16 +515,65 @@
         saveData()
             .then(() => {
                 alert("✅ Route cache cleared successfully! You can now save changes. Please re-generate your route.");
-                document.getElementById('routeResults').innerHTML = ''; // Clear display
+                renderCachedRoute(); // Re-render the now empty route tab
+                closeModal('settingsModal');
             })
             .catch(e => {
                 alert("Failed to clear cache. Error: " + e.message);
             });
     }
 
-    // --- Route Planner ---
+    // --- NEW SETTINGS MODAL SYSTEM ---
+    function openSettingsModal(category) {
+        const modal = document.getElementById('settingsModal');
+        const titleEl = document.getElementById('settingsModalTitle');
+        const contentEl = document.getElementById('settingsModalContent');
+        const template = document.getElementById(`${category}-template`);
+
+        if (!template) {
+            console.error(`Template not found for category: ${category}`);
+            return;
+        }
+        
+        let title = "Settings";
+        switch(category) {
+            case 'add-hotel': title = '🏨 Add Hotel Confirmation'; break;
+            case 'add-venue': title = '🎵 Add Venue/Show'; break;
+            case 'add-expense': title = '💰 Add Expense'; break;
+            case 'route-builder': title = '🗺️ Build/Edit Tour Route'; break;
+            case 'gas-settings': title = '⛽ Gas/Vehicle Settings'; break;
+            case 'data-management': title = '📤 Data Management'; break;
+        }
+        
+        titleEl.textContent = title;
+        contentEl.innerHTML = template.innerHTML;
+        
+        // Special handling for route builder
+        if (category === 'route-builder') {
+            renderRouteBuilder();
+        }
+        
+        if (category === 'add-expense') {
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        if (category === 'gas-settings') {
+            applySettingsToUI();
+        }
+
+        // Apply restrictions within the modal
+        if (!isAdmin()) {
+            contentEl.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
+            contentEl.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
+        
+        modal.style.display = 'block';
+    }
+
+    // --- App Core Functions (Forms, Display, etc.) ---
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
+        if(!routeStepsContainer) return; // Guard clause in case modal isn't open
         routeStepsContainer.innerHTML = '';
         if (!tourData.routePlannerState || tourData.routePlannerState.length === 0) {
             tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
@@ -472,12 +597,14 @@
         updateStopCounter();
     }
     function addStopAfter(index) {
+        if (!isAdmin()) return;
         saveRoutePlannerState(false); 
         tourData.routePlannerState.splice(index + 1, 0, { selectValue: '', dateValue: '' });
         renderRouteBuilder();
         saveData();
     }
     function removeStopAt(index) {
+        if (!isAdmin()) return;
         if (tourData.routePlannerState.length <= 1) { return; }
         saveRoutePlannerState(false); 
         tourData.routePlannerState.splice(index, 1);
@@ -485,12 +612,14 @@
         saveData();
     }
     function addRouteStop() {
+        if (!isAdmin()) return;
         saveRoutePlannerState(false);
         tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
         renderRouteBuilder();
         saveData();
     }
     function removeRouteStop() {
+        if (!isAdmin()) return;
         if (tourData.routePlannerState.length > 1) {
             saveRoutePlannerState(false);
             tourData.routePlannerState.pop();
@@ -519,7 +648,10 @@
             }
         }
     }
-    function updateStopCounter() { document.getElementById('routeStopCount').textContent = `Stops: ${tourData.routePlannerState.length} / Unlimited`; }
+    function updateStopCounter() {
+        const counter = document.getElementById('routeStopCount');
+        if (counter) counter.textContent = `Stops: ${tourData.routePlannerState.length} / Unlimited`; 
+    }
     function updateRouteSelects() {
         const hotels = tourData.hotels.map(h => ({ id: h.id, name: h.name, type: 'Hotel' }));
         const venues = tourData.venues.map(v => ({ id: v.id, name: v.name, type: 'Venue' }));
@@ -534,13 +666,16 @@
             }
         });
     }
-
-    // --- Core App Functions (with saveData() calls) ---
     function getGasSettings() {
+        const litresEl = document.getElementById('litresPer100km');
+        const costEl = document.getElementById('costPerLitre');
+        const heavyFootEl = document.getElementById('heavyFootPercent');
+        
         const settings = tourData.settings || {};
-        const litresPer100km = parseFloat(document.getElementById('litresPer100km').value) || settings.litresPer100km || 12;
-        const costPerLitre = parseFloat(document.getElementById('costPerLitre').value) || settings.costPerLitre || 1.75;
-        const heavyFootPercent = parseFloat(document.getElementById('heavyFootPercent').value) || settings.heavyFootPercent || 10;
+        const litresPer100km = litresEl ? parseFloat(litresEl.value) || settings.litresPer100km || 12 : settings.litresPer100km || 12;
+        const costPerLitre = costEl ? parseFloat(costEl.value) || settings.costPerLitre || 1.75 : settings.costPerLitre || 1.75;
+        const heavyFootPercent = heavyFootEl ? parseFloat(heavyFootEl.value) || settings.heavyFootPercent || 10 : settings.heavyFootPercent || 10;
+        
         return { litresPer100km, costPerLitre, heavyFootPercent }; 
     }
     function calculateGasCost(distanceKm) {
@@ -551,105 +686,105 @@
         return litresUsed * costPerLitre; 
     }
     function applySettings() { 
+        if (!isAdmin()) return;
         const { litresPer100km, costPerLitre, heavyFootPercent } = getGasSettings(); 
         tourData.settings = { litresPer100km, costPerLitre, heavyFootPercent }; 
         saveData(); 
         alert("Settings applied and saved."); 
-        if (document.getElementById('routeResults').innerHTML.trim() !== '') { rerenderRouteCosts(); } 
+        renderCachedRoute(); // Re-render route with new gas settings
+        closeModal('settingsModal');
     }
     function applySettingsToUI() { 
         const settings = tourData.settings || {}; 
-        document.getElementById('litresPer100km').value = settings.litresPer100km || ''; 
-        document.getElementById('costPerLitre').value = settings.costPerLitre || ''; 
-        document.getElementById('heavyFootPercent').value = settings.heavyFootPercent || ''; 
+        const litresEl = document.getElementById('litresPer100km');
+        const costEl = document.getElementById('costPerLitre');
+        const heavyFootEl = document.getElementById('heavyFootPercent');
+        if(litresEl) litresEl.value = settings.litresPer100km || ''; 
+        if(costEl) costEl.value = settings.costPerLitre || ''; 
+        if(heavyFootEl) heavyFootEl.value = settings.heavyFootPercent || ''; 
     }
-    function rerenderRouteCosts() { let grandTotalGas = 0; const daySummaries = document.querySelectorAll('#routeResults .day-summary-box'); daySummaries.forEach(daySummary => { let dayTotalDistance = 0; const dayId = daySummary.dataset.dayId; const segments = document.querySelectorAll(`.route-item[data-day-id='${dayId}']`); segments.forEach(segment => { const distanceKm = parseFloat(segment.dataset.distanceKm); dayTotalDistance += distanceKm; const newGasCost = calculateGasCost(distanceKm); segment.querySelector('.gas-cost').textContent = `$${newGasCost.toFixed(0)} CAD`; }); const newDayGasCost = calculateGasCost(dayTotalDistance); grandTotalGas += newDayGasCost; daySummary.querySelector('.day-gas-value').textContent = `$${newDayGasCost.toFixed(0)}`; }); document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); }
     function formatDate(dateString) { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); return `${day}-${month}`; }
     function formatTime(timeString) { if (!timeString) return ''; let [hours, minutes] = timeString.split(':'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; return `${hours}:${minutes} ${ampm}`; }
-    function showTab(tabName) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(tabName).classList.add('active'); const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`); if (activeButton) activeButton.classList.add('active'); updateAllDisplays(); }
-    function addHotel() { saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); clearHotelForm(); alert('Hotel added successfully!'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
-    function addVenue() { saveRoutePlannerState(false); const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); clearVenueForm(); alert('Venue added successfully!'); } else { alert('Please fill in venue name, full address, and show date'); } }
-    function addExpense() { saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); clearExpenseForm(); alert('Expense added successfully!'); } else { alert('Please enter date and amount'); } }
-    function clearAllStops() {  tourData.routePlannerState = [{ selectValue: '', dateValue: '' }]; tourData.routeCache = {}; renderRouteBuilder(); saveData(); document.getElementById('routeResults').innerHTML = ''; }
-    function autoFillRoute() { if (!confirm('This will replace your current route plan. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
-    function toggleRouteBuilder() { const content = document.getElementById('route-builder-content'); const arrow = document.getElementById('routeBuilderToggleArrow'); content.classList.toggle('collapsed'); arrow.classList.toggle('collapsed'); }
-    async function generateCustomRoute() { saveRoutePlannerState(); if (isGeneratingRoute) { alert('Route generation in progress...'); return; } isGeneratingRoute = true; const generateBtn = document.getElementById('generateRouteBtn'); const progressDiv = document.getElementById('routeProgress'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); const routeResults = document.getElementById('routeResults'); generateBtn.disabled = true; generateBtn.textContent = '🔄 Generating...'; progressDiv.style.display = 'block'; routeResults.innerHTML = ''; progressText.textContent = 'Preparing route...'; progressFill.style.width = '0%'; try { const dailySegments = {}; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { const fromStopInfo = tourData.routePlannerState[i]; const toStopInfo = tourData.routePlannerState[i + 1]; if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue; const date = fromStopInfo.dateValue || 'No Date'; if (!dailySegments[date]) dailySegments[date] = []; if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue)); dailySegments[date].push(getLocationDetails(toStopInfo.selectValue)); } const allDates = Object.keys(dailySegments).sort(); if (allDates.length === 0) throw new Error('No valid route segments found.'); let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0, processedDays = 0; routeResults.innerHTML = '<h3 style="color: #ffd700; margin-bottom: 15px;">🛣️ Generated Route</h3>'; for (const date of allDates) { const stopsForDay = dailySegments[date]; try { const dayRouteData = await processDayRoute(date, stopsForDay); grandTotalDistanceMeters += dayRouteData.totalDistance || 0; grandTotalTimeSecs += dayRouteData.totalTime || 0; renderDayRoute(date, dayRouteData, processedDays + 1); } catch (dayError) { renderErrorDay(date, processedDays + 1, dayError.message); } processedDays++; const progress = (processedDays / allDates.length) * 100; progressFill.style.width = `${progress}%`; progressText.textContent = `Day ${processedDays}/${allDates.length} processed...`; await new Promise(resolve => setTimeout(resolve, 300)); } const grandTotalGas = calculateGasCost(grandTotalDistanceMeters / 1000); const totalHours = Math.floor(grandTotalTimeSecs / 3600); const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60); document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters/1000).toFixed(0)} km`; document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`; document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0); progressText.textContent = '✅ All days completed!'; } catch (error) { console.error('Route generation error:', error); routeResults.innerHTML = `<div class="route-item error"><strong>❌ Error:</strong> ${error.message}</div>`; progressText.textContent = '❌ Generation failed'; } finally { isGeneratingRoute = false; generateBtn.disabled = false; generateBtn.textContent = '🛣️ Generate Full Tour Route'; setTimeout(() => { progressDiv.style.display = 'none'; }, 3000); } }
     
-    // MODIFICATION: Slimmed down the cache object
-    async function processDayRoute(date, stopsForDay) { 
-        if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); 
-        const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; 
-        if (tourData.routeCache[cacheKey] && (Date.now() - tourData.routeCache[cacheKey].timestamp < 86400000)) { // 24hr cache
-             let cachedData = tourData.routeCache[cacheKey]; 
-             cachedData.isCached = true; 
-             return cachedData; 
-        } 
-        let totalDistanceMeters = 0, totalTimeSecs = 0; 
-        let allLegs = []; 
-        const MAX_WAYPOINTS = 23; 
-        for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { 
-            const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); 
-            if (chunk.length < 2) break; 
-            const origin = chunk[0].address; 
-            const destination = chunk[chunk.length - 1].address; 
-            const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); 
-            const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; 
-            const response = await fetch(url); 
-            if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); 
-            const data = await response.json(); 
-            if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); 
-            const legs = data.routes[0].legs; 
-            const processedLegs = legs.map(leg => ({
-                distanceText: leg.distance.text,
-                durationText: (leg.duration_in_traffic || leg.duration).text,
-                distanceValue: leg.distance.value,
-                durationValue: (leg.duration_in_traffic || leg.duration).value
-            }));
-            allLegs.push(...processedLegs); 
-            for (let leg of processedLegs) { 
-                totalDistanceMeters += leg.distanceValue; 
-                totalTimeSecs += leg.durationValue; 
-            } 
-        } 
-        const dayData = { legs: allLegs, stops: stopsForDay, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, isCached: false }; 
-        tourData.routeCache[cacheKey] = { legs: allLegs, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, stops: stopsForDay, timestamp: Date.now() }; 
-        saveData(); 
-        return dayData; 
+    function showTab(tabName) { 
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`);
+        if (activeButton) activeButton.classList.add('active');
+        updateAllDisplays();
+        if (tabName === 'routes') {
+            renderCachedRoute();
+        }
+    }
+
+    function addHotel() { if (!isAdmin()) return; saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); clearHotelForm(); alert('Hotel added successfully!'); closeModal('settingsModal'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
+    function addVenue() { if (!isAdmin()) return; saveRoutePlannerState(false); const venue = { id: Date.now(), name: document.getElementById('venueName').value || '', address: document.getElementById('venueAddress').value || '', date: document.getElementById('showDate').value || '', time: document.getElementById('showTime').value || '', startInventory: parseInt(document.getElementById('startInventory').value) || 0, endInventory: parseInt(document.getElementById('endInventory').value) || 0, totalSales: parseFloat(document.getElementById('totalSales').value) || 0, notes: document.getElementById('venueNotes').value || '', type: 'venue' }; if (venue.name && venue.address && venue.date) { tourData.venues.push(venue); saveData(); clearVenueForm(); alert('Venue added successfully!'); closeModal('settingsModal'); } else { alert('Please fill in venue name, full address, and show date'); } }
+    function addExpense() { if (!isAdmin()) return; saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); clearExpenseForm(); alert('Expense added successfully!'); closeModal('settingsModal'); } else { alert('Please enter date and amount'); } }
+    function clearAllStops() {  if (!isAdmin()) return; tourData.routePlannerState = [{ selectValue: '', dateValue: '' }]; tourData.routeCache = {}; renderRouteBuilder(); saveData(); document.getElementById('routeResults').innerHTML = ''; }
+    function autoFillRoute() { if (!isAdmin()) return; if (!confirm('This will replace your current route plan. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
+    async function generateCustomRoute() { if (!isAdmin()) return; saveRoutePlannerState(); if (isGeneratingRoute) { alert('Route generation in progress...'); return; } isGeneratingRoute = true; const generateBtn = document.getElementById('generateRouteBtn'); const progressDiv = document.getElementById('routeProgress'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); if (!generateBtn || !progressDiv) return; generateBtn.disabled = true; generateBtn.textContent = '🔄 Generating...'; progressDiv.style.display = 'block'; progressText.textContent = 'Preparing route...'; progressFill.style.width = '0%'; try { const dailySegments = {}; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { const fromStopInfo = tourData.routePlannerState[i]; const toStopInfo = tourData.routePlannerState[i + 1]; if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue; const date = fromStopInfo.dateValue || 'No Date'; if (!dailySegments[date]) dailySegments[date] = []; if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue)); dailySegments[date].push(getLocationDetails(toStopInfo.selectValue)); } const allDates = Object.keys(dailySegments).sort((a,b) => new Date(a) - new Date(b)); if (allDates.length === 0) throw new Error('No valid route segments found.'); tourData.routeCache = {}; for (const date of allDates) { await processDayRoute(date, dailySegments[date]); const progress = ((allDates.indexOf(date) + 1) / allDates.length) * 100; progressFill.style.width = `${progress}%`; progressText.textContent = `Day ${allDates.indexOf(date) + 1}/${allDates.length} processed...`; await new Promise(resolve => setTimeout(resolve, 100)); } progressText.textContent = '✅ Route Generated!'; renderCachedRoute(); } catch (error) { console.error('Route generation error:', error); progressText.textContent = '❌ Generation failed'; } finally { isGeneratingRoute = false; generateBtn.disabled = false; generateBtn.textContent = '🛣️ Generate Full Tour Route'; setTimeout(() => { progressDiv.style.display = 'none'; closeModal('settingsModal'); }, 2000); } }
+    async function processDayRoute(date, stopsForDay) { if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = []; const MAX_WAYPOINTS = 23; for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); if (chunk.length < 2) break; const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address; const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; const response = await fetch(url); if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); const data = await response.json(); if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); const legs = data.routes[0].legs; const processedLegs = legs.map(leg => ({ distanceText: leg.distance.text, durationText: (leg.duration_in_traffic || leg.duration).text, distanceValue: leg.distance.value, durationValue: (leg.duration_in_traffic || leg.duration).value })); allLegs.push(...processedLegs); for (let leg of processedLegs) { totalDistanceMeters += leg.distanceValue; totalTimeSecs += leg.durationValue; } } tourData.routeCache[cacheKey] = { legs: allLegs, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, stops: stopsForDay, timestamp: Date.now() }; await saveData(); }
+    
+    // --- DISPLAY & RENDER FUNCTIONS ---
+    function renderCachedRoute() {
+        const routeResults = document.getElementById('routeResults');
+        routeResults.innerHTML = '';
+        if (Object.keys(tourData.routeCache).length === 0) {
+            routeResults.innerHTML = '<p style="text-align: center; color: #ccc;">No route has been generated yet. An admin can build one in the Settings tab.</p>';
+            document.getElementById('totalDistanceStat').textContent = '0 km';
+            document.getElementById('totalTimeStat').textContent = '0h';
+            document.getElementById('totalGasStat').textContent = '$0';
+            return;
+        }
+
+        let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0;
+        const sortedDays = Object.keys(tourData.routeCache).sort((a, b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0]));
+
+        sortedDays.forEach((key, index) => {
+            const dayData = tourData.routeCache[key];
+            const date = key.split('_')[0];
+            renderDayRoute(date, dayData, index + 1);
+            grandTotalDistanceMeters += dayData.totalDistance;
+            grandTotalTimeSecs += dayData.totalTime;
+        });
+        
+        const grandTotalGas = calculateGasCost(grandTotalDistanceMeters / 1000);
+        const totalHours = Math.floor(grandTotalTimeSecs / 3600);
+        const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60);
+        document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters / 1000).toFixed(0)} km`;
+        document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
+        document.getElementById('totalGasStat').textContent = '$' + grandTotalGas.toFixed(0);
     }
     
-    // MODIFICATION: Updated to use slim cache properties
-    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item ${dayData.isCached ? 'cached' : ''} ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong><span style="color: ${dayData.isCached ? '#4CAF50' : '#87CEEB'}; font-size: 10px;">✓ ${dayData.isCached ? 'CACHED' : 'REAL-TIME'}</span></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`; routeResults.appendChild(routeSegment); }); }
+    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item cached ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(0)} CAD</span></div>`; routeResults.appendChild(routeSegment); }); }
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
-    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
-    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = tourData.routePlannerState.some(r => r.dateValue === dateStr); return { isVenue, isTravel }; }
-    
-    // MODIFICATION: Updated to use slim cache properties
-    function showDayDetails(dateStr) { saveRoutePlannerState(false); const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const stopsForDay = []; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { if(tourData.routePlannerState[i].dateValue === dateStr) { if (stopsForDay.length === 0) stopsForDay.push(getLocationDetails(tourData.routePlannerState[i].selectValue)); stopsForDay.push(getLocationDetails(tourData.routePlannerState[i+1].selectValue)); } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (stopsForDay.length > 1) { const cacheKey = `${dateStr}_${stopsForDay.map(s => s.address).join('|')}`; if(tourData.routeCache[cacheKey]) { const dayData = tourData.routeCache[cacheKey]; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distanceText} | Time: ${leg.durationText}</small></div>`; }); } else { html += `<h3>🚗 Travel Segments</h3><div class="route-item">Route data not generated. Go to Routes tab and click "Generate".</div>`; } } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && stopsForDay.length < 2) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
+    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isVenue) { eventIcons += '🎵'; } if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
+    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = Object.keys(tourData.routeCache).some(key => key.startsWith(dateStr)); return { isVenue, isTravel }; }
+    function showDayDetails(dateStr) { saveRoutePlannerState(false); const modal = document.getElementById('calendarModal'); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); let travelDayData = null; for (const key in tourData.routeCache) { if (key.startsWith(dateStr)) { travelDayData = tourData.routeCache[key]; break; } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (travelDayData) { const dayData = travelDayData; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distanceText} | Time: ${leg.durationText}</small></div>`; }); } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && !travelDayData) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'block'; currentModalDate = dateStr; addSwipeListeners(modal); }
     function showPrevDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() - 1); showDayDetails(date.toISOString().split('T')[0]); }
     function showNextDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() + 1); showDayDetails(date.toISOString().split('T')[0]); }
     let touchstartX = 0; let touchendX = 0; function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); } function addSwipeListeners(element) { element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true}); element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true}); }
     function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }
     function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
     function getLocationDetails(locationId) { const [type, id] = locationId.split(':'); const numId = parseInt(id); if (type === 'Hotel') { const hotel = tourData.hotels.find(h => h.id === numId); return hotel ? { ...hotel } : { type: 'Hotel', name: 'N/A', address: 'N/A' }; } else { const venue = tourData.venues.find(v => v.id === numId); return venue ? { ...venue } : { type: 'Venue', name: 'N/A', address: 'N/A' }; } }
-    function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; document.getElementById('hotelModal').style.display = 'block'; }
-    function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; document.getElementById('venueModal').style.display = 'block'; }
+    function openHotelModal(hotelId) { const hotel = tourData.hotels.find(h => h.id === hotelId); if (!hotel) return; currentEditId = hotelId; const modal = document.getElementById('hotelModal'); modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = isAdmin() ? 'inline-block' : 'none'); document.getElementById('editHotelName').value = hotel.name; document.getElementById('editHotelAddress').value = hotel.address; document.getElementById('editCheckinDate').value = hotel.checkin; document.getElementById('editCheckoutDate').value = hotel.checkout; document.getElementById('editHotelCostUSD').value = hotel.costUSD; document.getElementById('editHotelCostCAD').value = hotel.costCAD; document.getElementById('editHotelNotes').value = hotel.notes || ''; modal.style.display = 'block'; }
+    function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; const modal = document.getElementById('venueModal'); modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = isAdmin() ? 'inline-block' : 'none'); document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; modal.style.display = 'block'; }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; currentEditId = null; }
-    function saveHotelEdit() { const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId); if (hotelIndex === -1) return; tourData.hotels[hotelIndex].name = document.getElementById('editHotelName').value; tourData.hotels[hotelIndex].address = document.getElementById('editHotelAddress').value; tourData.hotels[hotelIndex].checkin = document.getElementById('editCheckinDate').value; tourData.hotels[hotelIndex].checkout = document.getElementById('editCheckoutDate').value; tourData.hotels[hotelIndex].costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; tourData.hotels[hotelIndex].costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; tourData.hotels[hotelIndex].notes = document.getElementById('editHotelNotes').value; saveData(); closeModal('hotelModal'); }
-    function saveVenueEdit() { const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId); if (venueIndex === -1) return; tourData.venues[venueIndex].name = document.getElementById('editVenueName').value; tourData.venues[venueIndex].address = document.getElementById('editVenueAddress').value; tourData.venues[venueIndex].date = document.getElementById('editShowDate').value; tourData.venues[venueIndex].time = document.getElementById('editShowTime').value; tourData.venues[venueIndex].startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; tourData.venues[venueIndex].endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; tourData.venues[venueIndex].totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; tourData.venues[venueIndex].notes = document.getElementById('editVenueNotes').value; saveData(); closeModal('venueModal'); }
-    function deleteHotel() { if (confirm('Are you sure?')) { tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId); saveData(); closeModal('hotelModal'); } }
-    function deleteVenue() { if (confirm('Are you sure?')) { tourData.venues = tourData.venues.filter(v => v.id !== currentEditId); saveData(); closeModal('venueModal'); } }
-    function updateAllDisplays() { updateHotelsDisplay(); updateExpensesDisplay(); updateVenuesDisplay(); renderRouteBuilder(); renderCalendar(); applySettingsToUI(); }
-    function updateHotelsDisplay() { const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = ''; const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin)); let totalCAD = 0, totalNights = 0; sortedHotels.forEach(hotel => { totalCAD += hotel.costCAD || (hotel.costUSD * 1.35); if (hotel.checkin && hotel.checkout) totalNights += (new Date(hotel.checkout) - new Date(hotel.checkin)) / 86400000; const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35); const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad'; const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id); hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button></div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; hotelsList.appendChild(hotelCard); }); document.getElementById('hotelCountStat').textContent = tourData.hotels.length; document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0); }
-    function updateExpensesDisplay() { const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0; const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date)); sortedExpenses.forEach(expense => { totalCAD += expense.amountCAD || (expense.amountUSD * 1.35); const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'; row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('expense', ${expense.id})">×</button></td>`; }); document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0); }
-    function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span><button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button></div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
-    function deleteItem(type, id) { if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); } }
-    function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => document.getElementById(id).value = ''); }
-    function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => document.getElementById(id).value = ''); }
-    function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0]; }
-    document.addEventListener('DOMContentLoaded', function() { document.getElementById('hotelCostUSD').addEventListener('input', function() { const cadInput = document.getElementById('hotelCostCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); document.getElementById('expenseAmountUSD').addEventListener('input', function() { const cadInput = document.getElementById('expenseAmountCAD'); if (this.value && cadInput && !cadInput.value) cadInput.placeholder = `≈ ${(parseFloat(this.value) * 1.35).toFixed(2)} CAD`; }); });
-    window.onclick = function(event) { if (event.target === document.getElementById('hotelModal')) closeModal('hotelModal'); if (event.target === document.getElementById('venueModal')) closeModal('venueModal'); if (event.target === document.getElementById('calendarModal')) closeModal('calendarModal'); }
-    function exportTourData() { saveRoutePlannerState(false); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort().forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
-
+    function saveHotelEdit() { if (!isAdmin()) return; const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId); if (hotelIndex === -1) return; tourData.hotels[hotelIndex].name = document.getElementById('editHotelName').value; tourData.hotels[hotelIndex].address = document.getElementById('editHotelAddress').value; tourData.hotels[hotelIndex].checkin = document.getElementById('editCheckinDate').value; tourData.hotels[hotelIndex].checkout = document.getElementById('editCheckoutDate').value; tourData.hotels[hotelIndex].costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; tourData.hotels[hotelIndex].costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; tourData.hotels[hotelIndex].notes = document.getElementById('editHotelNotes').value; saveData(); closeModal('hotelModal'); }
+    function saveVenueEdit() { if (!isAdmin()) return; const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId); if (venueIndex === -1) return; tourData.venues[venueIndex].name = document.getElementById('editVenueName').value; tourData.venues[venueIndex].address = document.getElementById('editVenueAddress').value; tourData.venues[venueIndex].date = document.getElementById('editShowDate').value; tourData.venues[venueIndex].time = document.getElementById('editShowTime').value; tourData.venues[venueIndex].startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; tourData.venues[venueIndex].endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; tourData.venues[venueIndex].totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; tourData.venues[venueIndex].notes = document.getElementById('editVenueNotes').value; saveData(); closeModal('venueModal'); }
+    function deleteHotel() { if (!isAdmin()) return; if (confirm('Are you sure?')) { tourData.hotels = tourData.hotels.filter(h => h.id !== currentEditId); saveData(); closeModal('hotelModal'); } }
+    function deleteVenue() { if (!isAdmin()) return; if (confirm('Are you sure?')) { tourData.venues = tourData.venues.filter(v => v.id !== currentEditId); saveData(); closeModal('venueModal'); } }
+    function updateAllDisplays() { updateHotelsDisplay(); updateExpensesDisplay(); updateVenuesDisplay(); renderCalendar(); }
+    function updateHotelsDisplay() { const hotelsList = document.getElementById('hotelsList'); hotelsList.innerHTML = ''; const sortedHotels = [...tourData.hotels].sort((a, b) => new Date(a.checkin) - new Date(b.checkin)); let totalCAD = 0, totalNights = 0; sortedHotels.forEach(hotel => { totalCAD += hotel.costCAD || (hotel.costUSD * 1.35); if (hotel.checkin && hotel.checkout) totalNights += (new Date(hotel.checkout) - new Date(hotel.checkin)) / 86400000; const displayCAD = hotel.costCAD > 0 ? hotel.costCAD : (hotel.costUSD * 1.35); const cadClass = hotel.costCAD > 0 ? 'manual-cad' : 'approx-cad'; const hotelCard = document.createElement('div'); hotelCard.className = 'hotel-card'; hotelCard.onclick = () => openHotelModal(hotel.id); hotelCard.innerHTML = `<div class="card-header"><strong class="card-title">${hotel.name}</strong><small class="card-date">${formatDate(hotel.checkin)} - ${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | <span class="${cadClass}">CAD: ${displayCAD.toFixed(0)}${hotel.costCAD === 0 ? '*' : ''}</span></span>${isAdmin() ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotel', ${hotel.id})">×</button>` : ''}</div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; hotelsList.appendChild(hotelCard); }); document.getElementById('hotelCountStat').textContent = tourData.hotels.length; document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); document.getElementById('hotelCostStat').textContent = '$' + totalCAD.toFixed(0); }
+    function updateExpensesDisplay() { const tbody = document.getElementById('expensesBody'); tbody.innerHTML = ''; let totalCAD = 0; const sortedExpenses = [...tourData.expenses].sort((a, b) => new Date(a.date) - new Date(b.date)); sortedExpenses.forEach(expense => { totalCAD += expense.amountCAD || (expense.amountUSD * 1.35); const row = tbody.insertRow(); const displayCAD = expense.amountCAD > 0 ? expense.amountCAD : (expense.amountUSD * 1.35); const cadClass = expense.amountCAD > 0 ? 'manual-cad' : 'approx-cad'; row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(0)}</td><td class="${cadClass}">${displayCAD.toFixed(0)}${expense.amountCAD === 0 ? '*' : ''}</td><td>${isAdmin() ? `<button class="btn btn-small btn-danger" onclick="deleteItem('expense', ${expense.id})">×</button>` : ''}</td>`; }); document.getElementById('expenseCountStat').textContent = tourData.expenses.length; document.getElementById('expenseCostStat').textContent = '$' + totalCAD.toFixed(0); }
+    function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span>${isAdmin() ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venue', ${venue.id})">×</button>` : ''}</div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
+    function deleteItem(type, id) { if (!isAdmin()) return; if (confirm(`Delete this ${type}?`)) { if (type === 'hotel') tourData.hotels = tourData.hotels.filter(h => h.id !== id); else if (type === 'venue') tourData.venues = tourData.venues.filter(v => v.id !== id); else if (type === 'expense') tourData.expenses = tourData.expenses.filter(e => e.id !== id); saveData(); } }
+    function clearHotelForm() { ['hotelName', 'hotelAddress', 'checkinDate', 'checkoutDate', 'hotelCostUSD', 'hotelCostCAD', 'hotelNotes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+    function clearVenueForm() { ['venueName', 'venueAddress', 'showDate', 'showTime', 'startInventory', 'endInventory', 'totalSales', 'venueNotes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+    function clearExpenseForm() { ['expenseAmountUSD', 'expenseAmountCAD', 'expenseLocation', 'expenseNotes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); const dateEl = document.getElementById('expenseDate'); if (dateEl) dateEl.value = new Date().toISOString().split('T')[0]; }
+    function exportTourData() { if (!isAdmin()) return; saveRoutePlannerState(false); const includeHotels = document.getElementById('exportHotels').checked; const includeVenues = document.getElementById('exportVenues').checked; const includeExpenses = document.getElementById('exportExpenses').checked; const includeRoute = document.getElementById('exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort((a,b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0])).forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `${TOUR_NAME}-tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+    window.onclick = function(event) { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } }
 </script>
 </body>
 </html>
