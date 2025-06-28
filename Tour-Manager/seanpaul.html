@@ -355,21 +355,10 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
     function applyAccessRestrictions() {
         if (!isAdmin()) {
             document.getElementById('settingsTabBtn').style.display = 'none';
-
-            // Hide delete buttons from item cards/rows
             const deleteIcons = document.querySelectorAll('.btn-danger');
             deleteIcons.forEach(btn => {
-                if(btn.closest('.card-header') || btn.closest('td')) {
-                   btn.style.display = 'none';
-                }
+                btn.style.display = 'none';
             });
-
-            // Disable editing on modals
-            const modalInputs = document.querySelectorAll('#hotelModal input, #hotelModal textarea, #venueModal input, #venueModal textarea');
-            modalInputs.forEach(input => input.disabled = true);
-            document.querySelectorAll('#hotelModal .btn, #venueModal .btn').forEach(btn => btn.style.display = 'none');
-
-
             const container = document.querySelector('.container');
             if (container && !document.querySelector('.viewer-notice')) {
                 const notice = document.createElement('div');
@@ -515,7 +504,7 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
         saveData()
             .then(() => {
                 alert("✅ Route cache cleared successfully! You can now save changes. Please re-generate your route.");
-                renderCachedRoute(); // Re-render the now empty route tab
+                renderCachedRoute();
                 closeModal('settingsModal');
             })
             .catch(e => {
@@ -523,57 +512,32 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
             });
     }
 
-    // --- NEW SETTINGS MODAL SYSTEM ---
     function openSettingsModal(category) {
         const modal = document.getElementById('settingsModal');
         const titleEl = document.getElementById('settingsModalTitle');
         const contentEl = document.getElementById('settingsModalContent');
         const template = document.getElementById(`${category}-template`);
-
-        if (!template) {
-            console.error(`Template not found for category: ${category}`);
-            return;
-        }
+        if (!template) return;
         
-        let title = "Settings";
-        switch(category) {
-            case 'add-hotel': title = '🏨 Add Hotel Confirmation'; break;
-            case 'add-venue': title = '🎵 Add Venue/Show'; break;
-            case 'add-expense': title = '💰 Add Expense'; break;
-            case 'route-builder': title = '🗺️ Build/Edit Tour Route'; break;
-            case 'gas-settings': title = '⛽ Gas/Vehicle Settings'; break;
-            case 'data-management': title = '📤 Data Management'; break;
-        }
+        const titles = {
+            'add-hotel': '🏨 Add Hotel Confirmation', 'add-venue': '🎵 Add Venue/Show', 'add-expense': '💰 Add Expense',
+            'route-builder': '🗺️ Build/Edit Tour Route', 'gas-settings': '⛽ Gas/Vehicle Settings', 'data-management': '📤 Data Management'
+        };
         
-        titleEl.textContent = title;
+        titleEl.textContent = titles[category] || "Settings";
         contentEl.innerHTML = template.innerHTML;
         
-        // Special handling for route builder
-        if (category === 'route-builder') {
-            renderRouteBuilder();
-        }
-        
-        if (category === 'add-expense') {
-            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-        }
-
-        if (category === 'gas-settings') {
-            applySettingsToUI();
-        }
-
-        // Apply restrictions within the modal
-        if (!isAdmin()) {
-            contentEl.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
-            contentEl.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-        }
+        if (category === 'route-builder') renderRouteBuilder();
+        if (category === 'add-expense' && document.getElementById('expenseDate')) document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        if (category === 'gas-settings') applySettingsToUI();
         
         modal.style.display = 'block';
     }
 
-    // --- App Core Functions (Forms, Display, etc.) ---
+    // --- App Core Functions ---
     function renderRouteBuilder() {
         const routeStepsContainer = document.getElementById('routeSteps');
-        if(!routeStepsContainer) return; // Guard clause in case modal isn't open
+        if(!routeStepsContainer) return;
         routeStepsContainer.innerHTML = '';
         if (!tourData.routePlannerState || tourData.routePlannerState.length === 0) {
             tourData.routePlannerState = [{ selectValue: '', dateValue: '' }];
@@ -582,71 +546,26 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
             const newStep = document.createElement('div');
             newStep.className = 'route-step';
             newStep.id = `routeStep${index}`;
-            newStep.innerHTML = `
-                <div class="route-step-number">${index + 1}</div>
-                <div class="route-step-inputs">
-                    <select id="routeSelect${index}" onchange="saveRoutePlannerState()"></select>
-                    <input type="date" id="routeDate${index}" onchange="saveRoutePlannerState()">
-                </div>
-                <button class="route-control-btn" onclick="addStopAfter(${index})">+</button>
-                <button class="route-control-btn remove" onclick="removeStopAt(${index})">×</button>
-            `;
+            newStep.innerHTML = `<div class="route-step-number">${index + 1}</div><div class="route-step-inputs"><select id="routeSelect${index}" onchange="saveRoutePlannerState()"></select><input type="date" id="routeDate${index}" onchange="saveRoutePlannerState()"></div><button class="route-control-btn" onclick="addStopAfter(${index})">+</button><button class="route-control-btn remove" onclick="removeStopAt(${index})">×</button>`;
             routeStepsContainer.appendChild(newStep);
         });
         updateRouteSelects();
         updateStopCounter();
     }
-    function addStopAfter(index) {
-        if (!isAdmin()) return;
-        saveRoutePlannerState(false); 
-        tourData.routePlannerState.splice(index + 1, 0, { selectValue: '', dateValue: '' });
-        renderRouteBuilder();
-        saveData();
-    }
-    function removeStopAt(index) {
-        if (!isAdmin()) return;
-        if (tourData.routePlannerState.length <= 1) { return; }
-        saveRoutePlannerState(false); 
-        tourData.routePlannerState.splice(index, 1);
-        renderRouteBuilder();
-        saveData();
-    }
-    function addRouteStop() {
-        if (!isAdmin()) return;
-        saveRoutePlannerState(false);
-        tourData.routePlannerState.push({ selectValue: '', dateValue: '' });
-        renderRouteBuilder();
-        saveData();
-    }
-    function removeRouteStop() {
-        if (!isAdmin()) return;
-        if (tourData.routePlannerState.length > 1) {
-            saveRoutePlannerState(false);
-            tourData.routePlannerState.pop();
-            renderRouteBuilder();
-            saveData();
-        }
-    }
+    function addStopAfter(index) { if (!isAdmin()) return; saveRoutePlannerState(false); tourData.routePlannerState.splice(index + 1, 0, { selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); }
+    function removeStopAt(index) { if (!isAdmin()) return; if (tourData.routePlannerState.length <= 1) return; saveRoutePlannerState(false); tourData.routePlannerState.splice(index, 1); renderRouteBuilder(); saveData(); }
+    function addRouteStop() { if (!isAdmin()) return; saveRoutePlannerState(false); tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); }
+    function removeRouteStop() { if (!isAdmin()) return; if (tourData.routePlannerState.length > 1) { saveRoutePlannerState(false); tourData.routePlannerState.pop(); renderRouteBuilder(); saveData(); } }
     function saveRoutePlannerState(andSave = true) {
         let changed = false;
         const newPlannerState = tourData.routePlannerState.map((oldState, index) => {
             const select = document.getElementById(`routeSelect${index}`);
             const date = document.getElementById(`routeDate${index}`);
-            const newState = {
-                selectValue: select ? select.value : '',
-                dateValue: date ? date.value : ''
-            };
-            if(!oldState || newState.selectValue !== oldState.selectValue || newState.dateValue !== oldState.dateValue) {
-                changed = true;
-            }
+            const newState = { selectValue: select ? select.value : '', dateValue: date ? date.value : '' };
+            if(!oldState || newState.selectValue !== oldState.selectValue || newState.dateValue !== oldState.dateValue) changed = true;
             return newState;
         });
-        if (changed) {
-            tourData.routePlannerState = newPlannerState;
-            if(andSave) {
-              saveData();
-            }
-        }
+        if (changed) { tourData.routePlannerState = newPlannerState; if(andSave) saveData(); }
     }
     function updateStopCounter() {
         const counter = document.getElementById('routeStopCount');
@@ -670,12 +589,10 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
         const litresEl = document.getElementById('litresPer100km');
         const costEl = document.getElementById('costPerLitre');
         const heavyFootEl = document.getElementById('heavyFootPercent');
-        
         const settings = tourData.settings || {};
         const litresPer100km = litresEl ? parseFloat(litresEl.value) || settings.litresPer100km || 12 : settings.litresPer100km || 12;
         const costPerLitre = costEl ? parseFloat(costEl.value) || settings.costPerLitre || 1.75 : settings.costPerLitre || 1.75;
         const heavyFootPercent = heavyFootEl ? parseFloat(heavyFootEl.value) || settings.heavyFootPercent || 10 : settings.heavyFootPercent || 10;
-        
         return { litresPer100km, costPerLitre, heavyFootPercent }; 
     }
     function calculateGasCost(distanceKm) {
@@ -691,7 +608,7 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
         tourData.settings = { litresPer100km, costPerLitre, heavyFootPercent }; 
         saveData(); 
         alert("Settings applied and saved."); 
-        renderCachedRoute(); // Re-render route with new gas settings
+        renderCachedRoute();
         closeModal('settingsModal');
     }
     function applySettingsToUI() { 
@@ -712,10 +629,7 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
         document.getElementById(tabName).classList.add('active');
         const activeButton = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`);
         if (activeButton) activeButton.classList.add('active');
-        updateAllDisplays();
-        if (tabName === 'routes') {
-            renderCachedRoute();
-        }
+        if (tabName === 'routes') renderCachedRoute();
     }
 
     function addHotel() { if (!isAdmin()) return; saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('hotelCostUSD').value) || 0; const cadCost = parseFloat(document.getElementById('hotelCostCAD').value) || 0; const hotel = { id: Date.now(), name: document.getElementById('hotelName').value || '', address: document.getElementById('hotelAddress').value || '', checkin: document.getElementById('checkinDate').value || '', checkout: document.getElementById('checkoutDate').value || '', costUSD: usdCost, costCAD: cadCost, notes: document.getElementById('hotelNotes').value || '', type: 'hotel' }; if (hotel.name && hotel.address && hotel.checkin) { tourData.hotels.push(hotel); saveData(); clearHotelForm(); alert('Hotel added successfully!'); closeModal('settingsModal'); } else { alert('Please fill in hotel name, full address, and check-in date'); } }
@@ -723,8 +637,91 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
     function addExpense() { if (!isAdmin()) return; saveRoutePlannerState(false); const usdCost = parseFloat(document.getElementById('expenseAmountUSD').value) || 0; const cadCost = parseFloat(document.getElementById('expenseAmountCAD').value) || 0; const expense = { id: Date.now(), type: document.getElementById('expenseType').value, date: document.getElementById('expenseDate').value, location: document.getElementById('expenseLocation').value, amountUSD: usdCost, amountCAD: cadCost, notes: document.getElementById('expenseNotes').value, category: 'expense' }; if (expense.date && (expense.amountUSD > 0 || expense.amountCAD > 0)) { tourData.expenses.push(expense); saveData(); clearExpenseForm(); alert('Expense added successfully!'); closeModal('settingsModal'); } else { alert('Please enter date and amount'); } }
     function clearAllStops() {  if (!isAdmin()) return; tourData.routePlannerState = [{ selectValue: '', dateValue: '' }]; tourData.routeCache = {}; renderRouteBuilder(); saveData(); document.getElementById('routeResults').innerHTML = ''; }
     function autoFillRoute() { if (!isAdmin()) return; if (!confirm('This will replace your current route plan. Continue?')) return; tourData.routePlannerState = []; const allStops = []; tourData.hotels.forEach(h => { if (h.checkin) allStops.push({ date: h.checkin, stopId: `Hotel:${h.id}`, sortKey: new Date(h.checkin).getTime() }); }); tourData.venues.forEach(v => { if (v.date) allStops.push({ date: v.date, stopId: `Venue:${v.id}`, sortKey: new Date(v.date).getTime() + 1 }); }); allStops.sort((a, b) => a.sortKey - b.sortKey); tourData.routePlannerState = allStops.map(stop => ({ selectValue: stop.stopId, dateValue: stop.date })); if (tourData.routePlannerState.length === 0) tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); alert(`Auto-filled ${allStops.length} stops!`); }
-    async function generateCustomRoute() { if (!isAdmin()) return; saveRoutePlannerState(); if (isGeneratingRoute) { alert('Route generation in progress...'); return; } isGeneratingRoute = true; const generateBtn = document.getElementById('generateRouteBtn'); const progressDiv = document.getElementById('routeProgress'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); if (!generateBtn || !progressDiv) return; generateBtn.disabled = true; generateBtn.textContent = '🔄 Generating...'; progressDiv.style.display = 'block'; progressText.textContent = 'Preparing route...'; progressFill.style.width = '0%'; try { const dailySegments = {}; for (let i = 0; i < tourData.routePlannerState.length - 1; i++) { const fromStopInfo = tourData.routePlannerState[i]; const toStopInfo = tourData.routePlannerState[i + 1]; if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue; const date = fromStopInfo.dateValue || 'No Date'; if (!dailySegments[date]) dailySegments[date] = []; if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue)); dailySegments[date].push(getLocationDetails(toStopInfo.selectValue)); } const allDates = Object.keys(dailySegments).sort((a,b) => new Date(a) - new Date(b)); if (allDates.length === 0) throw new Error('No valid route segments found.'); tourData.routeCache = {}; for (const date of allDates) { await processDayRoute(date, dailySegments[date]); const progress = ((allDates.indexOf(date) + 1) / allDates.length) * 100; progressFill.style.width = `${progress}%`; progressText.textContent = `Day ${allDates.indexOf(date) + 1}/${allDates.length} processed...`; await new Promise(resolve => setTimeout(resolve, 100)); } progressText.textContent = '✅ Route Generated!'; renderCachedRoute(); } catch (error) { console.error('Route generation error:', error); progressText.textContent = '❌ Generation failed'; } finally { isGeneratingRoute = false; generateBtn.disabled = false; generateBtn.textContent = '🛣️ Generate Full Tour Route'; setTimeout(() => { progressDiv.style.display = 'none'; closeModal('settingsModal'); }, 2000); } }
-    async function processDayRoute(date, stopsForDay) { if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`); const cacheKey = `${date}_${stopsForDay.map(s => s.address).join('|')}`; let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = []; const MAX_WAYPOINTS = 23; for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) { const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1); if (chunk.length < 2) break; const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address; const waypoints = chunk.slice(1, -1).map(s => s.address).join('|'); const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`; const response = await fetch(url); if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`); const data = await response.json(); if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`); const legs = data.routes[0].legs; const processedLegs = legs.map(leg => ({ distanceText: leg.distance.text, durationText: (leg.duration_in_traffic || leg.duration).text, distanceValue: leg.distance.value, durationValue: (leg.duration_in_traffic || leg.duration).value })); allLegs.push(...processedLegs); for (let leg of processedLegs) { totalDistanceMeters += leg.distanceValue; totalTimeSecs += leg.durationValue; } } tourData.routeCache[cacheKey] = { legs: allLegs, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, stops: stopsForDay, timestamp: Date.now() }; await saveData(); }
+    
+    // --- CORRECTED ROUTE GENERATION LOGIC ---
+    async function processDayRoute(date, stopsForDay) {
+        if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`);
+        let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = [];
+        const MAX_WAYPOINTS = 23;
+        for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) {
+            const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1);
+            if (chunk.length < 2) break;
+            const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address;
+            const waypoints = chunk.slice(1, -1).map(s => s.address).join('|');
+            const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`);
+            const data = await response.json();
+            if (data.status !== 'OK') throw new Error(`Google Maps Error: ${data.status}. ${data.error_message || 'Check addresses'}`);
+            const legs = data.routes[0].legs;
+            const processedLegs = legs.map(leg => ({ distanceText: leg.distance.text, durationText: (leg.duration_in_traffic || leg.duration).text, distanceValue: leg.distance.value, durationValue: (leg.duration_in_traffic || leg.duration).value }));
+            allLegs.push(...processedLegs);
+            for (let leg of processedLegs) { totalDistanceMeters += leg.distanceValue; totalTimeSecs += leg.durationValue; }
+        }
+        return { legs: allLegs, totalDistance: totalDistanceMeters, totalTime: totalTimeSecs, stops: stopsForDay, timestamp: Date.now() };
+    }
+
+    async function generateCustomRoute() {
+        if (!isAdmin()) return;
+        saveRoutePlannerState();
+        if (isGeneratingRoute) { alert('Route generation in progress...'); return; }
+        isGeneratingRoute = true;
+        const generateBtn = document.getElementById('generateRouteBtn');
+        const progressDiv = document.getElementById('routeProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        if (!generateBtn || !progressDiv) return;
+        
+        generateBtn.disabled = true;
+        generateBtn.textContent = '🔄 Generating...';
+        progressDiv.style.display = 'block';
+        progressText.textContent = 'Preparing route...';
+        progressFill.style.width = '0%';
+
+        try {
+            const dailySegments = {};
+            for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
+                const fromStopInfo = tourData.routePlannerState[i];
+                const toStopInfo = tourData.routePlannerState[i + 1];
+                if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
+                const date = fromStopInfo.dateValue || 'No Date';
+                if (!dailySegments[date]) dailySegments[date] = [];
+                if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue));
+                dailySegments[date].push(getLocationDetails(toStopInfo.selectValue));
+            }
+            const allDates = Object.keys(dailySegments).sort((a,b) => new Date(a) - new Date(b));
+            if (allDates.length === 0) throw new Error('No valid route segments found.');
+            
+            const newRouteCache = {}; // Build cache in a temporary object
+            for (const date of allDates) {
+                const dayData = await processDayRoute(date, dailySegments[date]);
+                const cacheKey = `${date}_${dayData.stops.map(s => s.address).join('|')}`;
+                newRouteCache[cacheKey] = dayData;
+                
+                const progress = ((allDates.indexOf(date) + 1) / allDates.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `Day ${allDates.indexOf(date) + 1}/${allDates.length} processed...`;
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+            tourData.routeCache = newRouteCache; // Assign the complete cache at the end
+            await saveData(); // Save once with the full cache
+
+            progressText.textContent = '✅ Route Generated!';
+            renderCachedRoute(); // Update the Routes tab UI
+        } catch (error) {
+            console.error('Route generation error:', error);
+            progressText.textContent = `❌ ${error.message}`;
+        } finally {
+            isGeneratingRoute = false;
+            generateBtn.disabled = false;
+            generateBtn.textContent = '🛣️ Generate Full Tour Route';
+            setTimeout(() => { 
+                if(progressDiv) progressDiv.style.display = 'none'; 
+                closeModal('settingsModal');
+            }, 2000);
+        }
+    }
     
     // --- DISPLAY & RENDER FUNCTIONS ---
     function renderCachedRoute() {
@@ -739,7 +736,11 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
         }
 
         let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0;
-        const sortedDays = Object.keys(tourData.routeCache).sort((a, b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0]));
+        const sortedDays = Object.keys(tourData.routeCache).sort((a, b) => {
+            const dateA = a.split('_')[0]; const dateB = b.split('_')[0];
+            if (dateA === 'No Date') return 1; if (dateB === 'No Date') return -1;
+            return new Date(dateA) - new Date(dateB);
+        });
 
         sortedDays.forEach((key, index) => {
             const dayData = tourData.routeCache[key];
