@@ -358,39 +358,40 @@ function initializeAppUI() {
 
 function applyAccessRestrictions() {
     if (!isAdmin()) {
-        // Hide all add/edit forms
-        hideElementForViewers('hotelForm');
-        hideElementForViewers('venueForm'); 
-        hideElementForViewers('expenseForm');
-        
-        // Hide route builder controls
-        hideElementForViewers('route-builder-content');
-        hideElementForViewers('generateRouteBtn');
-        hideElementForViewers('clearRouteBtn');
-        hideElementForViewers('autoFillBtn');
-        
-        // Hide export section
-        hideElementForViewers('exportSection');
-        
-        // Hide settings
-        hideElementForViewers('settingsSection');
-        
-        // Add viewer notice
-        const appContent = document.getElementById('app-content');
-        if (appContent) {
-            const notice = document.createElement('div');
-            notice.innerHTML = `
-                <div style="background: rgba(255,193,7,0.2); border: 1px solid #ffc107; 
-                           padding: 10px; margin: 10px; border-radius: 5px; text-align: center;">
-                    👀 <strong>Viewer Mode</strong> - You're viewing live tour data (read-only)
-                </div>
-            `;
-            appContent.insertBefore(notice, appContent.firstChild);
+        // Hide the entire settings tab content instead of individual forms
+        const settingsTab = document.querySelector('.tab-content#settings');
+        if (settingsTab) {
+            settingsTab.style.display = 'none';
         }
         
-        console.log('🔒 Applied viewer restrictions');
-    } else {
-        console.log('🔓 Admin mode - full access');
+        // Hide specific buttons that exist
+        const addButtons = [
+            'button[onclick="addHotel()"]',
+            'button[onclick="addVenue()"]', 
+            'button[onclick="addExpense()"]',
+            'button[onclick="generateCustomRoute()"]'
+        ];
+        
+        addButtons.forEach(selector => {
+            const btn = document.querySelector(selector);
+            if (btn) {
+                btn.style.display = 'none';
+            }
+        });
+        
+        // Add viewer notice
+        const container = document.querySelector('.container');
+        if (container && !document.querySelector('.viewer-notice')) {
+            const notice = document.createElement('div');
+            notice.className = 'viewer-notice';
+            notice.innerHTML = `
+                <div style="background: rgba(255,193,7,0.2); border: 1px solid #ffc107; 
+                           padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center;">
+                    👀 <strong>Viewer Mode</strong> - Read-only access
+                </div>
+            `;
+            container.insertBefore(notice, container.firstChild);
+        }
     }
 }
 
@@ -425,6 +426,8 @@ function saveData() {
 
     // MISSING FUNCTION - THIS WAS YOUR PROBLEM!
     async function initializeFirebaseAndSync() {
+        checkUserAccess(); // ADD THIS LINE FIRST
+
         try {
             updateSyncStatus("Connecting...");
             
