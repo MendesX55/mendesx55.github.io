@@ -9,8 +9,48 @@
 <title>Tour Management - Sean Paul × Wiz Khalifa × DaBaby</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); background-color: #0f3460; }
-body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+/* --- START: CSS FIX FOR SCROLLING --- */
+html, body { 
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); 
+    background-color: #0f3460; 
+    overscroll-behavior: none;
+}
+body { 
+    font-family: 'Arial', sans-serif; 
+    color: #fff; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh;
+    -webkit-user-select: none; 
+    -webkit-touch-callout: none; 
+    -webkit-tap-highlight-color: transparent; 
+}
+/* Apply the fixed, non-scrolling layout ONLY for PWA/homescreen mode */
+html.is-pwa, html.is-pwa body {
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+#app-content {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+}
+.container {
+    max-width: 430px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* This is key for flexbox scrolling inside a fixed container */
+}
+/* --- END: CSS FIX FOR SCROLLING --- */
 .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .login-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,215,0,0.3); }
 .login-box h2 { color: #ffd700; margin-bottom: 20px; font-size: 1.5em; }
@@ -21,7 +61,6 @@ body { font-family: 'Arial', sans-serif; color: #fff; min-height: 100vh; -webkit
 .header h1 { font-size: 1.6em; font-weight: bold; color: #000; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); margin-bottom: 5px; }
 .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
 .logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
-.container { max-width: 430px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; overflow: hidden; }
 .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 10px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
 .tab-btn span { font-size: 1.5em; }
@@ -105,7 +144,6 @@ input[type="date"], input[type="time"], input[type="number"], select { height: 4
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
 .data-table th, .data-table td { padding: 6px 4px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .data-table th { background: rgba(255,255,255,0.1); color: #ffd700; font-weight: bold; }
-html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-behavior: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
 .settings-menu { display: flex; flex-direction: column; gap: 10px; }
 .settings-menu-item { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 15px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; text-align: left; }
 .settings-menu-item:hover { background: rgba(255,215,0,0.2); }
@@ -118,11 +156,18 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
   .summary-box, .day-summary-box { padding: 8px !important; font-size: 0.97em !important; max-width: 98vw !important; }
   .data-table th, .data-table td { font-size: 0.83em !important; padding: 3px !important; }
   .hotel-card, .venue-card { padding: 9px !important; font-size: 0.95em !important; }
-  html, body { font-size: 14px !important; overflow-x: hidden !important; }
+  html.is-pwa, html.is-pwa body { font-size: 14px !important; overflow-x: hidden !important; }
 }
 </style>
+<!-- START: SCRIPT TO DETECT PWA MODE -->
+<script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        document.documentElement.classList.add('is-pwa');
+    }
+</script>
+<!-- END: SCRIPT TO DETECT PWA MODE -->
 </head>
-<body style="display: flex; flex-direction: column;">
+<body>
 
 <div class="login-screen" id="loginScreen" style="display: none;">
     <div class="login-box">
@@ -138,7 +183,7 @@ html, body { height: 100%; overflow: hidden; touch-action: none; overscroll-beha
 
 <div class="loading-overlay" id="loadingOverlay">Connecting &amp; Syncing...</div>
 
-<div id="app-content" style="display: none; flex-direction: column; height: 100%;">
+<div id="app-content">
     <div style="padding-top: env(safe-area-inset-top); background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999;">
         <a href="index.html" style="display: block; padding: 10px 20px; text-decoration: none; color: #ff6b35; font-size: 1.5em;">← Back</a>
     </div>
