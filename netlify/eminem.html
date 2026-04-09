@@ -304,7 +304,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 <div class="modal" id="hotelModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('hotelModal')">×</span><div>Edit Hotel Details</div></div><div id="hotelEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Hotel Name</label><input id="editHotelName" type="text"/></div><div class="form-group"><label>Address</label><input id="editHotelAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="editCheckinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="editCheckoutDate" type="date"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="editHotelNotes" rows="3"></textarea></div><div class="form-group"><label>Guests</label><select id="editHotelGuestNames" multiple></select></div><div class="form-row-2"><div class="currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostUSD" step="0.01" type="number"/></div><div class="currency-input"><label>CAD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostCAD" step="0.01" type="number"/></div></div><button class="btn" onclick="saveHotelEdit(this)">Save Changes</button><button class="btn btn-danger" onclick="deleteItem('hotels', currentEditId)">Delete Hotel</button></div></div></div>
 <div class="modal" id="venueModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('venueModal')">×</span><div>Edit Venue Details</div></div><div id="venueEditForm"><div class="form-group"><label>Venue Name</label><input id="editVenueName" type="text"/></div><div class="form-group"><label>Address</label><input id="editVenueAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="editShowDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="editShowTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="editStartInventory" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="editEndInventory" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="editVenueNotes" rows="3"></textarea></div><button class="btn" onclick="saveVenueEdit(this)">Save Changes</button><button class="btn btn-danger" onclick="deleteItem('venues', currentEditId)">Delete Venue</button></div></div></div>
-<div class="modal" id="flightModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('flightModal')">×</span><div>Edit Flight/Rental Details</div></div><div id="flightEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Booking Type</label><select id="editBookingType" onchange="toggleFlightRentalFields(this.value, true)"><option value="flight">Flight</option><option value="rental">Car Rental</option><option value="uber">Uber / Transfer</option></select></div><div class="form-group"><label id="editFlightNameLabel">Passenger Name</label><input id="editFlightName" type="text"/></div><div class="form-group"><label>To → From</label><input id="editFlightToFrom" type="text"/></div><div class="form-row"><div class="form-group"><label id="editAirlineAgencyLabel">Airline</label><input id="editFlightAirline" type="text"/></div><div class="form-group"><label id="editFlightConfLabel">Flight #</label><input id="editFlightConf" type="text"/></div></div><div class="form-group"><label id="editPickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="editPickupDate" type="date"/><input id="editPickupTime" type="time"/></div></div><div class="form-group"><label id="editDropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="editDropoffDate" type="date"/><input id="editDropoffTime" type="time"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editFlightCostUSD" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="editFlightCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label id="editPickupAddressLabel">Departure Airport Address</label><input id="editFlightPickupAddress" type="text"/></div><div class="form-group"><label id="editDropoffAddressLabel">Arrival Airport Address</label><input id="editFlightDropoffAddress" type="text"/></div><div class="form-group"><label>Notes</label><textarea id="editFlightNotes" rows="2"></textarea></div><button class="btn" onclick="saveFlightRentalEdit(this)">Save Changes</button><button class="btn" onclick="duplicateBooking()">Duplicate Booking</button><button class="btn btn-danger" onclick="deleteItem('flights', currentEditId)">Delete Booking</button></div></div></div></div>
+<div class="modal" id="flightModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('flightModal')">×</span><div>Edit Flight/Rental Details</div></div><div id="flightEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Booking Type</label><select id="editBookingType" onchange="toggleFlightRentalFields(this.value, true)"><option value="flight">Flight</option><option value="rental">Car Rental</option><option value="uber">Uber / Transfer</option></select></div><div class="form-group"><label id="editFlightNameLabel">Passenger Name</label><input id="editFlightName" type="text"/></div><div class="form-group"><label>To → From</label><input id="editFlightToFrom" type="text"/></div><div class="form-row"><div class="form-group"><label id="editAirlineAgencyLabel">Airline</label><input id="editFlightAirline" type="text"/></div><div class="form-group"><label id="editFlightConfLabel">Flight #</label><input id="editFlightConf" type="text"/></div></div><div class="form-group"><label id="editPickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="editPickupDate" type="date"/><input id="editPickupTime" type="time"/></div></div><div class="form-group"><label id="editDropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="editDropoffDate" type="date"/><input id="editDropoffTime" type="time"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editFlightCostUSD" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="editFlightCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label id="editPickupAddressLabel">Departure Airport Address</label><select id="editFlightPickupAddress" onchange="updateEditBookingToFrom()"><option value="">-- Select or type below --</option></select><input id="editFlightPickupAddressCustom" type="text" style="margin-top:6px;" oninput="updateEditBookingToFrom()"/></div><div class="form-group"><label id="editDropoffAddressLabel">Arrival Airport Address</label><select id="editFlightDropoffAddress" onchange="updateEditBookingToFrom()"><option value="">-- Select or type below --</option></select><input id="editFlightDropoffAddressCustom" type="text" style="margin-top:6px;" oninput="updateEditBookingToFrom()"/></div><div class="form-group"><label>Notes</label><textarea id="editFlightNotes" rows="2"></textarea></div><button class="btn" onclick="saveFlightRentalEdit(this)">Save Changes</button><button class="btn" onclick="duplicateBooking()">Duplicate Booking</button><button class="btn btn-danger" onclick="deleteItem('flights', currentEditId)">Delete Booking</button></div></div></div></div>
 <div class="modal" id="calendarModal"><div class="modal-content" id="calendarModalContent"></div></div>
 <div class="modal" id="settingsModal"><div class="modal-content"><div class="modal-header"><span id="settingsModalTitle">Settings</span><span class="close" onclick="closeModal('settingsModal')">×</span></div><div id="settingsModalContent"></div></div></div>
 
@@ -1202,9 +1202,11 @@ input:checked + .slider:before { transform: translateX(22px); }
 
             const icon = booking.bookingType === 'flight' ? '✈️' : (booking.bookingType === 'uber' ? '🚕' : '🚗');
             if (pointType === 'pickup') {
-                return { name: `${icon} ${booking.toFrom} (Depart)`, address: booking.pickupAddress, type: 'Booking' };
-            } else { // dropoff
-                return { name: `${icon} ${booking.toFrom} (Arrive)`, address: booking.dropoffAddress, type: 'Booking' };
+                const ps = booking.pickupAddress ? booking.pickupAddress.split(',')[0] : booking.toFrom;
+                return { name: `${icon} ${ps}`, address: booking.pickupAddress, type: 'Booking', bookingType: booking.bookingType };
+            } else {
+                const ds = booking.dropoffAddress ? booking.dropoffAddress.split(',')[0] : booking.toFrom;
+                return { name: `${icon} ${ds}`, address: booking.dropoffAddress, type: 'Booking', bookingType: booking.bookingType };
             }
         }
         return { type: 'N/A', name: 'N/A', address: 'N/A' }; 
@@ -1253,6 +1255,10 @@ input:checked + .slider:before { transform: translateX(22px); }
                 const fid = fv.replace('Booking:','').split('_')[0];
                 const tid = tv.replace('Booking:','').split('_')[0];
                 if (fv.endsWith('_dropoff') && tv.endsWith('_pickup') && fid !== tid) continue;
+                // Skip: same address consecutive stops (e.g. Uber drops at hotel, hotel is next stop = 1m phantom)
+                const fromDet = getLocationDetails(fv);
+                const toDet = getLocationDetails(tv);
+                if (fromDet.address && toDet.address && fromDet.address.trim() === toDet.address.trim()) continue;
                 if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
                 const date = fromStopInfo.dateValue || 'No Date';
                 if (!dailySegments[date]) dailySegments[date] = [];
@@ -1332,12 +1338,29 @@ input:checked + .slider:before { transform: translateX(22px); }
     function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas (USD)</div></div></div>`; routeResults.appendChild(daySummary);
             // Show Flight Info Cards for this day (depart time, arrive time, airline — not counted in drive totals)
             (tourData.flights || []).filter(f => f.pickupDate === date && f.bookingType === 'flight').forEach(f => {
+                let durationStr = '';
+                try {
+                    if (f.pickupTime && f.dropoffTime) {
+                        const arrDate = f.dropoffDate || f.pickupDate;
+                        const ukKw = ['gatwick','heathrow','lgw','lhr','stansted','manchester','london, uk','england'];
+                        const isDepUK = ukKw.some(k => (f.pickupAddress||'').toLowerCase().includes(k)) || /^LG[WH]|^LHR/i.test(f.toFrom||'');
+                        const isArrUK = ukKw.some(k => (f.dropoffAddress||'').toLowerCase().includes(k));
+                        const depTZ = isDepUK ? '+01:00' : '-04:00';
+                        const arrTZ = isArrUK ? '+01:00' : '-04:00';
+                        const depMs = new Date(`${f.pickupDate}T${f.pickupTime}:00${depTZ}`).getTime();
+                        const arrMs = new Date(`${arrDate}T${f.dropoffTime}:00${arrTZ}`).getTime();
+                        const diff = Math.round((arrMs - depMs) / 60000);
+                        if (diff > 0) durationStr = ` &nbsp;|&nbsp; <strong>✈️ Flight Time:</strong> ${Math.floor(diff/60)}h ${diff%60}m`;
+                    }
+                } catch(e) {}
+                const depCity = f.pickupAddress ? f.pickupAddress.split(',')[0] : (f.toFrom||'').split('→')[0].trim();
+                const arrCity = f.dropoffAddress ? f.dropoffAddress.split(',')[0] : ((f.toFrom||'').split('→')[1]||'').trim();
                 const fc = document.createElement('div');
                 fc.className = 'route-item';
                 fc.style.cssText = 'border-left-color:#00a8ff;';
-                fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: ' + (f.toFrom || '') + '</strong></div>'
+                fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: ' + depCity + ' → ' + arrCity + '</strong></div>'
                     + '<div class="route-info" style="margin-top:5px;"><strong>Airline:</strong> ' + (f.airline||'') + ' &nbsp;|&nbsp; <strong>Flight #:</strong> ' + (f.conf||'')
-                    + '<br><strong>Depart:</strong> ' + (f.pickupTime||'') + ' &nbsp;|&nbsp; <strong>Arrive:</strong> ' + (f.dropoffTime||'')
+                    + '<br><strong>Depart:</strong> ' + (f.pickupTime||'') + ' &nbsp;|&nbsp; <strong>Arrive:</strong> ' + (f.dropoffTime||'') + durationStr
                     + '<br><small style="color:#00a8ff;">✈️ Flight segment — excluded from drive totals</small></div>';
                 routeResults.appendChild(fc);
             });
@@ -1364,11 +1387,17 @@ input:checked + .slider:before { transform: translateX(22px); }
     function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; const modal = document.getElementById('venueModal'); document.body.appendChild(modal);
     modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; modal.style.display = 'flex'; }
     function openFlightRentalModal(itemId) { const item = (tourData.flights || []).find(f => f.id === itemId); if (!item) return; currentEditId = itemId; const modal = document.getElementById('flightModal'); document.body.appendChild(modal);
-    modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editBookingType').value = item.bookingType; toggleFlightRentalFields(item.bookingType, true); document.getElementById('editFlightName').value = item.name; document.getElementById('editFlightToFrom').value = item.toFrom; document.getElementById('editFlightAirline').value = item.airline; document.getElementById('editFlightConf').value = item.conf; document.getElementById('editPickupDate').value = item.pickupDate; document.getElementById('editPickupTime').value = item.pickupTime; document.getElementById('editDropoffDate').value = item.dropoffDate; document.getElementById('editDropoffTime').value = item.dropoffTime; document.getElementById('editFlightCostUSD').value = item.costUSD; document.getElementById('editFlightCostCAD').value = item.costCAD; document.getElementById('editFlightPickupAddress').value = item.pickupAddress; document.getElementById('editFlightDropoffAddress').value = item.dropoffAddress; document.getElementById('editFlightNotes').value = item.notes; modal.style.display = 'flex'; }
+    modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editBookingType').value = item.bookingType; toggleFlightRentalFields(item.bookingType, true); document.getElementById('editFlightName').value = item.name; document.getElementById('editFlightToFrom').value = item.toFrom; document.getElementById('editFlightAirline').value = item.airline; document.getElementById('editFlightConf').value = item.conf; document.getElementById('editPickupDate').value = item.pickupDate; document.getElementById('editPickupTime').value = item.pickupTime; document.getElementById('editDropoffDate').value = item.dropoffDate; document.getElementById('editDropoffTime').value = item.dropoffTime; document.getElementById('editFlightCostUSD').value = item.costUSD; document.getElementById('editFlightCostCAD').value = item.costCAD; 
+    wireEditBookingAddressDropdowns();
+    document.getElementById('editFlightPickupAddress').value = item.pickupAddress || ''; 
+    if (!document.getElementById('editFlightPickupAddress').value) document.getElementById('editFlightPickupAddressCustom').value = item.pickupAddress || '';
+    document.getElementById('editFlightDropoffAddress').value = item.dropoffAddress || ''; 
+    if (!document.getElementById('editFlightDropoffAddress').value) document.getElementById('editFlightDropoffAddressCustom').value = item.dropoffAddress || '';
+    document.getElementById('editFlightNotes').value = item.notes; modal.style.display = 'flex'; }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; currentEditId = null; }
     function saveHotelEdit(button) { if (!isAdmin() && !isManager()) return; const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId); if (hotelIndex === -1) return; const selectedOptions = document.getElementById('editHotelGuestNames').selectedOptions; tourData.hotels[hotelIndex].guestNames = Array.from(selectedOptions).map(option => option.value); tourData.hotels[hotelIndex].name = document.getElementById('editHotelName').value; tourData.hotels[hotelIndex].address = document.getElementById('editHotelAddress').value; tourData.hotels[hotelIndex].checkin = document.getElementById('editCheckinDate').value; tourData.hotels[hotelIndex].checkout = document.getElementById('editCheckoutDate').value; tourData.hotels[hotelIndex].costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; tourData.hotels[hotelIndex].costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; tourData.hotels[hotelIndex].notes = document.getElementById('editHotelNotes').value; saveDataWithFeedback(button, saveData()); }
     function saveVenueEdit(button) { if (!isAdmin() && !isManager()) return; const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId); if (venueIndex === -1) return; tourData.venues[venueIndex].name = document.getElementById('editVenueName').value; tourData.venues[venueIndex].address = document.getElementById('editVenueAddress').value; tourData.venues[venueIndex].date = document.getElementById('editShowDate').value; tourData.venues[venueIndex].time = document.getElementById('editShowTime').value; tourData.venues[venueIndex].startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; tourData.venues[venueIndex].endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; tourData.venues[venueIndex].totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; tourData.venues[venueIndex].notes = document.getElementById('editVenueNotes').value; saveDataWithFeedback(button, saveData()); }
-    function saveFlightRentalEdit(button) { if (!isAdmin() && !isManager()) return; const itemIndex = (tourData.flights || []).findIndex(f => f.id === currentEditId); if (itemIndex === -1) return; tourData.flights[itemIndex] = { ...tourData.flights[itemIndex], bookingType: document.getElementById('editBookingType').value, name: document.getElementById('editFlightName').value, toFrom: document.getElementById('editFlightToFrom').value, airline: document.getElementById('editFlightAirline').value, conf: document.getElementById('editFlightConf').value, pickupDate: document.getElementById('editPickupDate').value, pickupTime: document.getElementById('editPickupTime').value, dropoffDate: document.getElementById('editDropoffDate').value, dropoffTime: document.getElementById('editDropoffTime').value, costUSD: parseFloat(document.getElementById('editFlightCostUSD').value) || 0, costCAD: parseFloat(document.getElementById('editFlightCostCAD').value) || 0, pickupAddress: document.getElementById('editFlightPickupAddress').value, dropoffAddress: document.getElementById('editFlightDropoffAddress').value, notes: document.getElementById('editFlightNotes').value, }; saveDataWithFeedback(button, saveData()); }
+    function saveFlightRentalEdit(button) { if (!isAdmin() && !isManager()) return; const itemIndex = (tourData.flights || []).findIndex(f => f.id === currentEditId); if (itemIndex === -1) return; tourData.flights[itemIndex] = { ...tourData.flights[itemIndex], bookingType: document.getElementById('editBookingType').value, name: document.getElementById('editFlightName').value, toFrom: document.getElementById('editFlightToFrom').value, airline: document.getElementById('editFlightAirline').value, conf: document.getElementById('editFlightConf').value, pickupDate: document.getElementById('editPickupDate').value, pickupTime: document.getElementById('editPickupTime').value, dropoffDate: document.getElementById('editDropoffDate').value, dropoffTime: document.getElementById('editDropoffTime').value, costUSD: parseFloat(document.getElementById('editFlightCostUSD').value) || 0, costCAD: parseFloat(document.getElementById('editFlightCostCAD').value) || 0, pickupAddress: (document.getElementById('editFlightPickupAddress').value || document.getElementById('editFlightPickupAddressCustom').value), dropoffAddress: (document.getElementById('editFlightDropoffAddress').value || document.getElementById('editFlightDropoffAddressCustom').value), notes: document.getElementById('editFlightNotes').value, }; saveDataWithFeedback(button, saveData()); }
     function deleteItem(typeKey, id) { if (!isAdmin() && !isManager()) return; if (!confirm(`Delete this item?`)) return; const itemIndex = tourData[typeKey].findIndex(i => i.id === id); if (itemIndex === -1) return; tourData[typeKey].splice(itemIndex, 1); const singularType = typeKey.slice(0, -1); saveDataWithFeedback(null, saveData()); closeModal(singularType + 'Modal'); }
     function updateAllDisplays() { updateHotelsDisplay(); updateVenuesDisplay(); updateFlightsDisplay(); updateExpensesDisplay(); renderCalendar(); }
     
@@ -1433,13 +1462,13 @@ input:checked + .slider:before { transform: translateX(22px); }
     function toggleFlightRentalFields(type, isEdit = false) {
         const prefix = isEdit ? 'edit' : '';
         const modalContent = isEdit ? document.getElementById('flightEditForm') : document.getElementById('settingsModalContent');
-        const flightNameLabel = modalContent.querySelector(`#${prefix}FlightNameLabel`);
-        const airlineAgencyLabel = modalContent.querySelector(`#${prefix}AirlineAgencyLabel`);
-        const flightConfLabel = modalContent.querySelector(`#${prefix}FlightConfLabel`);
-        const pickupDateLabel = modalContent.querySelector(`#${prefix}PickupDateLabel`);
-        const dropoffDateLabel = modalContent.querySelector(`#${prefix}DropoffDateLabel`);
-        const pickupAddressLabel = modalContent.querySelector(`#${prefix}PickupAddressLabel`);
-        const dropoffAddressLabel = modalContent.querySelector(`#${prefix}DropoffAddressLabel`);
+        const flightNameLabel = modalContent.querySelector(isEdit ? '#editFlightNameLabel' : '#flightNameLabel');
+        const airlineAgencyLabel = modalContent.querySelector(isEdit ? '#editAirlineAgencyLabel' : '#airlineAgencyLabel');
+        const flightConfLabel = modalContent.querySelector(isEdit ? '#editFlightConfLabel' : '#flightConfLabel');
+        const pickupDateLabel = modalContent.querySelector(isEdit ? '#editPickupDateLabel' : '#pickupDateLabel');
+        const dropoffDateLabel = modalContent.querySelector(isEdit ? '#editDropoffDateLabel' : '#dropoffDateLabel');
+        const pickupAddressLabel = modalContent.querySelector(isEdit ? '#editPickupAddressLabel' : '#pickupAddressLabel');
+        const dropoffAddressLabel = modalContent.querySelector(isEdit ? '#editDropoffAddressLabel' : '#dropoffAddressLabel');
         if (type === 'flight') {
             flightNameLabel.textContent = 'Passenger Name';
             airlineAgencyLabel.textContent = 'Airline';
@@ -1516,6 +1545,33 @@ input:checked + .slider:before { transform: translateX(22px); }
     }
 
     // Auto-populate To→From field based on selected pickup/dropoff addresses
+    function wireEditBookingAddressDropdowns() {
+        const pickupSel = document.getElementById('editFlightPickupAddress');
+        const dropoffSel = document.getElementById('editFlightDropoffAddress');
+        if (!pickupSel || !dropoffSel) return;
+
+        const addresses = [];
+        (tourData.hotels || []).forEach(h => { if (h.address) addresses.push({ label: h.name, value: h.address }); });
+        (tourData.venues || []).forEach(v => { if (v.address) addresses.push({ label: v.name, value: v.address }); });
+        (tourData.flights || []).forEach(f => {
+            if (f.pickupAddress) addresses.push({ label: f.pickupAddress.split(',')[0], value: f.pickupAddress });
+            if (f.dropoffAddress) addresses.push({ label: f.dropoffAddress.split(',')[0], value: f.dropoffAddress });
+        });
+        const seen = new Set();
+        const unique = addresses.filter(a => { if (seen.has(a.value)) return false; seen.add(a.value); return true; });
+
+        [pickupSel, dropoffSel].forEach(sel => {
+            const current = sel.value;
+            sel.innerHTML = '<option value="">-- Select address --</option>';
+            unique.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.value;
+                opt.textContent = a.label;
+                sel.appendChild(opt);
+            });
+            if (current) sel.value = current;
+        });
+    }
     function updateBookingToFrom() {
         const container = document.getElementById('settingsModalContent');
         if (!container) return;
@@ -1526,9 +1582,23 @@ input:checked + .slider:before { transform: translateX(22px); }
         const toFromField = container.querySelector('#flightToFrom');
         if (!toFromField) return;
 
-        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom ? pickupCustom.value.split(',')[0] : '');
-        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom ? dropoffCustom.value.split(',')[0] : '');
-        if (from && to) toFromField.value = from + ' → ' + to;
+        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom && pickupCustom.value ? pickupCustom.value.split(',')[0] : '');
+        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom && dropoffCustom.value ? dropoffCustom.value.split(',')[0] : '');
+        if (from && to) toFromField.value = from.trim() + ' → ' + to.trim();
+    }
+    function updateEditBookingToFrom() {
+        const container = document.getElementById('flightEditForm');
+        if (!container) return;
+        const pickupSel = container.querySelector('#editFlightPickupAddress');
+        const dropoffSel = container.querySelector('#editFlightDropoffAddress');
+        const pickupCustom = container.querySelector('#editFlightPickupAddressCustom');
+        const dropoffCustom = container.querySelector('#editFlightDropoffAddressCustom');
+        const toFromField = container.querySelector('#editFlightToFrom');
+        if (!toFromField) return;
+
+        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom && pickupCustom.value ? pickupCustom.value.split(',')[0] : '');
+        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom && dropoffCustom.value ? dropoffCustom.value.split(',')[0] : '');
+        if (from && to) toFromField.value = from.trim() + ' → ' + to.trim();
     }
 </script>
 </body>
