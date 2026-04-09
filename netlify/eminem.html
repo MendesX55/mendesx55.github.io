@@ -793,7 +793,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             });
     }
 
-    function openSettingsModal(category) {
+    function openSettingsModal(category, prefillData) {
         const modal = document.getElementById('settingsModal');
         document.body.appendChild(modal);
         const titleEl = document.getElementById('settingsModalTitle');
@@ -812,11 +812,30 @@ input:checked + .slider:before { transform: translateX(22px); }
         if (category === 'route-builder') renderRouteBuilder();
         if (category === 'add-expense' && contentEl.querySelector('#expenseDate')) contentEl.querySelector('#expenseDate').value = new Date().toISOString().split('T')[0];
         if (category === 'add-flight-rental') {
-            const now = new Date();
-            const today = now.toISOString().split('T')[0];
-            const time = now.toTimeString().split(' ')[0].substring(0,5);
-            if (contentEl.querySelector('#pickupDate')) contentEl.querySelector('#pickupDate').value = today;
-            if (contentEl.querySelector('#pickupTime')) contentEl.querySelector('#pickupTime').value = time;
+            if (prefillData) {
+                const setVal = (id, val) => { const el = contentEl.querySelector('#' + id); if (el) el.value = (val !== undefined && val !== null) ? String(val) : ''; };
+                setVal('bookingType', prefillData.bookingType);
+                toggleFlightRentalFields(prefillData.bookingType, false);
+                setVal('flightName', prefillData.name);
+                setVal('flightToFrom', prefillData.toFrom);
+                setVal('flightAirline', prefillData.airline);
+                setVal('flightConf', prefillData.conf);
+                setVal('pickupDate', prefillData.pickupDate);
+                setVal('pickupTime', prefillData.pickupTime);
+                setVal('dropoffDate', prefillData.dropoffDate);
+                setVal('dropoffTime', prefillData.dropoffTime);
+                setVal('flightCostUSD', prefillData.costUSD);
+                setVal('flightCostCAD', prefillData.costCAD);
+                setVal('flightPickupAddress', prefillData.pickupAddress);
+                setVal('flightDropoffAddress', prefillData.dropoffAddress);
+                setVal('flightNotes', prefillData.notes);
+            } else {
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                const time = now.toTimeString().split(' ')[0].substring(0,5);
+                if (contentEl.querySelector('#pickupDate')) contentEl.querySelector('#pickupDate').value = today;
+                if (contentEl.querySelector('#pickupTime')) contentEl.querySelector('#pickupTime').value = time;
+            }
         }
         if (category === 'gas-settings') applySettingsToUI();
         if (category === 'user-management') renderUsers();
@@ -1294,7 +1313,16 @@ input:checked + .slider:before { transform: translateX(22px); }
         document.getElementById('totalGasStat').textContent = '$' + grandTotalGasUSD.toFixed(0);
     }
     
-    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas (USD)</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item cached ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(2)} USD</span></div>`; routeResults.appendChild(routeSegment); }); }
+    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas (USD)</div></div></div>`; routeResults.appendChild(daySummary);
+            const flightsOnDay = (tourData.flights || []).filter(f => f.pickupDate === date && f.bookingType === 'flight');
+            flightsOnDay.forEach(f => {
+                const flightCard = document.createElement('div');
+                flightCard.className = 'route-item';
+                flightCard.style.borderLeftColor = '#00a8ff';
+                flightCard.innerHTML = `<div class="route-header"><strong>✈️ ${f.pickupAddress || f.toFrom.split('→')[0]} → ${f.dropoffAddress || (f.toFrom.split('→')[1] || f.toFrom)}</strong></div><div class="route-info" style="margin-top:4px;"><strong>Flight:</strong> ${f.airline} ${f.conf} | <strong>Depart:</strong> ${f.pickupTime} | <strong>Arrive:</strong> ${f.dropoffTime}<br><small style="color:#00a8ff;">Flight segment (Not included in drive totals)</small></div>`;
+                routeResults.appendChild(flightCard);
+            });
+            dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item cached ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(2)} USD</span></div>`; routeResults.appendChild(routeSegment); }); }
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
     function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; const today = new Date(); const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day ${dateStr === todayStr ? 'today' : ''}" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isFlight) { eventIcons += '✈️'; } if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
     function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = Object.keys(tourData.routeCache || {}).some(key => key.startsWith(dateStr)); let isFlight = (tourData.flights || []).some(f => f.pickupDate === dateStr && f.bookingType === 'flight'); return { isVenue, isTravel, isFlight }; }
@@ -1386,39 +1414,10 @@ input:checked + .slider:before { transform: translateX(22px); }
         if (!isAdmin() && !isManager()) return;
         const item = (tourData.flights || []).find(f => f.id === currentEditId);
         if (!item) return;
-        // Capture item data before closing modal
         const dupData = JSON.parse(JSON.stringify(item));
         closeModal('flightModal');
-        openSettingsModal('add-flight-rental');
-        // openSettingsModal sets today's date/time on the form — we override it after with a longer delay
-        setTimeout(() => {
-            const formContent = document.getElementById('settingsModalContent');
-            if (!formContent) return;
-            const setVal = (id, val) => {
-                const el = formContent.querySelector('#' + id);
-                if (el) el.value = (val !== undefined && val !== null) ? String(val) : '';
-            };
-            setVal('bookingType', dupData.bookingType);
-            toggleFlightRentalFields(dupData.bookingType, false);
-            setVal('flightName', dupData.name);
-            setVal('flightToFrom', dupData.toFrom);
-            setVal('flightAirline', dupData.airline);
-            setVal('flightConf', dupData.conf);
-            setVal('pickupDate', dupData.pickupDate);
-            setVal('pickupTime', dupData.pickupTime);
-            setVal('dropoffDate', dupData.dropoffDate);
-            setVal('dropoffTime', dupData.dropoffTime);
-            setVal('flightCostUSD', dupData.costUSD);
-            setVal('flightCostCAD', dupData.costCAD);
-            setVal('flightPickupAddress', dupData.pickupAddress);
-            setVal('flightDropoffAddress', dupData.dropoffAddress);
-            setVal('flightNotes', dupData.notes);
-        }, 300);
+        openSettingsModal('add-flight-rental', dupData);
     }
-    function renderUsers() { const modalContent = document.getElementById('settingsModalContent'); const tbody = modalContent.querySelector('#usersBody'); tbody.innerHTML = ''; const roleSelect = modalContent.querySelector('#newUserRole'); roleSelect.innerHTML = `<option value="user only">User Only</option><option value="viewer">View All</option>`; if(isAdmin() || isManager()) roleSelect.innerHTML += `<option value="management">Management</option>`; if(isAdmin()) roleSelect.innerHTML += `<option value="admin">Admin</option>`; const accessCodes = tourData.access_codes || {}; for(const code in accessCodes) { const user = accessCodes[code]; if(isManager() && (user.role === 'admin' || user.role === 'management')) continue; const row = tbody.insertRow(); row.innerHTML = `<td>${user.name}</td><td>${code}</td><td>${user.role}</td><td><button class="btn btn-small btn-danger" onclick="deleteUser('${code}')">×</button></td>`; } }
-    function addUser(button) { if (!isAdmin() && !isManager()) return; const form = button.closest('.form-section'); const name = form.querySelector('#newUserName').value; const code = form.querySelector('#newAccessCode').value.trim(); const role = form.querySelector('#newUserRole').value; if (name && code) { if (tourData.access_codes[code]) { alert('This access code is already in use.'); return; } tourData.access_codes[code] = { name, role }; saveDataWithFeedback(button, saveData(), () => { form.querySelector('#newUserName').value = ''; form.querySelector('#newAccessCode').value = ''; renderUsers(); }); } else { alert('Please fill in all fields.'); } }
-    function deleteUser(code) { if ((!isAdmin() && !isManager()) || (currentUser && code === currentUser.code)) { alert("Action not allowed."); return; } if (confirm(`Are you sure you want to delete the user with access code "${code}"?`)) { delete tourData.access_codes[code]; saveData().then(() => renderUsers()); } }
-    function populateUserSelect(selectId, selectedNames = [], context = document) { const select = context.querySelector(`#${selectId}`); if (!select) return; select.innerHTML = ''; if (!isAdmin() && !isManager()) { selectedNames.sort().forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); } else { const allUsers = Object.values(tourData.access_codes || {}).map(u => u.name); const selectedUsers = allUsers.filter(name => selectedNames.includes(name)).sort(); const unselectedUsers = allUsers.filter(name => !selectedNames.includes(name)).sort(); selectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); unselectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); }); } }
     function exportTourData() { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); const form = document.getElementById('settingsModalContent'); const includeHotels = form.querySelector('#exportHotels').checked; const includeVenues = form.querySelector('#exportVenues').checked; const includeExpenses = form.querySelector('#exportExpenses').checked; const includeFlights = form.querySelector('#exportFlights').checked; const includeRoute = form.querySelector('#exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Guests: ${(h.guestNames || []).join(', ')} | Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeFlights) (tourData.flights || []).forEach(f => csvData.push([f.bookingType, f.pickupDate, f.airline, f.toFrom, f.conf, 'N/A', `Passenger/Driver: ${f.name} | Pickup: ${f.pickupAddress} at ${f.pickupTime} | Dropoff: ${f.dropoffAddress} at ${f.dropoffTime} | Notes: ${f.notes}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort((a,b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0])).forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `${TOUR_NAME}-tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } }
 </script>
