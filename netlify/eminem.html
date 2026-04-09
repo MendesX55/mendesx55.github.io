@@ -1205,11 +1205,17 @@ input:checked + .slider:before { transform: translateX(22px); }
             for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
                 const fromStopInfo = tourData.routePlannerState[i];
                 const toStopInfo = tourData.routePlannerState[i + 1];
-                // Skip non-driven booking-to-booking legs like flight airport-to-airport or artist Uber-to-rental handoffs
-                const fromIsBooking = (fromStopInfo.selectValue || '').startsWith('Booking:');
-                const toIsBooking = (toStopInfo.selectValue || '').startsWith('Booking:');
-                if (fromIsBooking && toIsBooking) {
-                    console.log('Skipping booking-to-booking leg');
+                // Only skip Flight-to-Flight legs (not driven). Uber/Rental legs ARE driven.
+                const resolveBookingType = (stopVal) => {
+                    if (!(stopVal || '').startsWith('Booking:')) return null;
+                    const bookingId = stopVal.replace('Booking:', '').replace('_pickup','').replace('_dropoff','');
+                    const b = (tourData.flights || []).find(f => f.id === bookingId);
+                    return b ? b.bookingType : null;
+                };
+                const fromType = resolveBookingType(fromStopInfo.selectValue);
+                const toType = resolveBookingType(toStopInfo.selectValue);
+                if (fromType === 'flight' && toType === 'flight') {
+                    console.log('Skipping flight-to-flight leg (not driven)');
                     continue;
                 }
                 if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
@@ -1380,35 +1386,34 @@ input:checked + .slider:before { transform: translateX(22px); }
         if (!isAdmin() && !isManager()) return;
         const item = (tourData.flights || []).find(f => f.id === currentEditId);
         if (!item) return;
+        // Capture item data before closing modal
+        const dupData = JSON.parse(JSON.stringify(item));
         closeModal('flightModal');
         openSettingsModal('add-flight-rental');
-        // Wait for template to be cloned into the modal, then populate
-        function tryFill(attempts) {
+        // openSettingsModal sets today's date/time on the form — we override it after with a longer delay
+        setTimeout(() => {
             const formContent = document.getElementById('settingsModalContent');
-            const bookingTypeEl = formContent ? formContent.querySelector('#bookingType') : null;
-            if (!bookingTypeEl && attempts > 0) {
-                setTimeout(() => tryFill(attempts - 1), 100);
-                return;
-            }
-            if (!bookingTypeEl) return;
-            const setVal = (id, val) => { const el = formContent.querySelector('#' + id); if (el) el.value = (val !== undefined && val !== null) ? val : ''; };
-            setVal('bookingType', item.bookingType);
-            toggleFlightRentalFields(item.bookingType, false);
-            setVal('flightName', item.name);
-            setVal('flightToFrom', item.toFrom);
-            setVal('flightAirline', item.airline);
-            setVal('flightConf', item.conf);
-            setVal('pickupDate', item.pickupDate);
-            setVal('pickupTime', item.pickupTime);
-            setVal('dropoffDate', item.dropoffDate);
-            setVal('dropoffTime', item.dropoffTime);
-            setVal('flightCostUSD', item.costUSD);
-            setVal('flightCostCAD', item.costCAD);
-            setVal('flightPickupAddress', item.pickupAddress);
-            setVal('flightDropoffAddress', item.dropoffAddress);
-            setVal('flightNotes', item.notes);
-        }
-        setTimeout(() => tryFill(10), 150);
+            if (!formContent) return;
+            const setVal = (id, val) => {
+                const el = formContent.querySelector('#' + id);
+                if (el) el.value = (val !== undefined && val !== null) ? String(val) : '';
+            };
+            setVal('bookingType', dupData.bookingType);
+            toggleFlightRentalFields(dupData.bookingType, false);
+            setVal('flightName', dupData.name);
+            setVal('flightToFrom', dupData.toFrom);
+            setVal('flightAirline', dupData.airline);
+            setVal('flightConf', dupData.conf);
+            setVal('pickupDate', dupData.pickupDate);
+            setVal('pickupTime', dupData.pickupTime);
+            setVal('dropoffDate', dupData.dropoffDate);
+            setVal('dropoffTime', dupData.dropoffTime);
+            setVal('flightCostUSD', dupData.costUSD);
+            setVal('flightCostCAD', dupData.costCAD);
+            setVal('flightPickupAddress', dupData.pickupAddress);
+            setVal('flightDropoffAddress', dupData.dropoffAddress);
+            setVal('flightNotes', dupData.notes);
+        }, 300);
     }
     function renderUsers() { const modalContent = document.getElementById('settingsModalContent'); const tbody = modalContent.querySelector('#usersBody'); tbody.innerHTML = ''; const roleSelect = modalContent.querySelector('#newUserRole'); roleSelect.innerHTML = `<option value="user only">User Only</option><option value="viewer">View All</option>`; if(isAdmin() || isManager()) roleSelect.innerHTML += `<option value="management">Management</option>`; if(isAdmin()) roleSelect.innerHTML += `<option value="admin">Admin</option>`; const accessCodes = tourData.access_codes || {}; for(const code in accessCodes) { const user = accessCodes[code]; if(isManager() && (user.role === 'admin' || user.role === 'management')) continue; const row = tbody.insertRow(); row.innerHTML = `<td>${user.name}</td><td>${code}</td><td>${user.role}</td><td><button class="btn btn-small btn-danger" onclick="deleteUser('${code}')">×</button></td>`; } }
     function addUser(button) { if (!isAdmin() && !isManager()) return; const form = button.closest('.form-section'); const name = form.querySelector('#newUserName').value; const code = form.querySelector('#newAccessCode').value.trim(); const role = form.querySelector('#newUserRole').value; if (name && code) { if (tourData.access_codes[code]) { alert('This access code is already in use.'); return; } tourData.access_codes[code] = { name, role }; saveDataWithFeedback(button, saveData(), () => { form.querySelector('#newUserName').value = ''; form.querySelector('#newAccessCode').value = ''; renderUsers(); }); } else { alert('Please fill in all fields.'); } }
