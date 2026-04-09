@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ITA - Tour Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            background: linear-gradient(-45deg, #0f3460, #16213e, #1a1a2e, #2e1a2b);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            overflow: hidden;
+        }
+
+        .hero-logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 40px;
+            mix-blend-mode: screen;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px 24px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: left;
+            text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-icon {
+            font-size: 1.8em;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .btn-text .tour-artist {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .btn-text .tour-title {
+            display: block;
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+        
+        .btn-text .tour-dates {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <img src="icon.png" class="hero-logo" alt="ITA Logo">
+
+    <div class="content-wrapper">
+        <a class="btn" href="seanpaul.html">
+            <span class="btn-icon">😎</span>
+            <span class="btn-text">
+                <span class="tour-artist">Sean Paul x Wiz Khalifa</span>
+                <span class="tour-title">Good Vibes Tour 2025</span>
+                <span class="tour-dates">🗓 July 6–27</span>
+            </span>
+        </a>
+
+        <a class="btn" href="swollen1.html">
+            <span class="btn-icon">💀</span>
+            <span class="btn-text">
+                <span class="tour-artist">Swollen Members</span>
+                <span class="tour-title">Bury the Hatchet I 2025</span>
+                <span class="tour-dates">🗓 Aug 16–31</span>
+            </span>
+        </a>
+
+        <a class="btn" href="swollen2.html">
+            <span class="btn-icon">💀</span>
+            <span class="btn-text">
+                <span class="tour-artist">Swollen Members</span>
+                <span class="tour-title">Bury the Hatchet II 2025</span>
+                <span class="tour-dates">🗓 Sep (TBA)</span>
+            </span>
+        </a>
+
+        <a class="btn" href="template.html">
+            <span class="btn-icon">❓</span>
+            <span class="btn-text">
+                <span class="tour-artist">TBD / TBA</span>
+                <span class="tour-title">Upcoming Tour</span>
+                <span class="tour-dates">🗓 Dates TBA</span>
+            </span>
+        </a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ITA - Tour Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 20px 50px;
+            background: linear-gradient(-45deg, #0f3460, #16213e, #1a1a2e, #2e1a2b);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+        .hero-logo {
+            width: 160px;
+            height: auto;
+            margin-bottom: 30px;
+            mix-blend-mode: screen;
+            flex-shrink: 0;
+        }
+        .content-wrapper {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .section-label {
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            text-align: center;
+            padding: 8px 0 4px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 4px;
+        }
+        .section-label:first-child { border-top: none; margin-top: 0; }
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px 24px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: left;
+            text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .btn:active { transform: scale(0.97); }
+        .btn-icon { font-size: 1.8em; width: 30px; text-align: center; flex-shrink: 0; }
+        .btn-text { display: flex; flex-direction: column; }
+        .btn-text .tour-artist { display: block; font-weight: 700; margin-bottom: 4px; }
+        .btn-text .tour-title { display: block; font-size: 0.9em; opacity: 0.9; margin-bottom: 2px; }
+        .btn-text .tour-dates { font-size: 0.8em; opacity: 0.8; }
+
+        /* Archive */
+        .archive-toggle {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.35);
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.82em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .archive-toggle:active { transform: scale(0.98); }
+        .archive-list { display: none; flex-direction: column; gap: 10px; margin-top: 2px; }
+        .archive-list.open { display: flex; }
+        .btn.archived {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.4);
+            box-shadow: none;
+        }
+        .btn.archived .tour-artist { color: rgba(255,255,255,0.45); }
+        .btn.archived .tour-title, .btn.archived .tour-dates { opacity: 0.5; }
+        .arrow { transition: transform 0.25s ease; display: inline-block; }
+        .arrow.open { transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+    <img src="icon.png" class="hero-logo" alt="ITA Logo">
+
+    <div class="content-wrapper">
+        <div class="section-label">Active Tours</div>
+
+        <a class="btn" href="eminem.html">
+            <span class="btn-icon">🎤</span>
+            <span class="btn-text">
+                <span class="tour-artist">Michael Mathers</span>
+                <span class="tour-title">Eminem Tribute Tour</span>
+                <span class="tour-dates">🗓 April 15–19</span>
+            </span>
+        </a>
+
+        <a class="btn" href="choclair.html">
+            <span class="btn-icon">🎵</span>
+            <span class="btn-text">
+                <span class="tour-artist">Choclair ft. Prevail & Moka Only</span>
+                <span class="tour-title">Tour 2025</span>
+                <span class="tour-dates">🗓 April 29 – May 2</span>
+            </span>
+        </a>
+
+        <div class="section-label">Past Tours</div>
+
+        <button class="archive-toggle" onclick="toggleArchive()">
+            <span>📁 Archived Tours (3)</span>
+            <span class="arrow" id="archiveArrow">▼</span>
+        </button>
+
+        <div class="archive-list" id="archiveList">
+            <a class="btn archived" href="seanpaul.html">
+                <span class="btn-icon">😎</span>
+                <span class="btn-text">
+                    <span class="tour-artist">Sean Paul x Wiz Khalifa</span>
+                    <span class="tour-title">Good Vibes Tour 2025</span>
+                    <span class="tour-dates">🗓 July 6–27</span>
+                </span>
+            </a>
+            <a class="btn archived" href="swollen1.html">
+                <span class="btn-icon">💀</span>
+                <span class="btn-text">
+                    <span class="tour-artist">Swollen Members</span>
+                    <span class="tour-title">Bury the Hatchet I 2025</span>
+                    <span class="tour-dates">🗓 Aug 16–31</span>
+                </span>
+            </a>
+            <a class="btn archived" href="swollen2.html">
+                <span class="btn-icon">💀</span>
+                <span class="btn-text">
+                    <span class="tour-artist">Swollen Members</span>
+                    <span class="tour-title">Bury the Hatchet II 2025</span>
+                    <span class="tour-dates">🗓 Sep (TBA)</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleArchive() {
+            document.getElementById('archiveList').classList.toggle('open');
+            document.getElementById('archiveArrow').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
