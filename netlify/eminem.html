@@ -335,8 +335,14 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="form-group"><label id="pickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="pickupDate" type="date"/><input id="pickupTime" type="time"/></div></div>
             <div class="form-group"><label id="dropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="dropoffDate" type="date"/><input id="dropoffTime" type="time"/></div></div>
             <div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="flightCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="flightCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div>
-            <div class="form-group"><label id="pickupAddressLabel">Departure Airport Address</label><input id="flightPickupAddress" placeholder="Full address of airport or rental office" type="text"/></div>
-            <div class="form-group"><label id="dropoffAddressLabel">Arrival Airport Address</label><input id="flightDropoffAddress" placeholder="Full address of airport or rental office" type="text"/></div>
+            <div class="form-group"><label id="pickupAddressLabel">Departure Airport Address</label>
+                <select id="flightPickupAddress" onchange="updateBookingToFrom()"><option value="">-- Select or type below --</option></select>
+                <input id="flightPickupAddressCustom" placeholder="Or type custom address" type="text" style="margin-top:6px;" oninput="updateBookingToFrom()"/>
+            </div>
+            <div class="form-group"><label id="dropoffAddressLabel">Arrival Airport Address</label>
+                <select id="flightDropoffAddress" onchange="updateBookingToFrom()"><option value="">-- Select or type below --</option></select>
+                <input id="flightDropoffAddressCustom" placeholder="Or type custom address" type="text" style="margin-top:6px;" oninput="updateBookingToFrom()"/>
+            </div>
             <div class="form-group"><label>Notes</label><textarea id="flightNotes" placeholder="Record locators, contact info, etc." rows="2"></textarea></div>
             <button class="btn" onclick="addFlightRental(this)">Add Booking</button>
         </div>
@@ -830,8 +836,13 @@ input:checked + .slider:before { transform: translateX(22px); }
                 sv('dropoffTime', prefillData.dropoffTime);
                 sv('flightCostUSD', prefillData.costUSD);
                 sv('flightCostCAD', prefillData.costCAD);
-                sv('flightPickupAddress', prefillData.pickupAddress);
-                sv('flightDropoffAddress', prefillData.dropoffAddress);
+                // For select dropdowns, set value then also populate custom field as fallback
+                const pSel = contentEl.querySelector('#flightPickupAddress');
+                const dSel = contentEl.querySelector('#flightDropoffAddress');
+                const pCus = contentEl.querySelector('#flightPickupAddressCustom');
+                const dCus = contentEl.querySelector('#flightDropoffAddressCustom');
+                if (pSel) { pSel.value = prefillData.pickupAddress || ''; if (!pSel.value && pCus) pCus.value = prefillData.pickupAddress || ''; }
+                if (dSel) { dSel.value = prefillData.dropoffAddress || ''; if (!dSel.value && dCus) dCus.value = prefillData.dropoffAddress || ''; }
                 sv('flightNotes', prefillData.notes);
             }
         }
@@ -1137,8 +1148,8 @@ input:checked + .slider:before { transform: translateX(22px); }
                 dropoffTime: form.querySelector('#dropoffTime').value,
                 costUSD: parseFloat(form.querySelector('#flightCostUSD').value) || 0,
                 costCAD: parseFloat(form.querySelector('#flightCostCAD').value) || 0,
-                pickupAddress: form.querySelector('#flightPickupAddress').value,
-                dropoffAddress: form.querySelector('#flightDropoffAddress').value,
+                pickupAddress: (form.querySelector('#flightPickupAddress').value || form.querySelector('#flightPickupAddressCustom').value),
+                dropoffAddress: (form.querySelector('#flightDropoffAddress').value || form.querySelector('#flightDropoffAddressCustom').value),
                 notes: form.querySelector('#flightNotes').value,
             };
             tourData.flights.push(booking);
@@ -1470,6 +1481,55 @@ input:checked + .slider:before { transform: translateX(22px); }
     function populateUserSelect(selectId, selectedNames = [], context = document) { const select = context.querySelector(`#${selectId}`); if (!select) return; select.innerHTML = ''; if (!isAdmin() && !isManager()) { selectedNames.sort().forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); } else { const allUsers = Object.values(tourData.access_codes || {}).map(u => u.name); const selectedUsers = allUsers.filter(name => selectedNames.includes(name)).sort(); const unselectedUsers = allUsers.filter(name => !selectedNames.includes(name)).sort(); selectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); unselectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); }); } }
     function exportTourData() { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); const form = document.getElementById('settingsModalContent'); const includeHotels = form.querySelector('#exportHotels').checked; const includeVenues = form.querySelector('#exportVenues').checked; const includeExpenses = form.querySelector('#exportExpenses').checked; const includeFlights = form.querySelector('#exportFlights').checked; const includeRoute = form.querySelector('#exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Guests: ${(h.guestNames || []).join(', ')} | Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeFlights) (tourData.flights || []).forEach(f => csvData.push([f.bookingType, f.pickupDate, f.airline, f.toFrom, f.conf, 'N/A', `Passenger/Driver: ${f.name} | Pickup: ${f.pickupAddress} at ${f.pickupTime} | Dropoff: ${f.dropoffAddress} at ${f.dropoffTime} | Notes: ${f.notes}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort((a,b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0])).forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `${TOUR_NAME}-tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } }
+
+    // Populate address dropdowns in booking add form with all known addresses
+    function wireBookingAddressDropdowns(container) {
+        const pickupSel = container ? container.querySelector('#flightPickupAddress') : document.getElementById('flightPickupAddress');
+        const dropoffSel = container ? container.querySelector('#flightDropoffAddress') : document.getElementById('flightDropoffAddress');
+        if (!pickupSel || !dropoffSel) return;
+
+        const addresses = [];
+        // Hotels
+        (tourData.hotels || []).forEach(h => { if (h.address) addresses.push({ label: h.name, value: h.address }); });
+        // Venues
+        (tourData.venues || []).forEach(v => { if (v.address) addresses.push({ label: v.name, value: v.address }); });
+        // Existing bookings pickup/dropoff addresses
+        (tourData.flights || []).forEach(f => {
+            if (f.pickupAddress) addresses.push({ label: f.pickupAddress.split(',')[0], value: f.pickupAddress });
+            if (f.dropoffAddress) addresses.push({ label: f.dropoffAddress.split(',')[0], value: f.dropoffAddress });
+        });
+        // Deduplicate by value
+        const seen = new Set();
+        const unique = addresses.filter(a => { if (seen.has(a.value)) return false; seen.add(a.value); return true; });
+
+        [pickupSel, dropoffSel].forEach(sel => {
+            const current = sel.value;
+            sel.innerHTML = '<option value="">-- Select address --</option>';
+            unique.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.value;
+                opt.textContent = a.label;
+                sel.appendChild(opt);
+            });
+            if (current) sel.value = current;
+        });
+    }
+
+    // Auto-populate To→From field based on selected pickup/dropoff addresses
+    function updateBookingToFrom() {
+        const container = document.getElementById('settingsModalContent');
+        if (!container) return;
+        const pickupSel = container.querySelector('#flightPickupAddress');
+        const dropoffSel = container.querySelector('#flightDropoffAddress');
+        const pickupCustom = container.querySelector('#flightPickupAddressCustom');
+        const dropoffCustom = container.querySelector('#flightDropoffAddressCustom');
+        const toFromField = container.querySelector('#flightToFrom');
+        if (!toFromField) return;
+
+        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom ? pickupCustom.value.split(',')[0] : '');
+        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom ? dropoffCustom.value.split(',')[0] : '');
+        if (from && to) toFromField.value = from + ' → ' + to;
+    }
 </script>
 </body>
 </html>
