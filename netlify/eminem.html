@@ -323,6 +323,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <select id="bookingType" onchange="toggleFlightRentalFields(this.value)">
                     <option value="flight">Flight</option>
                     <option value="rental">Car Rental</option>
+                    <option value="uber">Uber / Transfer</option>
                 </select>
             </div>
             <div class="form-group"><label id="flightNameLabel">Passenger Name</label><input id="flightName" placeholder="e.g., John Doe" type="text"/></div>
@@ -1375,7 +1376,40 @@ input:checked + .slider:before { transform: translateX(22px); }
 
     function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venues', ${venue.id})">×</button>` : ''}</div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
     function toggleFlightRentalFields(type, isEdit = false) { const prefix = isEdit ? 'edit' : ''; const modalContent = isEdit ? document.getElementById('flightEditForm') : document.getElementById('settingsModalContent'); const flightNameLabel = modalContent.querySelector(`#${prefix}FlightNameLabel`); const airlineAgencyLabel = modalContent.querySelector(`#${prefix}AirlineAgencyLabel`); const flightConfLabel = modalContent.querySelector(`#${prefix}FlightConfLabel`); const pickupDateLabel = modalContent.querySelector(`#${prefix}PickupDateLabel`); const dropoffDateLabel = modalContent.querySelector(`#${prefix}DropoffDateLabel`); const pickupAddressLabel = modalContent.querySelector(`#${prefix}PickupAddressLabel`); const dropoffAddressLabel = modalContent.querySelector(`#${prefix}DropoffAddressLabel`); if (type === 'flight') { flightNameLabel.textContent = 'Passenger Name'; airlineAgencyLabel.textContent = 'Airline'; flightConfLabel.textContent = 'Flight #'; pickupDateLabel.textContent = 'Departure Date & Time'; dropoffDateLabel.textContent = 'Arrival Date & Time'; pickupAddressLabel.textContent = 'Departure Airport Address'; dropoffAddressLabel.textContent = 'Arrival Airport Address'; } else if (type === 'uber') { flightNameLabel.textContent = 'Passenger Name'; airlineAgencyLabel.textContent = 'Provider'; flightConfLabel.textContent = 'Trip Ref #'; pickupDateLabel.textContent = 'Pickup Date & Time'; dropoffDateLabel.textContent = 'Drop-off Date & Time'; pickupAddressLabel.textContent = 'Pickup Address'; dropoffAddressLabel.textContent = 'Drop-off Address'; } else { flightNameLabel.textContent = 'Driver Name'; airlineAgencyLabel.textContent = 'Rental Agency'; flightConfLabel.textContent = 'Confirmation #'; pickupDateLabel.textContent = 'Pickup Date & Time'; dropoffDateLabel.textContent = 'Drop-off Date & Time'; pickupAddressLabel.textContent = 'Pickup Address'; dropoffAddressLabel.textContent = 'Drop-off Address'; } }
-    function duplicateBooking() { if (!isAdmin() && !isManager()) return; const item = (tourData.flights || []).find(f => f.id === currentEditId); if (!item) return; closeModal('flightModal'); openSettingsModal('add-flight-rental'); setTimeout(() => { const formContent = document.getElementById('settingsModalContent'); if (!formContent) { setTimeout(arguments.callee, 100); return; } const setVal = (id, val) => { const el = formContent.querySelector('#' + id); if (el) el.value = val || ''; }; setVal('bookingType', item.bookingType); toggleFlightRentalFields(item.bookingType, false); setVal('flightName', item.name); setVal('flightToFrom', item.toFrom); setVal('flightAirline', item.airline); setVal('flightConf', item.conf); setVal('pickupDate', item.pickupDate); setVal('pickupTime', item.pickupTime); setVal('dropoffDate', item.dropoffDate); setVal('dropoffTime', item.dropoffTime); setVal('flightCostUSD', item.costUSD); setVal('flightCostCAD', item.costCAD); setVal('flightPickupAddress', item.pickupAddress); setVal('flightDropoffAddress', item.dropoffAddress); setVal('flightNotes', item.notes); }, 400); }
+    function duplicateBooking() {
+        if (!isAdmin() && !isManager()) return;
+        const item = (tourData.flights || []).find(f => f.id === currentEditId);
+        if (!item) return;
+        closeModal('flightModal');
+        openSettingsModal('add-flight-rental');
+        // Wait for template to be cloned into the modal, then populate
+        function tryFill(attempts) {
+            const formContent = document.getElementById('settingsModalContent');
+            const bookingTypeEl = formContent ? formContent.querySelector('#bookingType') : null;
+            if (!bookingTypeEl && attempts > 0) {
+                setTimeout(() => tryFill(attempts - 1), 100);
+                return;
+            }
+            if (!bookingTypeEl) return;
+            const setVal = (id, val) => { const el = formContent.querySelector('#' + id); if (el) el.value = (val !== undefined && val !== null) ? val : ''; };
+            setVal('bookingType', item.bookingType);
+            toggleFlightRentalFields(item.bookingType, false);
+            setVal('flightName', item.name);
+            setVal('flightToFrom', item.toFrom);
+            setVal('flightAirline', item.airline);
+            setVal('flightConf', item.conf);
+            setVal('pickupDate', item.pickupDate);
+            setVal('pickupTime', item.pickupTime);
+            setVal('dropoffDate', item.dropoffDate);
+            setVal('dropoffTime', item.dropoffTime);
+            setVal('flightCostUSD', item.costUSD);
+            setVal('flightCostCAD', item.costCAD);
+            setVal('flightPickupAddress', item.pickupAddress);
+            setVal('flightDropoffAddress', item.dropoffAddress);
+            setVal('flightNotes', item.notes);
+        }
+        setTimeout(() => tryFill(10), 150);
+    }
     function renderUsers() { const modalContent = document.getElementById('settingsModalContent'); const tbody = modalContent.querySelector('#usersBody'); tbody.innerHTML = ''; const roleSelect = modalContent.querySelector('#newUserRole'); roleSelect.innerHTML = `<option value="user only">User Only</option><option value="viewer">View All</option>`; if(isAdmin() || isManager()) roleSelect.innerHTML += `<option value="management">Management</option>`; if(isAdmin()) roleSelect.innerHTML += `<option value="admin">Admin</option>`; const accessCodes = tourData.access_codes || {}; for(const code in accessCodes) { const user = accessCodes[code]; if(isManager() && (user.role === 'admin' || user.role === 'management')) continue; const row = tbody.insertRow(); row.innerHTML = `<td>${user.name}</td><td>${code}</td><td>${user.role}</td><td><button class="btn btn-small btn-danger" onclick="deleteUser('${code}')">×</button></td>`; } }
     function addUser(button) { if (!isAdmin() && !isManager()) return; const form = button.closest('.form-section'); const name = form.querySelector('#newUserName').value; const code = form.querySelector('#newAccessCode').value.trim(); const role = form.querySelector('#newUserRole').value; if (name && code) { if (tourData.access_codes[code]) { alert('This access code is already in use.'); return; } tourData.access_codes[code] = { name, role }; saveDataWithFeedback(button, saveData(), () => { form.querySelector('#newUserName').value = ''; form.querySelector('#newAccessCode').value = ''; renderUsers(); }); } else { alert('Please fill in all fields.'); } }
     function deleteUser(code) { if ((!isAdmin() && !isManager()) || (currentUser && code === currentUser.code)) { alert("Action not allowed."); return; } if (confirm(`Are you sure you want to delete the user with access code "${code}"?`)) { delete tourData.access_codes[code]; saveData().then(() => renderUsers()); } }
