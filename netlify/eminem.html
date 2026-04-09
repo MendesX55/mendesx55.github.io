@@ -1210,12 +1210,23 @@ input:checked + .slider:before { transform: translateX(22px); }
             if (!booking) return { type: 'Booking', name: 'N/A', address: 'N/A' };
 
             const icon = booking.bookingType === 'flight' ? '✈️' : (booking.bookingType === 'uber' ? '🚕' : '🚗');
+            const lookupName = (addr) => {
+                if (!addr) return null;
+                const a = addr.trim().toLowerCase();
+                const loc = (tourData.locations||[]).find(l => l.address && l.address.trim().toLowerCase() === a);
+                if (loc) return loc.name;
+                const h = (tourData.hotels||[]).find(h => h.address && h.address.trim().toLowerCase() === a);
+                if (h) return h.name;
+                const v = (tourData.venues||[]).find(v => v.address && v.address.trim().toLowerCase() === a);
+                if (v) return v.name;
+                return null;
+            };
             if (pointType === 'pickup') {
-                const ps = booking.pickupAddress ? booking.pickupAddress.split(',')[0] : booking.toFrom;
-                return { name: `${icon} ${ps}`, address: booking.pickupAddress, type: 'Booking', bookingType: booking.bookingType };
+                const name = lookupName(booking.pickupAddress) || booking.pickupAddress || booking.toFrom;
+                return { name: `${icon} ${name}`, address: booking.pickupAddress, type: 'Booking', bookingType: booking.bookingType };
             } else {
-                const ds = booking.dropoffAddress ? booking.dropoffAddress.split(',')[0] : booking.toFrom;
-                return { name: `${icon} ${ds}`, address: booking.dropoffAddress, type: 'Booking', bookingType: booking.bookingType };
+                const name = lookupName(booking.dropoffAddress) || booking.dropoffAddress || booking.toFrom;
+                return { name: `${icon} ${name}`, address: booking.dropoffAddress, type: 'Booking', bookingType: booking.bookingType };
             }
         }
         return { type: 'N/A', name: 'N/A', address: 'N/A' }; 
@@ -1366,7 +1377,8 @@ input:checked + .slider:before { transform: translateX(22px); }
                 fc.style.cssText = 'border-left-color:#00a8ff;';
                 fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: '+(booking.toFrom||'')+'</strong></div>'
                     +'<div class="route-info" style="margin-top:5px;"><strong>Airline:</strong> '+(booking.airline||'')+' &nbsp;|&nbsp; <strong>Flight #:</strong> '+(booking.conf||'')
-                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')+dur
+                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')
+                    +(dur ? '<br>'+dur : '')
                     +'<br><small style="color:#00a8ff;">✈️ Flight segment — excluded from drive totals</small></div>';
                 routeResults.appendChild(fc);
             }
@@ -1400,8 +1412,11 @@ input:checked + .slider:before { transform: translateX(22px); }
                 const legKm = leg.distanceValue/1000;
                 const gasCost = calculateGasCost(legKm);
                 const isUber = fromBT==='uber'||toBT==='uber';
-                const emoji = isUber ? '' : '🚗 ';
-                const fromName = fDet.name||'';
+                // Booking stop names already contain their icon (✈️/🚕/🚗) — only add 🚗 for Hotel/Venue stops
+                const fromIsBooking = fv.startsWith('Booking:');
+                const toIsBooking = tv.startsWith('Booking:');
+                const drivePrefix = (!isUber && !fromIsBooking) ? '🚗 ' : '';
+                const fromName = drivePrefix + (fDet.name||'');
                 const toName = tDet.name||'';
                 const seg = document.createElement('div');
                 seg.className = 'route-item cached '+(tDet.type==='Venue'?'show-day':'');
