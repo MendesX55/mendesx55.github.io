@@ -295,6 +295,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <button class="settings-menu-item" onclick="openSettingsModal('add-flight-rental')">✈️ Add Flight/Rental</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('add-expense')">💰 Add Expense</button>
                 <button class="settings-menu-item" id="gas-settings-btn" onclick="openSettingsModal('gas-settings')">⛽ Gas/Vehicle Settings</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('manage-locations')">📍 Manage Locations</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('data-management')">📤 Data Management</button>
                 <button class="settings-menu-item btn-danger" onclick="logout()">🚪 Logout</button>
             </div>
@@ -439,7 +440,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
     // --- Global State ---
     const defaultData = { 
-        hotels: [], venues: [], expenses: [], flights: [], routePlannerState: [], routeCache: {}, 
+        hotels: [], venues: [], expenses: [], flights: [], locations: [], routePlannerState: [], routeCache: {}, 
         settings: { 
             litresPer100km: 12, costPerLitre: 1.75, 
             mpg: 20, costPerGallon: 4.50,
@@ -645,6 +646,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 tourData = loadFromLocalStorage();
             }
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = [];
             if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
             if (!tourData.hotels) tourData.hotels = [];
             if (!tourData.venues) tourData.venues = [];
@@ -671,6 +673,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             updateSyncStatus("⚠️ Offline mode");
             tourData = loadFromLocalStorage();
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = [];
             if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
             initializeAppUI();
         }
@@ -684,6 +687,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 console.log("Live update is newer. Applying changes.");
                 tourData = { ...defaultData, ...cloudData };
                 if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = [];
                 if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
 
@@ -808,7 +812,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         
         const titles = {
             'add-hotel': '🏨 Add Hotel Confirmation', 'add-venue': '🎤 Add Venue/Show', 'add-flight-rental': '✈️ Add Flight/Rental', 'add-expense': '💰 Add Expense',
-            'route-builder': '🗺️ Build/Edit Tour Route', 'gas-settings': '⛽ Gas/Vehicle Settings', 'data-management': '📤 Data Management', 'user-management': '👤 User Management'
+            'route-builder': '🗺️ Build/Edit Tour Route', 'gas-settings': '⛽ Gas/Vehicle Settings', 'data-management': '📤 Data Management', 'user-management': '👤 User Management', 'manage-locations': '📍 Manage Locations'
         };
         
         titleEl.textContent = titles[category] || "Settings";
@@ -822,6 +826,9 @@ input:checked + .slider:before { transform: translateX(22px); }
             const time = now.toTimeString().split(' ')[0].substring(0,5);
             if (contentEl.querySelector('#pickupDate')) contentEl.querySelector('#pickupDate').value = today;
             if (contentEl.querySelector('#pickupTime')) contentEl.querySelector('#pickupTime').value = time;
+            // Initialize labels and populate address dropdowns
+            toggleFlightRentalFields('flight', false);
+            wireBookingAddressDropdowns(contentEl);
             if (prefillData) {
                 const sv = (id, val) => { const el = contentEl.querySelector('#' + id); if (el && val !== undefined && val !== null) el.value = String(val); };
                 sv('bookingType', prefillData.bookingType);
@@ -848,6 +855,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         }
         if (category === 'gas-settings') applySettingsToUI();
         if (category === 'user-management') renderUsers();
+        if (category === 'manage-locations') setTimeout(() => renderLocationsList(), 50);
         if (category === 'add-hotel') populateUserSelect('hotelGuestNames', [], contentEl);
         
         modal.style.display = 'flex';
@@ -1135,6 +1143,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
         if (airline && pickupDate) {
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = [];
             const booking = {
                 id: Date.now(),
                 bookingType: form.querySelector('#bookingType').value,
@@ -1336,37 +1345,75 @@ input:checked + .slider:before { transform: translateX(22px); }
     }
     
     function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas (USD)</div></div></div>`; routeResults.appendChild(daySummary);
-            // Show Flight Info Cards for this day (depart time, arrive time, airline — not counted in drive totals)
-            (tourData.flights || []).filter(f => f.pickupDate === date && f.bookingType === 'flight').forEach(f => {
-                let durationStr = '';
+            // Render cards in exact order of routePlannerState
+            const stateForDay = (tourData.routePlannerState || []).filter(s => s.dateValue === date);
+            function renderFlightCard(booking) {
+                let dur = '';
                 try {
-                    if (f.pickupTime && f.dropoffTime) {
-                        const arrDate = f.dropoffDate || f.pickupDate;
-                        const ukKw = ['gatwick','heathrow','lgw','lhr','stansted','manchester','london, uk','england'];
-                        const isDepUK = ukKw.some(k => (f.pickupAddress||'').toLowerCase().includes(k)) || /^LG[WH]|^LHR/i.test(f.toFrom||'');
-                        const isArrUK = ukKw.some(k => (f.dropoffAddress||'').toLowerCase().includes(k));
-                        const depTZ = isDepUK ? '+01:00' : '-04:00';
-                        const arrTZ = isArrUK ? '+01:00' : '-04:00';
-                        const depMs = new Date(`${f.pickupDate}T${f.pickupTime}:00${depTZ}`).getTime();
-                        const arrMs = new Date(`${arrDate}T${f.dropoffTime}:00${arrTZ}`).getTime();
-                        const diff = Math.round((arrMs - depMs) / 60000);
-                        if (diff > 0) durationStr = ` &nbsp;|&nbsp; <strong>✈️ Flight Time:</strong> ${Math.floor(diff/60)}h ${diff%60}m`;
+                    if (booking.pickupTime && booking.dropoffTime) {
+                        const ad = booking.dropoffDate || booking.pickupDate;
+                        const ukKw = ['gatwick','heathrow','lgw','lhr','stansted','manchester','england'];
+                        const dUK = ukKw.some(k=>(booking.pickupAddress||'').toLowerCase().includes(k))||/^LGW|^LHR/i.test(booking.toFrom||'');
+                        const aUK = ukKw.some(k=>(booking.dropoffAddress||'').toLowerCase().includes(k));
+                        const dm = new Date(`${booking.pickupDate}T${booking.pickupTime}:00${dUK?'+01:00':'-04:00'}`).getTime();
+                        const am = new Date(`${ad}T${booking.dropoffTime}:00${aUK?'+01:00':'-04:00'}`).getTime();
+                        const diff = Math.round((am-dm)/60000);
+                        if (diff>0) dur = ' &nbsp;|&nbsp; <strong>✈️ Flight Time:</strong> '+Math.floor(diff/60)+'h '+(diff%60)+'m';
                     }
-                } catch(e) {}
-                const depCity = f.pickupAddress ? f.pickupAddress.split(',')[0] : (f.toFrom||'').split('→')[0].trim();
-                const arrCity = f.dropoffAddress ? f.dropoffAddress.split(',')[0] : ((f.toFrom||'').split('→')[1]||'').trim();
+                } catch(e){}
                 const fc = document.createElement('div');
                 fc.className = 'route-item';
                 fc.style.cssText = 'border-left-color:#00a8ff;';
-                fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: ' + depCity + ' → ' + arrCity + '</strong></div>'
-                    + '<div class="route-info" style="margin-top:5px;"><strong>Airline:</strong> ' + (f.airline||'') + ' &nbsp;|&nbsp; <strong>Flight #:</strong> ' + (f.conf||'')
-                    + '<br><strong>Depart:</strong> ' + (f.pickupTime||'') + ' &nbsp;|&nbsp; <strong>Arrive:</strong> ' + (f.dropoffTime||'') + durationStr
-                    + '<br><small style="color:#00a8ff;">✈️ Flight segment — excluded from drive totals</small></div>';
+                fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: '+(booking.toFrom||'')+'</strong></div>'
+                    +'<div class="route-info" style="margin-top:5px;"><strong>Airline:</strong> '+(booking.airline||'')+' &nbsp;|&nbsp; <strong>Flight #:</strong> '+(booking.conf||'')
+                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')+dur
+                    +'<br><small style="color:#00a8ff;">✈️ Flight segment — excluded from drive totals</small></div>';
                 routeResults.appendChild(fc);
-            });
-            dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item cached ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; const isUber = dayData.stops[index].bookingType === 'uber' || toStop.bookingType === 'uber';
-                routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>${isUber ? 'Uber Cost:' : 'Est. Gas:'}</strong> <span class="gas-cost" style="${isUber ? 'color:#ffcc00' : ''}">${isUber ? 'See Expenses tab' : '$'+gasCost.toFixed(2)+' USD'}</span></div>`;
-                routeResults.appendChild(routeSegment); }); }
+            }
+            let legIdx = 0;
+            for (let si = 0; si < stateForDay.length - 1; si++) {
+                const fv = stateForDay[si].selectValue || '';
+                const tv = stateForDay[si+1].selectValue || '';
+                const getB = (val) => {
+                    if (!val.startsWith('Booking:')) return null;
+                    const bid = val.replace('Booking:','').replace('_pickup','').replace('_dropoff','');
+                    return (tourData.flights||[]).find(f=>String(f.id)===bid)||null;
+                };
+                const fromB = getB(fv), toB = getB(tv);
+                const fromBT = fromB ? fromB.bookingType : null;
+                const toBT = toB ? toB.bookingType : null;
+                // Flight pickup→dropoff same booking = flight card
+                if (fromBT==='flight' && fv.endsWith('_pickup') && tv.endsWith('_dropoff') && fromB===toB) { renderFlightCard(fromB); continue; }
+                // Skip flight arrive→any pickup (airport handoff)
+                if (fromBT==='flight' && fv.endsWith('_dropoff') && tv.endsWith('_pickup')) continue;
+                // Skip different booking dropoff→pickup (handoff)
+                const fid = fv.replace('Booking:','').split('_')[0];
+                const tid = tv.replace('Booking:','').split('_')[0];
+                if (fv.endsWith('_dropoff') && tv.endsWith('_pickup') && fid!==tid) continue;
+                // Skip same address
+                const fDet = getLocationDetails(fv);
+                const tDet = getLocationDetails(tv);
+                if (fDet.address && tDet.address && fDet.address.trim()===tDet.address.trim()) continue;
+                // Driven leg
+                const leg = dayData.legs[legIdx++];
+                if (!leg) continue;
+                const legKm = leg.distanceValue/1000;
+                const gasCost = calculateGasCost(legKm);
+                const isUber = fromBT==='uber'||toBT==='uber';
+                const emoji = isUber ? '' : '🚗 ';
+                const fromName = fDet.name||'';
+                const toName = tDet.name||'';
+                const seg = document.createElement('div');
+                seg.className = 'route-item cached '+(tDet.type==='Venue'?'show-day':'');
+                seg.dataset.dayId = dayId;
+                seg.dataset.distanceKm = legKm;
+                seg.innerHTML = '<div class="route-header"><strong>'+emoji+fromName+' → '+toName+'</strong></div>'
+                    +'<div class="route-info"><strong>Distance:</strong> '+leg.distanceText+' | <strong>Time (traffic):</strong> '+leg.durationText
+                    +'<br><strong>'+(isUber?'Uber Cost:':'Est. Gas:')+'</strong> <span class="gas-cost"'+(isUber?' style="color:#ffcc00"':'')+'>'
+                    +(isUber?'See Expenses tab':'$'+gasCost.toFixed(2)+' USD')+'</span></div>';
+                routeResults.appendChild(seg);
+            }
+        }
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
     function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; const today = new Date(); const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day ${dateStr === todayStr ? 'today' : ''}" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isFlight) { eventIcons += '✈️'; } if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
     function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = Object.keys(tourData.routeCache || {}).some(key => key.startsWith(dateStr)); let isFlight = (tourData.flights || []).some(f => f.pickupDate === dateStr && f.bookingType === 'flight'); return { isVenue, isTravel, isFlight }; }
@@ -1511,37 +1558,95 @@ input:checked + .slider:before { transform: translateX(22px); }
     function exportTourData() { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); const form = document.getElementById('settingsModalContent'); const includeHotels = form.querySelector('#exportHotels').checked; const includeVenues = form.querySelector('#exportVenues').checked; const includeExpenses = form.querySelector('#exportExpenses').checked; const includeFlights = form.querySelector('#exportFlights').checked; const includeRoute = form.querySelector('#exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Guests: ${(h.guestNames || []).join(', ')} | Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeFlights) (tourData.flights || []).forEach(f => csvData.push([f.bookingType, f.pickupDate, f.airline, f.toFrom, f.conf, 'N/A', `Passenger/Driver: ${f.name} | Pickup: ${f.pickupAddress} at ${f.pickupTime} | Dropoff: ${f.dropoffAddress} at ${f.dropoffTime} | Notes: ${f.notes}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort((a,b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0])).forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `${TOUR_NAME}-tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } }
 
+
+    function addLocation(btn) {
+        if (!isAdmin() && !isManager()) return;
+        const name = document.getElementById('locationName').value.trim();
+        const address = document.getElementById('locationAddress').value.trim();
+        const category = document.getElementById('locationCategory').value;
+        if (!name || !address) { alert('Name and Address are required.'); return; }
+        if (!tourData.locations) tourData.locations = [];
+        tourData.locations.push({ id: Date.now(), name, address, category });
+        saveDataWithFeedback(btn, saveData());
+        renderLocationsList();
+        document.getElementById('locationName').value = '';
+        document.getElementById('locationAddress').value = '';
+    }
+
+    function deleteLocation(id) {
+        if (!isAdmin() && !isManager()) return;
+        tourData.locations = (tourData.locations || []).filter(l => l.id !== id);
+        saveData();
+        renderLocationsList();
+    }
+
+    function renderLocationsList() {
+        const container = document.getElementById('locationsListContent');
+        if (!container) return;
+        const locs = tourData.locations || [];
+        if (locs.length === 0) { container.innerHTML = '<p style="color:#aaa;">No locations saved yet.</p>'; return; }
+        const grouped = {};
+        locs.forEach(l => { if (!grouped[l.category]) grouped[l.category] = []; grouped[l.category].push(l); });
+        let html = '';
+        Object.keys(grouped).forEach(cat => {
+            html += `<div style="margin-bottom:10px;"><strong style="color:#d4af37;">${cat}</strong>`;
+            grouped[cat].forEach(l => {
+                html += `<div class="route-item" style="margin-top:6px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+                    <div><strong>${l.name}</strong><br><small style="color:#aaa;">${l.address}</small></div>
+                    <button onclick="deleteLocation(${l.id})" style="background:#c0392b;border:none;color:white;border-radius:6px;padding:4px 10px;cursor:pointer;">✕</button>
+                </div>`;
+            });
+            html += '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+
+
     // Populate address dropdowns in booking add form with all known addresses
+    function buildAddressOptionGroups() {
+        const groups = [];
+        // Airports from locations
+        const airports = (tourData.locations || []).filter(l => l.category === 'Airport');
+        if (airports.length) groups.push({ label: '✈️ Airports', items: airports });
+        // Rental Agencies
+        const rentals = (tourData.locations || []).filter(l => l.category === 'Rental Agency');
+        if (rentals.length) groups.push({ label: '🚗 Rental Agencies', items: rentals });
+        // Important Locations
+        const important = (tourData.locations || []).filter(l => l.category === 'Important Location');
+        if (important.length) groups.push({ label: '📍 Important Locations', items: important });
+        // Hotels
+        const hotels = (tourData.hotels || []).filter(h => h.address);
+        if (hotels.length) groups.push({ label: '🏨 Hotels', items: hotels });
+        // Venues
+        const venues = (tourData.venues || []).filter(v => v.address);
+        if (venues.length) groups.push({ label: '🎤 Venues', items: venues });
+        return groups;
+    }
+
+    function populateAddressSelect(sel, currentValue) {
+        const groups = buildAddressOptionGroups();
+        sel.innerHTML = '<option value="">-- Select address --</option>';
+        groups.forEach(g => {
+            const og = document.createElement('optgroup');
+            og.label = g.label;
+            g.items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.address;
+                opt.textContent = item.name;
+                og.appendChild(opt);
+            });
+            sel.appendChild(og);
+        });
+        if (currentValue) sel.value = currentValue;
+    }
+
     function wireBookingAddressDropdowns(container) {
         const pickupSel = container ? container.querySelector('#flightPickupAddress') : document.getElementById('flightPickupAddress');
         const dropoffSel = container ? container.querySelector('#flightDropoffAddress') : document.getElementById('flightDropoffAddress');
         if (!pickupSel || !dropoffSel) return;
-
-        const addresses = [];
-        // Hotels
-        (tourData.hotels || []).forEach(h => { if (h.address) addresses.push({ label: h.name, value: h.address }); });
-        // Venues
-        (tourData.venues || []).forEach(v => { if (v.address) addresses.push({ label: v.name, value: v.address }); });
-        // Existing bookings pickup/dropoff addresses
-        (tourData.flights || []).forEach(f => {
-            if (f.pickupAddress) addresses.push({ label: f.pickupAddress.split(',')[0], value: f.pickupAddress });
-            if (f.dropoffAddress) addresses.push({ label: f.dropoffAddress.split(',')[0], value: f.dropoffAddress });
-        });
-        // Deduplicate by value
-        const seen = new Set();
-        const unique = addresses.filter(a => { if (seen.has(a.value)) return false; seen.add(a.value); return true; });
-
-        [pickupSel, dropoffSel].forEach(sel => {
-            const current = sel.value;
-            sel.innerHTML = '<option value="">-- Select address --</option>';
-            unique.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.value;
-                opt.textContent = a.label;
-                sel.appendChild(opt);
-            });
-            if (current) sel.value = current;
-        });
+        populateAddressSelect(pickupSel, pickupSel.value);
+        populateAddressSelect(dropoffSel, dropoffSel.value);
     }
 
     // Auto-populate To→From field based on selected pickup/dropoff addresses
@@ -1549,28 +1654,15 @@ input:checked + .slider:before { transform: translateX(22px); }
         const pickupSel = document.getElementById('editFlightPickupAddress');
         const dropoffSel = document.getElementById('editFlightDropoffAddress');
         if (!pickupSel || !dropoffSel) return;
-
-        const addresses = [];
-        (tourData.hotels || []).forEach(h => { if (h.address) addresses.push({ label: h.name, value: h.address }); });
-        (tourData.venues || []).forEach(v => { if (v.address) addresses.push({ label: v.name, value: v.address }); });
-        (tourData.flights || []).forEach(f => {
-            if (f.pickupAddress) addresses.push({ label: f.pickupAddress.split(',')[0], value: f.pickupAddress });
-            if (f.dropoffAddress) addresses.push({ label: f.dropoffAddress.split(',')[0], value: f.dropoffAddress });
-        });
-        const seen = new Set();
-        const unique = addresses.filter(a => { if (seen.has(a.value)) return false; seen.add(a.value); return true; });
-
-        [pickupSel, dropoffSel].forEach(sel => {
-            const current = sel.value;
-            sel.innerHTML = '<option value="">-- Select address --</option>';
-            unique.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.value;
-                opt.textContent = a.label;
-                sel.appendChild(opt);
-            });
-            if (current) sel.value = current;
-        });
+        populateAddressSelect(pickupSel, pickupSel.value);
+        populateAddressSelect(dropoffSel, dropoffSel.value);
+    }
+    function getSelectedName(sel, customInput) {
+        if (sel && sel.value) {
+            const opt = sel.options[sel.selectedIndex];
+            return opt ? opt.textContent.trim() : sel.value.split(',')[0];
+        }
+        return customInput && customInput.value ? customInput.value.split(',')[0] : '';
     }
     function updateBookingToFrom() {
         const container = document.getElementById('settingsModalContent');
@@ -1581,10 +1673,9 @@ input:checked + .slider:before { transform: translateX(22px); }
         const dropoffCustom = container.querySelector('#flightDropoffAddressCustom');
         const toFromField = container.querySelector('#flightToFrom');
         if (!toFromField) return;
-
-        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom && pickupCustom.value ? pickupCustom.value.split(',')[0] : '');
-        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom && dropoffCustom.value ? dropoffCustom.value.split(',')[0] : '');
-        if (from && to) toFromField.value = from.trim() + ' → ' + to.trim();
+        const from = getSelectedName(pickupSel, pickupCustom);
+        const to = getSelectedName(dropoffSel, dropoffCustom);
+        if (from && to) toFromField.value = from + ' → ' + to;
     }
     function updateEditBookingToFrom() {
         const container = document.getElementById('flightEditForm');
@@ -1595,11 +1686,40 @@ input:checked + .slider:before { transform: translateX(22px); }
         const dropoffCustom = container.querySelector('#editFlightDropoffAddressCustom');
         const toFromField = container.querySelector('#editFlightToFrom');
         if (!toFromField) return;
-
-        const from = (pickupSel && pickupSel.value) ? pickupSel.value.split(',')[0] : (pickupCustom && pickupCustom.value ? pickupCustom.value.split(',')[0] : '');
-        const to = (dropoffSel && dropoffSel.value) ? dropoffSel.value.split(',')[0] : (dropoffCustom && dropoffCustom.value ? dropoffCustom.value.split(',')[0] : '');
-        if (from && to) toFromField.value = from.trim() + ' → ' + to.trim();
+        const from = getSelectedName(pickupSel, pickupCustom);
+        const to = getSelectedName(dropoffSel, dropoffCustom);
+        if (from && to) toFromField.value = from + ' → ' + to;
     }
 </script>
+
+    <template id="manage-locations-template">
+        <div class="form-section">
+            <h3>📍 Manage Locations</h3>
+            <p style="color:#aaa;font-size:0.9em;">Add airports, rental agencies, and important places to use in booking address dropdowns.</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input id="locationName" placeholder="e.g., Toronto Pearson Airport" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="locationCategory">
+                        <option value="Airport">✈️ Airport</option>
+                        <option value="Rental Agency">🚗 Rental Agency</option>
+                        <option value="Important Location">📍 Important Location</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Full Address</label>
+                <input id="locationAddress" placeholder="e.g., 6301 Silver Dart Dr, Mississauga, ON" type="text"/>
+            </div>
+            <button class="btn btn-primary" onclick="addLocation(this)">+ Add Location</button>
+        </div>
+        <div class="form-section" id="locationsList">
+            <h3>Saved Locations</h3>
+            <div id="locationsListContent"></div>
+        </div>
+    </template>
 </body>
 </html>
