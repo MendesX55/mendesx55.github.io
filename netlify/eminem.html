@@ -638,8 +638,6 @@ input:checked + .slider:before { transform: translateX(22px); }
                 console.warn("Cloud fetch failed, falling back to cache:", fetchError);
                 tourData = loadFromLocalStorage();
             }
-            if (false) {
-            
             if (!tourData.flights) tourData.flights = [];
             if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
             if (!tourData.hotels) tourData.hotels = [];
