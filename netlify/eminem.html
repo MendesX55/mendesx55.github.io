@@ -714,6 +714,14 @@ input:checked + .slider:before { transform: translateX(22px); }
     function initializeAppUI() {
         document.getElementById('loadingOverlay').style.display = 'none';
         document.getElementById('app-content').style.display = 'flex';
+        // Purge legacy cache keys (old format without __ chunk separator)
+        if (tourData.routeCache) {
+            let legacyFound = false;
+            Object.keys(tourData.routeCache).forEach(k => {
+                if (!k.includes('__')) { delete tourData.routeCache[k]; legacyFound = true; }
+            });
+            if (legacyFound) saveData();
+        }
         updateAllDisplays();
         renderCachedRoute();
         showTab('calendar');
@@ -1318,6 +1326,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 
                 // Declare date early so flight skip can use it
                 const date = fromStopInfo.dateValue || 'No Date';
+                // Skip legs that cross day boundaries (from earlier date to later date)
+                // These are transition legs the user handles separately
+                const dateTo = toStopInfo.dateValue || 'No Date';
+                if (date !== 'No Date' && dateTo !== 'No Date' && date !== dateTo) continue;
 
                 // Skip: flight segment — never route through Google Maps, start new drive chunk
                 if (segType === 'flight') {
@@ -1398,6 +1410,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         const routeResults = document.getElementById('routeResults');
         if (!routeResults) return;
         routeResults.innerHTML = '';
+        window._renderedFlightIds = {}; // Reset flight render tracker
         if (!tourData.routeCache || Object.keys(tourData.routeCache).length === 0) {
             routeResults.innerHTML = '<p style="text-align: center; color: #ccc;">No route has been generated yet. An admin can build one in the Settings tab.</p>';
             document.getElementById('totalDistanceStat').textContent = '0 km';
@@ -1466,21 +1479,43 @@ input:checked + .slider:before { transform: translateX(22px); }
                 if ((stateForDayHeader[si+1].segmentType||'drive') !== 'flight') continue;
                 const fDet2 = getLocationDetails(stateForDayHeader[si].selectValue||'');
                 const tDet2 = getLocationDetails(stateForDayHeader[si+1].selectValue||'');
+                // Normalize date formats (YYYY-MM-DD or MM/DD/YYYY)
+                const normDate = (d) => {
+                    if (!d) return '';
+                    if (d.includes('-')) return d;
+                    const p = d.split('/');
+                    return p.length===3 ? p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0') : d;
+                };
+                const normDate2 = normDate(date);
+                // Match any flight on this date that has time data — take first match
                 const matchFlight = (tourData.flights||[]).find(f =>
-                    f.bookingType==='flight' && f.pickupDate===date && f.pickupTime && f.dropoffTime &&
-                    ((f.toFrom||'').toLowerCase().includes((fDet2.name||'').toLowerCase().split(' ')[0]) ||
-                     (f.toFrom||'').toLowerCase().includes((tDet2.name||'').toLowerCase().split(' ')[0]))
+                    f.bookingType === 'flight' &&
+                    normDate(f.date || f.pickupDate) === normDate2 &&
+                    (f.time || f.pickupTime) && f.dropoffTime
                 );
                 if (matchFlight) {
-                    try {
-                        const ad2 = matchFlight.dropoffDate || matchFlight.pickupDate;
-                        const dUK2 = ukKwH.some(k=>(matchFlight.pickupAddress||'').toLowerCase().includes(k));
-                        const aUK2 = ukKwH.some(k=>(matchFlight.dropoffAddress||'').toLowerCase().includes(k));
-                        const dm2 = new Date(matchFlight.pickupDate+'T'+matchFlight.pickupTime+':00'+(dUK2?'+01:00':'-04:00')).getTime();
-                        const am2 = new Date(ad2+'T'+matchFlight.dropoffTime+':00'+(aUK2?'+01:00':'-04:00')).getTime();
-                        const diff2 = Math.round((am2-dm2)/60000);
+                    // Simple direct calculation: use pickupTime and dropoffTime as local times
+                    // Convert both to minutes-since-midnight, handle overnight flights via dropoffDate
+                    const fDate2  = matchFlight.pickupDate || matchFlight.date || '';
+                    const fTime2  = matchFlight.pickupTime || matchFlight.time || '';
+                    const fATime2 = matchFlight.dropoffTime || '';
+                    const ad2     = matchFlight.dropoffDate || fDate2;
+                    if (fDate2 && fTime2 && fATime2) {
+                        const depMins = parseInt(fTime2.split(':')[0])*60 + parseInt(fTime2.split(':')[1]);
+                        const arrMins = parseInt(fATime2.split(':')[0])*60 + parseInt(fATime2.split(':')[1]);
+                        const dayDiff = Math.round((new Date(ad2) - new Date(fDate2)) / 86400000);
+                        // Detect UK departure from toFrom field to add 5hr offset
+                        const toFromStr = (matchFlight.toFrom||'').toLowerCase();
+                        const ukKwHlocal = ['gatwick','heathrow','lgw','lhr','stansted','manchester'];
+                        const arrowPos2 = toFromStr.indexOf('→');
+                        const depPart2 = arrowPos2 > -1 ? toFromStr.substring(0, arrowPos2) : toFromStr;
+                        const arrPart2 = arrowPos2 > -1 ? toFromStr.substring(arrowPos2) : '';
+                        const depIsUK2 = ukKwHlocal.some(k => depPart2.includes(k));
+                        const arrIsUK2 = ukKwHlocal.some(k => arrPart2.includes(k));
+                        const ukOffset = depIsUK2 ? 300 : arrIsUK2 ? -300 : 0;
+                        const diff2 = arrMins - depMins + ukOffset + (dayDiff * 1440);
                         if (diff2 > 0) flightTimeSecs += diff2 * 60;
-                    } catch(e){}
+                    }
                 }
             }
             const totalTravelTime = totalTime + flightTimeSecs;
@@ -1493,7 +1528,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             daySummary.innerHTML = '<h4>Day ' + dayCounter + ' (' + (date === 'No Date' ? 'No Date' : formatDate(date)) + ') ✅</h4>'
                 + '<div class="stats-grid stats-grid-3-col">'
                 + '<div class="stat-card"><div class="stat-value">' + dayDistanceKm.toFixed(0) + ' km</div><div class="stat-label">Day Distance</div></div>'
-                + '<div class="stat-card"><div class="stat-value">' + dayHours + 'h ' + dayMinutes + 'm</div><div class="stat-label">Day Travel Time</div></div>'
+                + '<div class="stat-card"><div class="stat-value">' + travelHours + 'h ' + travelMinutes + 'm</div><div class="stat-label">Travel Time</div></div>'
                 + '<div class="stat-card"><div class="stat-value day-gas-value">$' + dayGasCost.toFixed(0) + '</div><div class="stat-label">Est. Gas (USD)</div></div>'
                 + '</div>';
             routeResults.appendChild(daySummary);
@@ -1504,14 +1539,24 @@ input:checked + .slider:before { transform: translateX(22px); }
             function renderFlightCard(booking) {
                 let dur = '';
                 try {
-                    if (booking.pickupTime && booking.dropoffTime) {
-                        const ad = booking.dropoffDate || booking.pickupDate;
-                        const ukKw = ['gatwick','heathrow','lgw','lhr','stansted','manchester','england'];
-                        const dUK = ukKw.some(k=>(booking.pickupAddress||'').toLowerCase().includes(k))||/^LGW|^LHR/i.test(booking.toFrom||'');
-                        const aUK = ukKw.some(k=>(booking.dropoffAddress||'').toLowerCase().includes(k));
-                        const dm = new Date(booking.pickupDate+'T'+booking.pickupTime+':00'+(dUK?'+01:00':'-04:00')).getTime();
-                        const am = new Date(ad+'T'+booking.dropoffTime+':00'+(aUK?'+01:00':'-04:00')).getTime();
-                        const diff = Math.round((am-dm)/60000);
+                    const bTime = booking.pickupTime || booking.time || '';
+                    const bDate = booking.pickupDate || booking.date || '';
+                    if (bTime && booking.dropoffTime) {
+                        const ad = booking.dropoffDate || bDate;
+                        const ukKwFc = ['gatwick','heathrow','lgw','lhr','stansted','manchester'];
+                        const toFromFc = (booking.toFrom||'').toLowerCase();
+                        // Find position of → to determine which side is departure
+                        const arrowPos = toFromFc.indexOf('→');
+                        const depPart = arrowPos > -1 ? toFromFc.substring(0, arrowPos) : toFromFc;
+                        const arrPart = arrowPos > -1 ? toFromFc.substring(arrowPos) : '';
+                        const depIsUK = ukKwFc.some(k => depPart.includes(k));
+                        const arrIsUK = ukKwFc.some(k => arrPart.includes(k));
+                        const depMins = parseInt(bTime.split(':')[0])*60 + parseInt(bTime.split(':')[1]);
+                        const arrMins = parseInt(booking.dropoffTime.split(':')[0])*60 + parseInt(booking.dropoffTime.split(':')[1]);
+                        const dayDiff = Math.round((new Date(ad) - new Date(bDate)) / 86400000);
+                        // UK↔Canada = 5hr offset; Canada↔UK = -5hr offset
+                        const tzOffset = depIsUK ? 300 : arrIsUK ? -300 : 0;
+                        const diff = arrMins - depMins + tzOffset + (dayDiff * 1440);
                         if (diff>0) dur = '<strong>Flight Time:</strong> '+Math.floor(diff/60)+'h '+(diff%60)+'m';
                     }
                 } catch(e){}
@@ -1542,11 +1587,22 @@ input:checked + .slider:before { transform: translateX(22px); }
 
                 if (segType === 'flight') {
                     // Render flight card inline
+                    // Match flights in order — track which ones already rendered
+                    if (!window._renderedFlightIds) window._renderedFlightIds = {};
+                    const fdKey = date + '_' + dayCounter;
+                    if (!window._renderedFlightIds[fdKey]) window._renderedFlightIds[fdKey] = new Set();
+                    const normDateInline = (d) => {
+                        if (!d) return '';
+                        if (d.includes('-')) return d;
+                        const p = d.split('/'); return p.length===3?p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0'):d;
+                    };
                     const matchedFlight = (tourData.flights||[]).find(f =>
-                        f.bookingType === 'flight' && f.pickupDate === date &&
-                        ((f.toFrom||'').toLowerCase().includes((fDet.name||'').toLowerCase().split(' ')[0]) ||
-                         (f.toFrom||'').toLowerCase().includes((tDet.name||'').toLowerCase().split(' ')[0]))
+                        f.bookingType === 'flight' &&
+                        normDateInline(f.date||f.pickupDate) === normDateInline(date) &&
+                        (f.time||f.pickupTime) && f.dropoffTime &&
+                        !window._renderedFlightIds[fdKey].has(f.id)
                     );
+                    if (matchedFlight) window._renderedFlightIds[fdKey].add(matchedFlight.id);
                     if (matchedFlight) {
                         renderFlightCard(matchedFlight);
                     } else {
