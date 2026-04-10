@@ -47,26 +47,26 @@ html.is-pwa, html.is-pwa body {
     min-height: 0;
 }
 .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-.login-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(255,215,0,0.3); }
-.login-box h2 { color: #ffd700; margin-bottom: 20px; font-size: 1.5em; }
+.login-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border: 1px solid rgba(180,100,255,0.3); }
+.login-box h2 { color: #b464ff; margin-bottom: 20px; font-size: 1.5em; }
 .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; }
-.login-box button { background: linear-gradient(45deg, #2d0057, #7b2d8b); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin: 10px 0; }
+.login-box button { background: linear-gradient(45deg, #1a1a1a, #7b2fff); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin: 10px 0; }
 .access-urls { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; font-size: 12px; }
 .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); position: sticky; top: 0; z-index: 999; }
-.top-bar a { display: block; padding: 10px; text-decoration: none; color: #b44fd4; font-size: 1.5em; }
-.header { background: linear-gradient(90deg, #2d0057, #7b2d8b, #00c9a7); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.top-bar a { display: block; padding: 10px; text-decoration: none; color: #7b2fff; font-size: 1.5em; }
+.header { background: linear-gradient(90deg, #111111, #7b2fff, #f0f0f0); padding: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .header h1 { font-size: 1.6em; font-weight: bold; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 5px; }
 .artist-logos { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-.logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #ffd700; border: 1px solid #ffd700; }
+.logo-placeholder { width: 80px; height: 35px; background: linear-gradient(45deg, #000, #333); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; color: #b464ff; border: 1px solid #b464ff; }
 .viewer-notice-container { max-width: 430px; margin: 0 auto; width: 100%; padding: 0 10px; }
 .tab-navigation { display: flex; background: rgba(255,255,255,0.1); border-radius: 15px 15px 0 0; margin: 10px 10px 0 10px; }
 .tab-btn { flex: 1; padding: 8px 4px; background: transparent; border: none; color: #ccc; font-weight: bold; font-size: 9px; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; }
 .tab-btn span { font-size: 1.4em; }
-.tab-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-bottom: 3px solid #ffd700; }
+.tab-btn.active { background: rgba(180,100,255,0.2); color: #b464ff; border-bottom: 3px solid #b464ff; }
 .tab-content { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin: 0 10px 10px 10px; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: none; padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
 .tab-content.active { display: block; }
 .form-section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-.form-section h3 { color: #ffd700; margin-bottom: 12px; font-size: 1.1em; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 5px; }
+.form-section h3 { color: #b464ff; margin-bottom: 12px; font-size: 1.1em; border-bottom: 1px solid rgba(180,100,255,0.3); padding-bottom: 5px; }
 .form-group { margin-bottom: 10px; }
 .form-group label { display: block; margin-bottom: 4px; color: #fff; font-weight: bold; font-size: 13px; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 16px; -webkit-appearance: none; }
@@ -78,7 +78,7 @@ select[multiple] option.selected-guest { background-color: rgba(255, 215, 0, 0.4
 .currency-input { position: relative; }
 .currency-prefix { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold; pointer-events: none; z-index: 1; }
 .currency-input input { padding-left: 30px; }
-.btn { background: linear-gradient(45deg, #2d0057, #7b2d8b); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin: 5px 0; width: 100%; -webkit-tap-highlight-color: transparent; }
+.btn { background: linear-gradient(45deg, #1a1a1a, #7b2fff); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.3s ease; margin: 5px 0; width: 100%; -webkit-tap-highlight-color: transparent; }
 .btn:active { transform: scale(0.98); }
 .btn-small { padding: 6px 12px; font-size: 11px; width: auto; }
 .btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
@@ -90,21 +90,23 @@ select[multiple] option.selected-guest { background-color: rgba(255, 215, 0, 0.4
 .stats-grid-2-col { grid-template-columns: 1fr 1fr; }
 .stats-grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
 .stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-.stat-value { font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 3px; }
+.stat-value { font-size: 1.2em; font-weight: bold; color: #b464ff; margin-bottom: 3px; }
 .stat-label { color: #ccc; font-size: 0.8em; }
-.venue-card, .hotel-card, .flight-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #ffd700; transition: all 0.3s ease; cursor: pointer; }
+.venue-card, .hotel-card, .flight-card { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #b464ff; transition: all 0.3s ease; cursor: pointer; }
+.ferry-card { border-left: 4px solid #00aaff !important; background: rgba(0,170,255,0.07) !important; }
+.ferry-card .card-title strong { color: #00aaff !important; }
 .flight-card { border-left-color: #87CEEB; }
-.venue-card:hover, .hotel-card:hover, .flight-card:hover { background: rgba(255,215,0,0.1); transform: translateY(-2px); }
+.venue-card:hover, .hotel-card:hover, .flight-card:hover { background: rgba(180,100,255,0.1); transform: translateY(-2px); }
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-.card-title { color: #ffd700; font-weight: bold; flex-grow: 1; word-break: break-word; line-height: 1.2; }
+.card-title { color: #b464ff; font-weight: bold; flex-grow: 1; word-break: break-word; line-height: 1.2; }
 .card-date { font-weight: bold; color: #fff; white-space: nowrap; flex-shrink: 0; font-size: 1em; text-align: right; line-height: 1.2; }
-.summary-box { background: #16213e; border: 1px solid rgba(255,215,0,0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; position: sticky; top: -15px; z-index: 10; }
-.day-summary-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; padding: 12px; margin-top: 20px; margin-bottom: 10px; }
-.day-summary-box h4 { color: #ffd700; text-align: center; margin-bottom: 10px; }
+.summary-box { background: #16213e; border: 1px solid rgba(180,100,255,0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; position: sticky; top: -15px; z-index: 10; }
+.day-summary-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(180,100,255,0.2); border-radius: 8px; padding: 12px; margin-top: 20px; margin-bottom: 10px; }
+.day-summary-box h4 { color: #b464ff; text-align: center; margin-bottom: 10px; }
 .modal { position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; }
-.modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid rgba(255,215,0,0.3); max-height: 85vh; overflow-y: auto; }
-.modal-header { color: #ffd700; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-.modal-nav { background: none; border: none; color: #ffd700; font-size: 2em; cursor: pointer; padding: 0 10px; }
+.modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid rgba(180,100,255,0.3); max-height: 85vh; overflow-y: auto; }
+.modal-header { color: #b464ff; font-size: 1.3em; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #b464ff; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.modal-nav { background: none; border: none; color: #b464ff; font-size: 2em; cursor: pointer; padding: 0 10px; }
 .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
 .close:hover { color: #fff; }
 .route-selector { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
@@ -114,7 +116,9 @@ select[multiple] option.selected-guest { background-color: rgba(255, 215, 0, 0.4
 .toggle-arrow.collapsed { transform: rotate(-90deg); }
 .route-controls-bottom { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
 .route-step { display: flex; align-items: center; margin-bottom: 10px; gap: 5px; }
-.route-step-number { background: #ffd700; color: #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.seg-type-btn { border: none; border-radius: 5px; padding: 4px 7px; cursor: pointer; font-size: 13px; background: rgba(255,255,255,0.15); color: #fff; opacity: 0.4; transition: opacity 0.2s; }
+.seg-type-btn.active { opacity: 1; background: #7b2fff; color: #000; }
+.route-step-number { background: #b464ff; color: #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
 .route-step-inputs { flex-grow: 1; display: flex; gap: 5px; min-width: 0; }
 .route-step-inputs select { flex-grow: 1; min-width: 0; padding: 8px; border-radius: 6px; border: none; background: rgba(255,255,255,0.9); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .route-step-inputs input[type="date"] { width: 100px; flex-shrink: 0; padding: 4px; font-size: 12px; }
@@ -131,12 +135,12 @@ input[type="date"], input[type="time"], input[type="number"], select { height: 4
 .settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
 .settings-row .form-group { margin-bottom: 0; }
 #calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-#calendar-header button { background: #7b2d8b; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+#calendar-header button { background: #7b2fff; border: none; color: #000; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
 #month-year { font-size: 1.2em; font-weight: bold; }
 #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
 .calendar-day { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); min-height: 80px; border-radius: 8px; padding: 5px; font-size: 0.8em; cursor: pointer; transition: background-color 0.3s; }
-.calendar-day.today { border: 2px solid #ffd700; background: rgba(255,215,0,0.1); }
-.calendar-day:hover { background: rgba(255,215,0,0.2); }
+.calendar-day.today { border: 2px solid #b464ff; background: rgba(180,100,255,0.1); }
+.calendar-day:hover { background: rgba(180,100,255,0.2); }
 .calendar-day.other-month { background: rgba(0,0,0,0.1); color: #666; }
 .day-number { font-weight: bold; }
 .day-events { font-size: 1.5em; line-height: 1; margin-top: 5px; }
@@ -146,10 +150,10 @@ input[type="date"], input[type="time"], input[type="number"], select { height: 4
 .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; color: white; font-size: 1.5em; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
 .data-table th, .data-table td { padding: 6px 4px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.data-table th { background: rgba(255,255,255,0.1); color: #ffd700; font-weight: bold; }
+.data-table th { background: rgba(255,255,255,0.1); color: #b464ff; font-weight: bold; }
 .settings-menu { display: flex; flex-direction: column; gap: 10px; }
 .settings-menu-item { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 15px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; text-align: left; }
-.settings-menu-item:hover { background: rgba(255,215,0,0.2); }
+.settings-menu-item:hover { background: rgba(180,100,255,0.2); }
 .settings-menu-item.btn-danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
 .user-filter { display: flex; align-items: center; gap: 8px; }
 .user-filter label { font-size: 0.9em; font-weight: bold; }
@@ -157,7 +161,7 @@ input[type="date"], input[type="time"], input[type="number"], select { height: 4
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 28px; }
 .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-input:checked + .slider { background-color: #7b2d8b; }
+input:checked + .slider { background-color: #7b2fff; }
 input:disabled + .slider { cursor: not-allowed; background-color: #666 !important; }
 input:checked + .slider:before { transform: translateX(22px); }
 
@@ -234,7 +238,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <div id="month-year"></div>
                 <button onclick="nextMonth()">Next ►</button>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #ffd700; font-size: 0.8em; padding-bottom: 5px;">
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-weight: bold; color: #b464ff; font-size: 0.8em; padding-bottom: 5px;">
                 <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
             </div>
             <div id="calendar-grid"></div>
@@ -253,7 +257,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <div class="stats-grid stats-grid-3-col">
                     <div class="stat-card"><div class="stat-value" id="hotelCountStat">0</div><div class="stat-label">Total Hotels</div></div>
                     <div class="stat-card"><div class="stat-value" id="hotelDaysStat">0</div><div class="stat-label">Total Days</div></div>
-                    <div class="stat-card"><div class="stat-value" id="hotelCostStat">$0</div><div class="stat-label">Total (USD)</div></div>
+                    <div class="stat-card"><div class="stat-value" id="hotelCostStat">$0</div><div class="stat-label total-cur-label">Total (USD)</div></div>
                 </div>
             </div>
             <div id="hotelsList"></div>
@@ -262,7 +266,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="summary-box">
                 <div class="stats-grid stats-grid-2-col">
                     <div class="stat-card"><div class="stat-value" id="flightCountStat">0</div><div class="stat-label">Total Bookings</div></div>
-                    <div class="stat-card"><div class="stat-value" id="flightCostStat">$0</div><div class="stat-label">Total (USD)</div></div>
+                    <div class="stat-card"><div class="stat-value" id="flightCostStat">$0</div><div class="stat-label total-cur-label">Total (USD)</div></div>
                 </div>
             </div>
             <div id="flightsList"></div>
@@ -272,7 +276,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <div class="stats-grid stats-grid-3-col">
                     <div class="stat-card"><div class="stat-value" id="totalDistanceStat">0 km</div><div class="stat-label">Total Distance</div></div>
                     <div class="stat-card"><div class="stat-value" id="totalTimeStat">0h</div><div class="stat-label">Drive Time</div></div>
-                    <div class="stat-card"><div class="stat-value" id="totalGasStat">$0</div><div class="stat-label">Est. Gas (USD)</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalGasStat">$0</div><div class="stat-label" id="gasStatLabel">Est. Gas (USD)</div></div>
                 </div>
             </div>
             <div id="routeResults"></div>
@@ -281,7 +285,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="summary-box">
                 <div class="stats-grid stats-grid-2-col">
                     <div class="stat-card"><div class="stat-value" id="expenseCountStat">0</div><div class="stat-label">Total Expenses</div></div>
-                    <div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label">Total (USD)</div></div>
+                    <div class="stat-card"><div class="stat-value" id="expenseCostStat">$0</div><div class="stat-label total-cur-label">Total (USD)</div></div>
                 </div>
             </div>
             <table class="data-table" id="expensesTable"><thead style="position: sticky; top: -1px;"><tr><th>Date</th><th>Type</th><th>Location</th><th>USD</th><th>CAD</th><th>Action</th></tr></thead><tbody id="expensesBody"></tbody></table>
@@ -292,10 +296,12 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <button class="settings-menu-item" id="route-builder-btn" onclick="openSettingsModal('route-builder')">🗺️ Build/Edit Tour Route</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('add-hotel')">🏨 Add Hotel Confirmation</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('add-venue')">🎤 Add Venue/Show</button>
-                <button class="settings-menu-item" onclick="openSettingsModal('add-flight-rental')">✈️ Add Flight/Rental</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('add-flight-rental')">🚀 Add Travel Logistics</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('add-expense')">💰 Add Expense</button>
                 <button class="settings-menu-item" id="gas-settings-btn" onclick="openSettingsModal('gas-settings')">⛽ Gas/Vehicle Settings</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('manage-locations')">📍 Manage Locations</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('data-management')">📤 Data Management</button>
+                <button class="settings-menu-item" onclick="openSettingsModal('currency-settings')">💱 Display Currency</button>
                 <button class="settings-menu-item btn-danger" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
@@ -304,7 +310,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 <div class="modal" id="hotelModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('hotelModal')">×</span><div>Edit Hotel Details</div></div><div id="hotelEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Hotel Name</label><input id="editHotelName" type="text"/></div><div class="form-group"><label>Address</label><input id="editHotelAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Check-in</label><input id="editCheckinDate" type="date"/></div><div class="form-group"><label>Check-out</label><input id="editCheckoutDate" type="date"/></div></div><div class="form-group"><label>Confirmation Notes</label><textarea id="editHotelNotes" rows="3"></textarea></div><div class="form-group"><label>Guests</label><select id="editHotelGuestNames" multiple></select></div><div class="form-row-2"><div class="currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostUSD" step="0.01" type="number"/></div><div class="currency-input"><label>CAD Cost</label><span class="currency-prefix">$</span><input id="editHotelCostCAD" step="0.01" type="number"/></div></div><button class="btn" onclick="saveHotelEdit(this)">Save Changes</button><button class="btn btn-danger" onclick="deleteItem('hotels', currentEditId)">Delete Hotel</button></div></div></div>
 <div class="modal" id="venueModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('venueModal')">×</span><div>Edit Venue Details</div></div><div id="venueEditForm"><div class="form-group"><label>Venue Name</label><input id="editVenueName" type="text"/></div><div class="form-group"><label>Address</label><input id="editVenueAddress" type="text"/></div><div class="form-row"><div class="form-group"><label>Show Date</label><input id="editShowDate" type="date"/></div><div class="form-group"><label>Show Time</label><input id="editShowTime" type="time"/></div></div><div class="form-row-3"><div class="form-group"><label>Start Inventory</label><input id="editStartInventory" type="number"/></div><div class="form-group"><label>End Inventory</label><input id="editEndInventory" type="number"/></div><div class="form-group currency-input"><label>Sales (USD)</label><span class="currency-prefix">$</span><input id="editTotalSales" step="0.01" type="number"/></div></div><div class="form-group"><label>Venue Notes</label><textarea id="editVenueNotes" rows="3"></textarea></div><button class="btn" onclick="saveVenueEdit(this)">Save Changes</button><button class="btn btn-danger" onclick="deleteItem('venues', currentEditId)">Delete Venue</button></div></div></div>
-<div class="modal" id="flightModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('flightModal')">×</span><div>Edit Flight/Rental Details</div></div><div id="flightEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Booking Type</label><select id="editBookingType" onchange="toggleFlightRentalFields(this.value, true)"><option value="flight">Flight</option><option value="rental">Car Rental</option></select></div><div class="form-group"><label id="editFlightNameLabel">Passenger Name</label><input id="editFlightName" type="text"/></div><div class="form-group"><label>To → From</label><input id="editFlightToFrom" type="text"/></div><div class="form-row"><div class="form-group"><label id="editAirlineAgencyLabel">Airline</label><input id="editFlightAirline" type="text"/></div><div class="form-group"><label id="editFlightConfLabel">Flight #</label><input id="editFlightConf" type="text"/></div></div><div class="form-group"><label id="editPickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="editPickupDate" type="date"/><input id="editPickupTime" type="time"/></div></div><div class="form-group"><label id="editDropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="editDropoffDate" type="date"/><input id="editDropoffTime" type="time"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editFlightCostUSD" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="editFlightCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label id="editPickupAddressLabel">Departure Airport Address</label><input id="editFlightPickupAddress" type="text"/></div><div class="form-group"><label id="editDropoffAddressLabel">Arrival Airport Address</label><input id="editFlightDropoffAddress" type="text"/></div><div class="form-group"><label>Notes</label><textarea id="editFlightNotes" rows="2"></textarea></div><button class="btn" onclick="saveFlightRentalEdit(this)">Save Changes</button><button class="btn" onclick="duplicateBooking()">Duplicate Booking</button><button class="btn btn-danger" onclick="deleteItem('flights', currentEditId)">Delete Booking</button></div></div></div></div>
+<div class="modal" id="flightModal"><div class="modal-content"><div class="modal-header"><span class="close" onclick="closeModal('flightModal')">×</span><div>Edit Flight/Rental Details</div></div><div id="flightEditForm"><div class="form-section" style="border:none; padding:0; margin:0;"><div class="form-group"><label>Booking Type</label><select id="editBookingType" onchange="toggleFlightRentalFields(this.value, true)"><option value="flight">✈️ Flight</option><option value="ferry">🛥️ Ferry</option><option value="rental">🚗 Car Rental</option><option value="uber">🚕 Uber / Transfer</option></select></div><div class="form-group"><label id="editFlightNameLabel">Passenger Name</label><select id="editFlightName" multiple style="width:100%;padding:8px;background:#1a2a3a;color:#fff;border:1px solid #2a3a4a;border-radius:6px;min-height:80px;"></select><small style="color:#aaa;">Hold Ctrl/Cmd to select multiple</small></div><div class="form-group"><label id="editToFromLabel">Route</label><input id="editFlightToFrom" type="text"/></div><div class="form-row"><div class="form-group"><label id="editAirlineAgencyLabel">Airline</label><input id="editFlightAirline" type="text"/></div><div class="form-group"><label id="editFlightConfLabel">Flight #</label><input id="editFlightConf" type="text"/></div></div><div class="form-group"><label id="editPickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="editPickupDate" type="date"/><input id="editPickupTime" type="time"/></div></div><div class="form-group"><label id="editDropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="editDropoffDate" type="date"/><input id="editDropoffTime" type="time"/></div></div><div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="editFlightCostUSD" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="editFlightCostCAD" step="0.01" type="number"/></div></div><div class="form-group"><label id="editPickupAddressLabel">Departure Airport Address</label><select id="editFlightPickupAddress" onchange="updateEditBookingToFrom()"><option value="">-- Select or type below --</option></select><input id="editFlightPickupAddressCustom" type="text" style="margin-top:6px;" oninput="updateEditBookingToFrom()"/></div><div class="form-group"><label id="editDropoffAddressLabel">Arrival Airport Address</label><select id="editFlightDropoffAddress" onchange="updateEditBookingToFrom()"><option value="">-- Select or type below --</option></select><input id="editFlightDropoffAddressCustom" type="text" style="margin-top:6px;" oninput="updateEditBookingToFrom()"/></div><div class="form-group"><label>Notes</label><textarea id="editFlightNotes" rows="2"></textarea></div><button class="btn" onclick="saveFlightRentalEdit(this)">Save Changes</button><button class="btn" onclick="duplicateBooking()">Duplicate Booking</button><button class="btn btn-danger" onclick="deleteItem('flights', currentEditId)">Delete Booking</button></div></div></div></div>
 <div class="modal" id="calendarModal"><div class="modal-content" id="calendarModalContent"></div></div>
 <div class="modal" id="settingsModal"><div class="modal-content"><div class="modal-header"><span id="settingsModalTitle">Settings</span><span class="close" onclick="closeModal('settingsModal')">×</span></div><div id="settingsModalContent"></div></div></div>
 
@@ -321,12 +327,14 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="form-group">
                 <label>Booking Type</label>
                 <select id="bookingType" onchange="toggleFlightRentalFields(this.value)">
-                    <option value="flight">Flight</option>
-                    <option value="rental">Car Rental</option>
+                    <option value="flight">✈️ Flight</option>
+                    <option value="ferry">🛥️ Ferry</option>
+                    <option value="rental">🚗 Car Rental</option>
+                    <option value="uber">🚕 Uber / Transfer</option>
                 </select>
             </div>
-            <div class="form-group"><label id="flightNameLabel">Passenger Name</label><input id="flightName" placeholder="e.g., John Doe" type="text"/></div>
-            <div class="form-group"><label>To → From</label><input id="flightToFrom" placeholder="e.g., YYZ → LAX" type="text"/></div>
+            <div class="form-group"><label id="flightNameLabel">Passenger Name</label><select id="flightName" multiple style="width:100%;padding:8px;background:#1a2a3a;color:#fff;border:1px solid #2a3a4a;border-radius:6px;min-height:80px;"></select><small style="color:#aaa;">Hold Ctrl/Cmd to select multiple</small></div>
+            <div class="form-group"><label id="toFromLabel">Route</label><input id="flightToFrom" placeholder="e.g., YYZ → LAX" type="text"/></div>
             <div class="form-row">
                 <div class="form-group"><label id="airlineAgencyLabel">Airline</label><input id="flightAirline" placeholder="e.g., Air Canada" type="text"/></div>
                 <div class="form-group"><label id="flightConfLabel">Flight #</label><input id="flightConf" placeholder="e.g., AC791" type="text"/></div>
@@ -334,8 +342,14 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="form-group"><label id="pickupDateLabel">Departure Date & Time</label><div class="form-row"><input id="pickupDate" type="date"/><input id="pickupTime" type="time"/></div></div>
             <div class="form-group"><label id="dropoffDateLabel">Arrival Date & Time</label><div class="form-row"><input id="dropoffDate" type="date"/><input id="dropoffTime" type="time"/></div></div>
             <div class="form-row-2"><div class="form-group currency-input"><label>USD Cost</label><span class="currency-prefix">$</span><input id="flightCostUSD" placeholder="0.00" step="0.01" type="number"/></div><div class="form-group currency-input"><label>Manual CAD</label><span class="currency-prefix">$</span><input id="flightCostCAD" placeholder="0.00" step="0.01" type="number"/></div></div>
-            <div class="form-group"><label id="pickupAddressLabel">Departure Airport Address</label><input id="flightPickupAddress" placeholder="Full address of airport or rental office" type="text"/></div>
-            <div class="form-group"><label id="dropoffAddressLabel">Arrival Airport Address</label><input id="flightDropoffAddress" placeholder="Full address of airport or rental office" type="text"/></div>
+            <div class="form-group"><label id="pickupAddressLabel">Departure Airport Address</label>
+                <select id="flightPickupAddress" onchange="updateBookingToFrom()"><option value="">-- Select or type below --</option></select>
+                <input id="flightPickupAddressCustom" placeholder="Or type custom address" type="text" style="margin-top:6px;" oninput="updateBookingToFrom()"/>
+            </div>
+            <div class="form-group"><label id="dropoffAddressLabel">Arrival Airport Address</label>
+                <select id="flightDropoffAddress" onchange="updateBookingToFrom()"><option value="">-- Select or type below --</option></select>
+                <input id="flightDropoffAddressCustom" placeholder="Or type custom address" type="text" style="margin-top:6px;" oninput="updateBookingToFrom()"/>
+            </div>
             <div class="form-group"><label>Notes</label><textarea id="flightNotes" placeholder="Record locators, contact info, etc." rows="2"></textarea></div>
             <button class="btn" onclick="addFlightRental(this)">Add Booking</button>
         </div>
@@ -354,7 +368,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
                 <div class="progress-text" id="progressText">Preparing...</div>
             </div>
-            <div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #ffd700; font-size: 12px;">Stops: 0 / Unlimited</span></div>
+            <div style="text-align: center; margin-top: 10px;"><span id="routeStopCount" style="color: #b464ff; font-size: 12px;">Stops: 0 / Unlimited</span></div>
         </div>
     </div>
     <div id="gas-settings-template">
@@ -400,13 +414,14 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="form-section">
             <h3>Current Users</h3>
             <table class="data-table" id="usersTable">
-                <thead><tr><th>Name</th><th>Code</th><th>Role</th><th>Action</th></tr></thead>
+                <thead><tr><th>Name</th><th>Nickname</th><th>Code</th><th>Role</th><th>Action</th></tr></thead>
                 <tbody id="usersBody"></tbody>
             </table>
         </div>
         <div class="form-section">
             <h3>Add New User</h3>
             <div class="form-group"><label>Full Name</label><input id="newUserName" placeholder="e.g., Shane Ralph" type="text"/></div>
+            <div class="form-group"><label>Nickname / Artist Name</label><input id="newUserNickname" placeholder="e.g., Madchild" type="text"/></div>
             <div class="form-group"><label>Access Code</label><input id="newAccessCode" placeholder="e.g., madchild" type="text"/></div>
             <div class="form-group"><label>Role</label><select id="newUserRole"><option value="user only">User Only</option><option value="viewer">View All</option><option value="management">Management</option><option value="admin">Admin</option></select></div>
             <button class="btn" onclick="addUser(this)">Add User</button>
@@ -427,12 +442,23 @@ input:checked + .slider:before { transform: translateX(22px); }
       authDomain: "tour-manager-b2888.firebaseapp.com",
       projectId: "tour-manager-b2888",
     };
-    const CAD_TO_USD_RATE = 1 / 1.35; // For converting CAD to USD
+    const CAD_TO_USD_RATE = 1 / 1.35;
     const KM_TO_MILES_RATE = 1 / 1.60934;
+    function getDisplayCurrency() { return (tourData && tourData.displayCurrency) || 'CAD'; }
+    function getCurrencyRates() { const r=(tourData&&tourData.currencyRates)||{}; return {cadPerUsd:r.cadPerUsd||1.35,eurPerUsd:r.eurPerUsd||0.92}; }
+    function currencySymbol() { const c=getDisplayCurrency(); return c==='EUR'?'€':'$'; }
+    function currencyLabel() { return getDisplayCurrency(); }
+    function convertFromUSD(v) { const c=getDisplayCurrency(),r=getCurrencyRates(); if(c==='CAD')return v*r.cadPerUsd; if(c==='EUR')return v*r.eurPerUsd; return v; }
+    function bestCost(usd,cad) {
+        const c=getDisplayCurrency(),r=getCurrencyRates(),hasC=cad&&cad>0,hasU=usd&&usd>0;
+        if(c==='CAD') return hasC?cad:(hasU?usd*r.cadPerUsd:0);
+        if(c==='EUR') return hasC?(cad/r.cadPerUsd)*r.eurPerUsd:(hasU?usd*r.eurPerUsd:0);
+        return hasU?usd:(hasC?cad/r.cadPerUsd:0);
+    }
 
     // --- Global State ---
     const defaultData = { 
-        hotels: [], venues: [], expenses: [], flights: [], routePlannerState: [], routeCache: {}, 
+        hotels: [], venues: [], expenses: [], flights: [], locations: [], routePlannerState: [], routeCache: {}, 
         settings: { 
             litresPer100km: 12, costPerLitre: 1.75, 
             mpg: 20, costPerGallon: 4.50,
@@ -457,6 +483,11 @@ input:checked + .slider:before { transform: translateX(22px); }
     let currentUser = null;
     
     // --- ACCESS CONTROL & LOGOUT ---
+    function logoutUser() {
+        localStorage.removeItem('tourAccess_' + TOUR_NAME);
+        location.reload();
+    }
+
     function initializeAccessControl() {
         const storedAccess = localStorage.getItem(`tourAccess_${TOUR_NAME}`);
         if (storedAccess) {
@@ -532,7 +563,24 @@ input:checked + .slider:before { transform: translateX(22px); }
         document.querySelectorAll('.viewer-notice').forEach(n => n.remove());
 
         if (!isAdmin()) {
-            document.getElementById('settingsTabBtn').style.display = (isManager()) ? 'block' : 'none';
+            // Show settings tab for all non-admin roles
+            document.getElementById('settingsTabBtn').style.display = isManager() ? 'block' : 'block';
+
+            if (!isManager()) {
+                // user-only and view-all: settings tab shows ONLY a logout button
+                document.getElementById('settingsTabBtn').style.display = 'block';
+                document.querySelectorAll('.settings-menu-item').forEach(btn => btn.style.display = 'none');
+                const menu = document.querySelector('.settings-menu');
+                if (menu && !document.getElementById('logout-settings-btn')) {
+                    const lo = document.createElement('button');
+                    lo.id = 'logout-settings-btn';
+                    lo.className = 'settings-menu-item';
+                    lo.style.cssText = 'background:#c0392b;color:#fff;border-color:#e74c3c;';
+                    lo.textContent = '🚪 Logout';
+                    lo.onclick = logoutUser;
+                    menu.insertBefore(lo, menu.firstChild);
+                }
+            }
             
             const noticeContainer = document.querySelector('.viewer-notice-container');
             if (noticeContainer && currentUser.role !== 'admin') {
@@ -575,7 +623,11 @@ input:checked + .slider:before { transform: translateX(22px); }
             if (nameField === 'guestNames') {
                 return items.filter(item => (item.guestNames || []).includes(currentUser.name));
             }
-            return items.filter(item => item.name === currentUser.name);
+            // For flights: check passengerNames array OR legacy single name
+            return items.filter(item => 
+                (item.passengerNames && item.passengerNames.includes(currentUser.name)) ||
+                item.name === currentUser.name
+            );
         }
         return items;
     }
@@ -616,10 +668,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 
     async function initializeFirebaseAndSync(forceSync = false) {
         try {
-            // ALWAYS fetch from Firebase first — never trust local cache on load
+            // Always fetch from Firebase first — never trust stale local cache
             updateSyncStatus("Connecting...");
-            const docRef = db.collection("tourData").doc(STORAGE_KEY);
             try {
+                const docRef = db.collection("tourData").doc(STORAGE_KEY);
                 const cloudDoc = await docRef.get();
                 if (cloudDoc.exists) {
                     console.log("✅ Syncing with cloud data.");
@@ -637,8 +689,8 @@ input:checked + .slider:before { transform: translateX(22px); }
                 console.warn("Cloud fetch failed, falling back to cache:", fetchError);
                 tourData = loadFromLocalStorage();
             }
-            
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = []; if (!Array.isArray(tourData.locations)) tourData.locations = [];
             if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
             if (!tourData.hotels) tourData.hotels = [];
             if (!tourData.venues) tourData.venues = [];
@@ -651,7 +703,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             
             try {
                 if (!auth) auth = firebase.auth();
-                if(!auth.currentUser) await auth.signInAnonymously();
+                if(!auth || !auth.currentUser) await auth.signInAnonymously();
                 const docRef = db.collection("tourData").doc(STORAGE_KEY);
                 attachLiveListener(docRef);
                 updateSyncStatus("☁️ Live sync active");
@@ -665,6 +717,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             updateSyncStatus("⚠️ Offline mode");
             tourData = loadFromLocalStorage();
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = []; if (!Array.isArray(tourData.locations)) tourData.locations = [];
             if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
             initializeAppUI();
         }
@@ -674,10 +727,11 @@ input:checked + .slider:before { transform: translateX(22px); }
         if (firebaseListener) firebaseListener(); 
         firebaseListener = docRef.onSnapshot((doc) => {
             const cloudData = doc.exists() ? doc.data() : defaultData;
-            if (cloudData.lastModified >= tourData.lastModified || true) { // always apply live data
+            if (cloudData.lastModified >= tourData.lastModified || true) {
                 console.log("Live update is newer. Applying changes.");
                 tourData = { ...defaultData, ...cloudData };
                 if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = []; if (!Array.isArray(tourData.locations)) tourData.locations = [];
                 if (!tourData.access_codes) tourData.access_codes = defaultData.access_codes;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
 
@@ -702,6 +756,14 @@ input:checked + .slider:before { transform: translateX(22px); }
     function initializeAppUI() {
         document.getElementById('loadingOverlay').style.display = 'none';
         document.getElementById('app-content').style.display = 'flex';
+        // Purge legacy cache keys (old format without __ chunk separator)
+        if (tourData.routeCache) {
+            let legacyFound = false;
+            Object.keys(tourData.routeCache).forEach(k => {
+                if (!k.includes('__')) { delete tourData.routeCache[k]; legacyFound = true; }
+            });
+            if (legacyFound) saveData();
+        }
         updateAllDisplays();
         renderCachedRoute();
         showTab('calendar');
@@ -754,7 +816,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         }
         tourData.lastModified = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
-        if (!db || !auth.currentUser) { 
+        if (!db || !auth || !auth.currentUser) { 
             updateSyncStatus("💾 Saved Locally (Offline)");
             return Promise.resolve(); 
         }
@@ -792,7 +854,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             });
     }
 
-    function openSettingsModal(category) {
+    function openSettingsModal(category, prefillData = null) {
         const modal = document.getElementById('settingsModal');
         document.body.appendChild(modal);
         const titleEl = document.getElementById('settingsModalTitle');
@@ -802,13 +864,26 @@ input:checked + .slider:before { transform: translateX(22px); }
         
         const titles = {
             'add-hotel': '🏨 Add Hotel Confirmation', 'add-venue': '🎤 Add Venue/Show', 'add-flight-rental': '✈️ Add Flight/Rental', 'add-expense': '💰 Add Expense',
-            'route-builder': '🗺️ Build/Edit Tour Route', 'gas-settings': '⛽ Gas/Vehicle Settings', 'data-management': '📤 Data Management', 'user-management': '👤 User Management'
+            'route-builder': '🗺️ Build/Edit Tour Route', 'gas-settings': '⛽ Gas/Vehicle Settings', 'data-management': '📤 Data Management', 'currency-settings': '💱 Display Currency', 'user-management': '👤 User Management', 'manage-locations': '📍 Manage Locations'
         };
         
         titleEl.textContent = titles[category] || "Settings";
-        contentEl.innerHTML = template.innerHTML;
+        contentEl.innerHTML = '';
+        const cloned = template.cloneNode(true);
+        cloned.style.display = '';
+        Array.from(cloned.children).forEach(c => contentEl.appendChild(c.cloneNode(true)));
         
         if (category === 'route-builder') renderRouteBuilder();
+        if (category === 'currency-settings') {
+            const cur = getDisplayCurrency();
+            const rates = getCurrencyRates();
+            const radios = contentEl.querySelectorAll('input[name="displayCurrency"]');
+            radios.forEach(r => { if(r.value === cur) r.checked = true; });
+            const cadInput = contentEl.querySelector('#cadPerUsdRate');
+            const eurInput = contentEl.querySelector('#eurPerUsdRate');
+            if(cadInput) cadInput.value = rates.cadPerUsd;
+            if(eurInput) eurInput.value = rates.eurPerUsd;
+        }
         if (category === 'add-expense' && contentEl.querySelector('#expenseDate')) contentEl.querySelector('#expenseDate').value = new Date().toISOString().split('T')[0];
         if (category === 'add-flight-rental') {
             const now = new Date();
@@ -816,9 +891,37 @@ input:checked + .slider:before { transform: translateX(22px); }
             const time = now.toTimeString().split(' ')[0].substring(0,5);
             if (contentEl.querySelector('#pickupDate')) contentEl.querySelector('#pickupDate').value = today;
             if (contentEl.querySelector('#pickupTime')) contentEl.querySelector('#pickupTime').value = time;
+            // Initialize labels and populate address dropdowns
+            toggleFlightRentalFields('flight', false);
+            wireBookingAddressDropdowns(contentEl);
+            populateFlightNameDropdown('flightName', '', contentEl);
+            if (prefillData) {
+                const sv = (id, val) => { const el = contentEl.querySelector('#' + id); if (el && val !== undefined && val !== null) el.value = String(val); };
+                sv('bookingType', prefillData.bookingType);
+                toggleFlightRentalFields(prefillData.bookingType, false);
+                sv('flightName', prefillData.name); populateFlightNameDropdown('flightName', prefillData.passengerNames||[prefillData.name||''], contentEl);
+                sv('flightToFrom', prefillData.toFrom);
+                sv('flightAirline', prefillData.airline);
+                sv('flightConf', prefillData.conf);
+                sv('pickupDate', prefillData.pickupDate);
+                sv('pickupTime', prefillData.pickupTime);
+                sv('dropoffDate', prefillData.dropoffDate);
+                sv('dropoffTime', prefillData.dropoffTime);
+                sv('flightCostUSD', prefillData.costUSD);
+                sv('flightCostCAD', prefillData.costCAD);
+                // For select dropdowns, set value then also populate custom field as fallback
+                const pSel = contentEl.querySelector('#flightPickupAddress');
+                const dSel = contentEl.querySelector('#flightDropoffAddress');
+                const pCus = contentEl.querySelector('#flightPickupAddressCustom');
+                const dCus = contentEl.querySelector('#flightDropoffAddressCustom');
+                if (pSel) { pSel.value = prefillData.pickupAddress || ''; if (!pSel.value && pCus) pCus.value = prefillData.pickupAddress || ''; }
+                if (dSel) { dSel.value = prefillData.dropoffAddress || ''; if (!dSel.value && dCus) dCus.value = prefillData.dropoffAddress || ''; }
+                sv('flightNotes', prefillData.notes);
+            }
         }
         if (category === 'gas-settings') applySettingsToUI();
         if (category === 'user-management') renderUsers();
+        if (category === 'manage-locations') setTimeout(() => renderLocationsList(), 50);
         if (category === 'add-hotel') populateUserSelect('hotelGuestNames', [], contentEl);
         
         modal.style.display = 'flex';
@@ -837,11 +940,28 @@ input:checked + .slider:before { transform: translateX(22px); }
         tourData.routePlannerState.forEach((stopState, index) => {
             const newStep = document.createElement('div');
             newStep.className = 'route-step';
-            newStep.innerHTML = `<div class="route-step-number">${index + 1}</div><div class="route-step-inputs"><select onchange="saveRoutePlannerState()"></select><input type="date" onchange="saveRoutePlannerState()"></div><button class="route-control-btn" onclick="addStopAfter(${index})">+</button><button class="route-control-btn remove" onclick="removeStopAt(${index})">×</button>`;
+            const segType = stopState.segmentType || 'drive';
+            const driveCls  = segType==='drive'  ? 'active' : '';
+            const uberCls   = segType==='uber'   ? 'active' : '';
+            const flightCls = segType==='flight' ? 'active' : '';
+            const ferryCls  = segType==='ferry'  ? 'active' : '';
+            const segBtnsHtml = index > 0
+                ? '<div class="seg-type-btns" style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;">'
+                    + '<button class="seg-type-btn ' + driveCls  + '" onclick="setSegType(' + index + ',\'drive\'  )" title="Drive">🚗</button>'
+                    + '<button class="seg-type-btn ' + uberCls   + '" onclick="setSegType(' + index + ',\'uber\'   )" title="Uber">🚕</button>'
+                    + '<button class="seg-type-btn ' + flightCls + '" onclick="setSegType(' + index + ',\'flight\')" title="Flight">✈️</button>'
+                    + '<button class="seg-type-btn ' + ferryCls + '" onclick="setSegType(' + index + ',\'ferry\')" title="Ferry">🛥️</button>'
+                    + '</div>'
+                : '<div style="width:30px;flex-shrink:0;"></div>';
+            newStep.innerHTML = '<div class="route-step-number">' + (index+1) + '</div>'
+                + segBtnsHtml
+                + '<div class="route-step-inputs">'
+                    + '<select onchange="saveRoutePlannerState()" id="routeSelect' + index + '"></select>'
+                    + '<input type="date" onchange="saveRoutePlannerState()" id="routeDate' + index + '">'
+                + '</div>'
+                + '<button class="route-control-btn" onclick="addStopAfter(' + index + ')">+</button>'
+                + '<button class="route-control-btn remove" onclick="removeStopAt(' + index + ')">×</button>';
             
-            newStep.querySelector('select').id = `routeSelect${index}`;
-            newStep.querySelector('input[type="date"]').id = `routeDate${index}`;
-
             routeStepsContainer.appendChild(newStep);
         });
         updateRouteSelects();
@@ -849,6 +969,13 @@ input:checked + .slider:before { transform: translateX(22px); }
     }
     function addStopAfter(index) { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); tourData.routePlannerState.splice(index + 1, 0, { selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); }
     function removeStopAt(index) { if (!isAdmin() && !isManager()) return; if (tourData.routePlannerState.length <= 1) return; saveRoutePlannerState(false); tourData.routePlannerState.splice(index, 1); renderRouteBuilder(); saveData(); }
+    function setSegType(index, type) {
+        saveRoutePlannerState(false);
+        if (!tourData.routePlannerState[index]) return;
+        tourData.routePlannerState[index].segmentType = type;
+        saveData();
+        renderRouteBuilder();
+    }
     function addRouteStop() { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); tourData.routePlannerState.push({ selectValue: '', dateValue: '' }); renderRouteBuilder(); saveData(); }
     function removeRouteStop() { if (!isAdmin() && !isManager()) return; if (tourData.routePlannerState.length > 1) { saveRoutePlannerState(false); tourData.routePlannerState.pop(); renderRouteBuilder(); saveData(); } }
     function saveRoutePlannerState(andSave = true) {
@@ -861,7 +988,10 @@ input:checked + .slider:before { transform: translateX(22px); }
         routeSteps.forEach((step, index) => {
             const select = step.querySelector(`#routeSelect${index}`);
             const date = step.querySelector(`#routeDate${index}`);
-            const newState = { selectValue: select ? select.value : '', dateValue: date ? date.value : '' };
+            const segBtns = step.querySelectorAll('.seg-type-btn');
+            let segType = 'drive';
+            segBtns.forEach(btn => { if (btn.classList.contains('active')) segType = btn.title.toLowerCase(); });
+            const newState = { selectValue: select ? select.value : '', dateValue: date ? date.value : '', segmentType: segType };
             newPlannerState.push(newState);
             if(!tourData.routePlannerState[index] || tourData.routePlannerState[index].selectValue !== newState.selectValue || tourData.routePlannerState[index].dateValue !== newState.dateValue) {
                 changed = true;
@@ -884,16 +1014,28 @@ input:checked + .slider:before { transform: translateX(22px); }
         const hotels = tourData.hotels.map(h => ({ id: h.id, name: h.name, type: 'Hotel' }));
         const venues = tourData.venues.map(v => ({ id: v.id, name: v.name, type: 'Venue' }));
         
-        const bookings = [];
+        const flightBookings = [], ferryBookings = [], uberBookings = [], rentalBookings = [];
         (tourData.flights || []).forEach(item => {
-            const icon = item.bookingType === 'flight' ? '✈️' : '🚗';
+            const isFerry = item.bookingType === 'ferry';
+            const icon = item.bookingType === 'flight' ? '✈️' : isFerry ? '🛥️' : (item.bookingType === 'uber' ? '🚕' : '🚗');
+            const label = item.toFrom || 'Unnamed Booking';
             if (item.pickupAddress) {
-                bookings.push({ id: `${item.id}_pickup`, name: `${icon} ${item.toFrom} (Depart)`, type: 'Booking' });
+                const entry = { id: `${item.id}_pickup`, name: `${icon} ${label} (Depart)` };
+                if (item.bookingType === 'flight' || item.bookingType === 'ferry') ferryBookings.push(entry);
+                else if (item.bookingType === 'uber') uberBookings.push(entry);
+                else rentalBookings.push(entry);
             }
             if (item.dropoffAddress) {
-                bookings.push({ id: `${item.id}_dropoff`, name: `${icon} ${item.toFrom} (Arrive)`, type: 'Booking' });
+                const entry = { id: `${item.id}_dropoff`, name: `${icon} ${label} (Arrive)` };
+                if (item.bookingType === 'flight' || item.bookingType === 'ferry') ferryBookings.push(entry);
+                else if (item.bookingType === 'uber') uberBookings.push(entry);
+                else rentalBookings.push(entry);
             }
         });
+        const locAirports = (tourData.locations||[]).filter(l=>l.category==='Airport');
+        const locFerries  = (tourData.locations||[]).filter(l=>l.category==='Ferry Terminal');
+        const locRentals  = (tourData.locations||[]).filter(l=>l.category==='Rental Agency');
+        const locImportant= (tourData.locations||[]).filter(l=>l.category==='Important Location');
 
         tourData.routePlannerState.forEach((savedState, i) => {
             const select = modalContent.querySelector(`#routeSelect${i}`);
@@ -901,11 +1043,23 @@ input:checked + .slider:before { transform: translateX(22px); }
                 let placeholderText = (i === 0) ? '-- Select Starting Point --' : '-- Select Next Stop --';
                 select.innerHTML = `<option value="">${placeholderText}</option>`;
                 
-                if (hotels.length > 0) { const hotelGroup = document.createElement('optgroup'); hotelGroup.label = '🏨 Hotels'; hotels.forEach(location => { const option = document.createElement('option'); option.value = `Hotel:${location.id}`; option.textContent = location.name; hotelGroup.appendChild(option); }); select.appendChild(hotelGroup); }
-                if (venues.length > 0) { const venueGroup = document.createElement('optgroup'); venueGroup.label = '🎤 Venues'; venues.forEach(location => { const option = document.createElement('option'); option.value = `Venue:${location.id}`; option.textContent = location.name; venueGroup.appendChild(option); }); select.appendChild(venueGroup); }
-                if (bookings.length > 0) { const bookingGroup = document.createElement('optgroup'); bookingGroup.label = '✈️ Bookings'; bookings.forEach(location => { const option = document.createElement('option'); option.value = `Booking:${location.id}`; option.textContent = location.name; bookingGroup.appendChild(option); }); select.appendChild(bookingGroup); }
+                const addGroup = (label, items, valFn, textFn) => {
+                    if (!items || !items.length) return;
+                    const og = document.createElement('optgroup'); og.label = label;
+                    items.forEach(it => { const opt = document.createElement('option'); opt.value = valFn(it); opt.textContent = textFn(it); og.appendChild(opt); });
+                    select.appendChild(og);
+                };
+                addGroup('✈️ Airports',          locAirports,    l=>`Location:${l.id}`, l=>l.name);
+                addGroup('🛥️ Ferry Terminals',   locFerries,     l=>`Location:${l.id}`, l=>l.name);
+                addGroup('🚗 Rental Agencies',   locRentals,     l=>`Location:${l.id}`, l=>l.name);
+                addGroup('📍 Important Locations',locImportant,  l=>`Location:${l.id}`, l=>l.name);
+                addGroup('🏨 Hotels',            hotels,         l=>`Hotel:${l.id}`,    l=>l.name);
+                addGroup('🎤 Venues',            venues,         l=>`Venue:${l.id}`,    l=>l.name);
+                addGroup('✈️ Flights',           flightBookings, b=>`Booking:${b.id}`,  b=>b.name);
+                addGroup('🚕 Uber / Transfers',  uberBookings,   b=>`Booking:${b.id}`,  b=>b.name);
+                addGroup('🚗 Car Rentals',       rentalBookings, b=>`Booking:${b.id}`,  b=>b.name);
 
-                select.value = savedState.selectValue; 
+                select.value = savedState.selectValue;
                 modalContent.querySelector(`#routeDate${i}`).value = savedState.dateValue;
             }
         });
@@ -950,12 +1104,12 @@ input:checked + .slider:before { transform: translateX(22px); }
             if (settings.mpg <= 0) return 0;
             const distanceMiles = distanceKm * KM_TO_MILES_RATE;
             const gallonsUsed = (distanceMiles / settings.mpg) * efficiencyLoss;
-            return gallonsUsed * settings.costPerGallon; // This is already in USD
+            return convertFromUSD(gallonsUsed * settings.costPerGallon);
         } else { // Default to metric
             if (settings.litresPer100km <= 0) return 0;
             const litresUsed = (distanceKm / 100) * settings.litresPer100km * efficiencyLoss;
             const costCAD = litresUsed * settings.costPerLitre;
-            return costCAD * CAD_TO_USD_RATE; // Convert from CAD to USD
+            return convertFromUSD(costCAD * CAD_TO_USD_RATE);
         }
     }
 
@@ -1106,10 +1260,12 @@ input:checked + .slider:before { transform: translateX(22px); }
 
         if (airline && pickupDate) {
             if (!tourData.flights) tourData.flights = [];
+            if (!tourData.locations) tourData.locations = []; if (!Array.isArray(tourData.locations)) tourData.locations = [];
             const booking = {
                 id: Date.now(),
                 bookingType: form.querySelector('#bookingType').value,
-                name: form.querySelector('#flightName').value,
+                name: Array.from(form.querySelector('#flightName').selectedOptions).map(o=>o.value).join(', '),
+                passengerNames: Array.from(form.querySelector('#flightName').selectedOptions).map(o=>o.value),
                 toFrom: form.querySelector('#flightToFrom').value,
                 airline: airline,
                 conf: form.querySelector('#flightConf').value,
@@ -1119,8 +1275,8 @@ input:checked + .slider:before { transform: translateX(22px); }
                 dropoffTime: form.querySelector('#dropoffTime').value,
                 costUSD: parseFloat(form.querySelector('#flightCostUSD').value) || 0,
                 costCAD: parseFloat(form.querySelector('#flightCostCAD').value) || 0,
-                pickupAddress: form.querySelector('#flightPickupAddress').value,
-                dropoffAddress: form.querySelector('#flightDropoffAddress').value,
+                pickupAddress: (form.querySelector('#flightPickupAddress').value || form.querySelector('#flightPickupAddressCustom').value),
+                dropoffAddress: (form.querySelector('#flightDropoffAddress').value || form.querySelector('#flightDropoffAddressCustom').value),
                 notes: form.querySelector('#flightNotes').value,
             };
             tourData.flights.push(booking);
@@ -1134,14 +1290,21 @@ input:checked + .slider:before { transform: translateX(22px); }
     
     // --- ROUTE GENERATION LOGIC ---
     async function processDayRoute(date, stopsForDay) {
-        if (stopsForDay.length < 2) throw new Error(`Insufficient stops for ${date}`);
+        if (!stopsForDay || stopsForDay.length < 2) return { stops: [], legs: [], totalDistanceMeters: 0, totalTimeSecs: 0, allLegs: [] };
         let totalDistanceMeters = 0, totalTimeSecs = 0; let allLegs = [];
         const MAX_WAYPOINTS = 23;
         for (let i = 0; i < stopsForDay.length - 1; i += MAX_WAYPOINTS) {
             const chunk = stopsForDay.slice(i, i + MAX_WAYPOINTS + 1);
             if (chunk.length < 2) break;
-            const origin = chunk[0].address; const destination = chunk[chunk.length - 1].address;
-            const waypoints = chunk.slice(1, -1).map(s => s.address).join('|');
+            const canonAddr = (a) => {
+                if (!a || a === 'N/A') return a;
+                // If it has a Canadian postal code pattern (A1A 1A1) but no "Canada", append it
+                if (/[A-Z]\d[A-Z]\s*\d[A-Z]\d/i.test(a) && !/canada/i.test(a)) return a + ', Canada';
+                return a;
+            };
+            const origin = canonAddr(chunk[0].address);
+            const destination = canonAddr(chunk[chunk.length - 1].address);
+            const waypoints = chunk.slice(1, -1).map(s => canonAddr(s.address)).join('|');
             const url = `https://maps-proxy-hru8.onrender.com/maps?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypoints)}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`API Load failed (status: ${response.status})`);
@@ -1159,7 +1322,10 @@ input:checked + .slider:before { transform: translateX(22px); }
         const [type, id] = locationId.split(':'); 
         const numId = parseInt(id); 
 
-        if (type === 'Hotel') { 
+        if (type === 'Location') {
+            const loc = (tourData.locations||[]).find(l => l.id === numId);
+            return loc ? { ...loc, type: 'Location' } : { type: 'Location', name: 'N/A', address: 'N/A' };
+        } else if (type === 'Hotel') { 
             const hotel = tourData.hotels.find(h => h.id === numId); 
             return hotel ? { ...hotel, type: 'Hotel' } : { type: 'Hotel', name: 'N/A', address: 'N/A' }; 
         } else if (type === 'Venue') { 
@@ -1171,11 +1337,24 @@ input:checked + .slider:before { transform: translateX(22px); }
             const booking = (tourData.flights || []).find(b => b.id === bookingId);
             if (!booking) return { type: 'Booking', name: 'N/A', address: 'N/A' };
 
-            const icon = booking.bookingType === 'flight' ? '✈️' : '🚗';
+            const icon = booking.bookingType === 'flight' ? '✈️' : booking.bookingType === 'ferry' ? '🛥️' : (booking.bookingType === 'uber' ? '🚕' : '🚗');
+            const lookupName = (addr) => {
+                if (!addr) return null;
+                const a = addr.trim().toLowerCase();
+                const loc = (tourData.locations||[]).find(l => l.address && l.address.trim().toLowerCase() === a);
+                if (loc) return loc.name;
+                const h = (tourData.hotels||[]).find(h => h.address && h.address.trim().toLowerCase() === a);
+                if (h) return h.name;
+                const v = (tourData.venues||[]).find(v => v.address && v.address.trim().toLowerCase() === a);
+                if (v) return v.name;
+                return null;
+            };
             if (pointType === 'pickup') {
-                return { name: `${icon} ${booking.toFrom} (Depart)`, address: booking.pickupAddress, type: 'Booking' };
-            } else { // dropoff
-                return { name: `${icon} ${booking.toFrom} (Arrive)`, address: booking.dropoffAddress, type: 'Booking' };
+                const name = lookupName(booking.pickupAddress) || booking.pickupAddress || booking.toFrom;
+                return { name: `${icon} ${name}`, address: booking.pickupAddress, type: 'Booking', bookingType: booking.bookingType };
+            } else {
+                const name = lookupName(booking.dropoffAddress) || booking.dropoffAddress || booking.toFrom;
+                return { name: `${icon} ${name}`, address: booking.dropoffAddress, type: 'Booking', bookingType: booking.bookingType };
             }
         }
         return { type: 'N/A', name: 'N/A', address: 'N/A' }; 
@@ -1201,22 +1380,71 @@ input:checked + .slider:before { transform: translateX(22px); }
 
         try {
             const dailySegments = {};
+            const dailyChunkIndex = {};
             for (let i = 0; i < tourData.routePlannerState.length - 1; i++) {
                 const fromStopInfo = tourData.routePlannerState[i];
                 const toStopInfo = tourData.routePlannerState[i + 1];
-                if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
+                const segType = toStopInfo.segmentType || 'drive'; // segment type is on the TO stop
+
+                // Declare date early so flight skip can use it
                 const date = fromStopInfo.dateValue || 'No Date';
-                if (!dailySegments[date]) dailySegments[date] = [];
-                if (dailySegments[date].length === 0) dailySegments[date].push(getLocationDetails(fromStopInfo.selectValue));
-                dailySegments[date].push(getLocationDetails(toStopInfo.selectValue));
+                // Skip legs that cross day boundaries (from earlier date to later date)
+                // These are transition legs the user handles separately
+                const dateTo = toStopInfo.dateValue || 'No Date';
+                if (date !== 'No Date' && dateTo !== 'No Date' && date !== dateTo) continue;
+
+                // Skip: flight/ferry segment — never route through Google Maps, start new drive chunk
+                if (segType === 'flight' || segType === 'ferry') {
+                    const regDate = (date !== 'No Date') ? date : (dateTo !== 'No Date' ? dateTo : null);
+                    if (regDate) {
+                        if (dailyChunkIndex[regDate] === undefined) dailyChunkIndex[regDate] = 0;
+                        const skipChunkKey = regDate + '__' + dailyChunkIndex[regDate];
+                        if (!dailySegments[skipChunkKey]) dailySegments[skipChunkKey] = [];
+                        dailyChunkIndex[regDate]++;
+                    }
+                    continue;
+                }
+
+                if (!fromStopInfo.selectValue || !toStopInfo.selectValue) continue;
+
+                // Legacy booking-based skip logic
+                const getBookingType = (val) => {
+                    if (!(val || '').startsWith('Booking:')) return null;
+                    const bid = val.replace('Booking:','').replace('_pickup','').replace('_dropoff','');
+                    const b = (tourData.flights || []).find(f => String(f.id) === bid);
+                    return b ? b.bookingType : null;
+                };
+                const fv = fromStopInfo.selectValue || '';
+                const tv = toStopInfo.selectValue || '';
+                const ft = getBookingType(fv);
+                const tt = getBookingType(tv);
+                if (ft === 'flight' && tt === 'flight') continue;
+                if (ft === 'flight' && fv.endsWith('_dropoff') && tv.endsWith('_pickup')) continue;
+                const fid = fv.replace('Booking:','').split('_')[0];
+                const tid = tv.replace('Booking:','').split('_')[0];
+                if (fv.endsWith('_dropoff') && tv.endsWith('_pickup') && fid !== tid) continue;
+                const fromDet = getLocationDetails(fv);
+                const toDet = getLocationDetails(tv);
+                if (fromDet.address && toDet.address && fromDet.address.trim() === toDet.address.trim()) continue;
+                if (!dailyChunkIndex[date] && dailyChunkIndex[date] !== 0) dailyChunkIndex[date] = 0;
+                const chunkKey = date + '__' + dailyChunkIndex[date];
+                if (!dailySegments[chunkKey]) dailySegments[chunkKey] = [];
+                if (dailySegments[chunkKey].length === 0) dailySegments[chunkKey].push(getLocationDetails(fromStopInfo.selectValue));
+                dailySegments[chunkKey].push(getLocationDetails(toStopInfo.selectValue));
             }
-            const allDates = Object.keys(dailySegments).sort((a,b) => new Date(a) - new Date(b));
+            const allDates = Object.keys(dailySegments).sort((a,b) => {
+                const da = a.split('__')[0], db = b.split('__')[0];
+                const ci = parseInt(a.split('__')[1]||0), cj = parseInt(b.split('__')[1]||0);
+                return (new Date(da) - new Date(db)) || (ci - cj);
+            });
             if (allDates.length === 0) throw new Error('No valid route segments found.');
             
             const newRouteCache = {}; // Build cache in a temporary object
             for (const date of allDates) {
                 const dayData = await processDayRoute(date, dailySegments[date]);
-                const cacheKey = `${date}_${dayData.stops.map(s => s.address).join('|')}`;
+                const baseDate = date.split('__')[0];
+                const chunkIdx = date.split('__')[1]||'0';
+                const cacheKey = `${baseDate}__${chunkIdx}_${dayData.stops.map(s => s.address).join('|')}`;
                 newRouteCache[cacheKey] = dayData;
                 
                 const progress = ((allDates.indexOf(date) + 1) / allDates.length) * 100;
@@ -1249,27 +1477,49 @@ input:checked + .slider:before { transform: translateX(22px); }
         const routeResults = document.getElementById('routeResults');
         if (!routeResults) return;
         routeResults.innerHTML = '';
+        window._renderedFlightIds = {}; // Reset flight render tracker
         if (!tourData.routeCache || Object.keys(tourData.routeCache).length === 0) {
             routeResults.innerHTML = '<p style="text-align: center; color: #ccc;">No route has been generated yet. An admin can build one in the Settings tab.</p>';
             document.getElementById('totalDistanceStat').textContent = '0 km';
             document.getElementById('totalTimeStat').textContent = '0h';
-            document.getElementById('totalGasStat').textContent = '$0';
+            document.getElementById('totalGasStat').textContent = currencySymbol()+'0'; const _gsl=document.getElementById('gasStatLabel'); if(_gsl)_gsl.textContent='Est. Gas ('+currencyLabel()+')';
             return;
         }
 
         let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0;
-        const sortedDays = Object.keys(tourData.routeCache).sort((a, b) => {
-            const dateA = a.split('_')[0]; const dateB = b.split('_')[0];
+
+        // Sort all cache keys by date then chunk index
+        // Filter out legacy cache keys (old format without __ separator)
+        const sortedKeys = Object.keys(tourData.routeCache).filter(k => k.includes('__')).sort((a, b) => {
+            const dateA = a.split('__')[0], dateB = b.split('__')[0];
+            const ciA = parseInt((a.split('__')[1]||'0').split('_')[0]);
+            const ciB = parseInt((b.split('__')[1]||'0').split('_')[0]);
             if (dateA === 'No Date') return 1; if (dateB === 'No Date') return -1;
-            return new Date(dateA) - new Date(dateB);
+            return (new Date(dateA) - new Date(dateB)) || (ciA - ciB);
         });
 
-        sortedDays.forEach((key, index) => {
-            const dayData = tourData.routeCache[key];
-            const date = key.split('_')[0];
-            renderDayRoute(date, dayData, index + 1);
-            grandTotalDistanceMeters += dayData.totalDistance;
-            grandTotalTimeSecs += dayData.totalTime;
+        // Group chunks by base date
+        const dateGroups = {};
+        sortedKeys.forEach(key => {
+            const baseDate = key.split('__')[0];
+            if (!dateGroups[baseDate]) dateGroups[baseDate] = [];
+            dateGroups[baseDate].push(tourData.routeCache[key]);
+        });
+
+        const uniqueDates = Object.keys(dateGroups).sort((a,b) => {
+            if (a === 'No Date') return 1; if (b === 'No Date') return -1;
+            return new Date(a) - new Date(b);
+        });
+
+        let dayCounter = 0;
+        uniqueDates.forEach(date => {
+            const chunks = dateGroups[date];
+            dayCounter++;
+            // Sum totals across all chunks for this date
+            const totalDist = chunks.reduce((s,c) => s + c.totalDistance, 0);
+            const totalTime = chunks.reduce((s,c) => s + c.totalTime, 0);
+            chunks.forEach(c => { grandTotalDistanceMeters += c.totalDistance; grandTotalTimeSecs += c.totalTime; });
+            renderDayRoute(date, chunks, dayCounter, totalDist, totalTime);
         });
         
         const grandTotalGasUSD = calculateGasCost(grandTotalDistanceMeters / 1000);
@@ -1277,15 +1527,259 @@ input:checked + .slider:before { transform: translateX(22px); }
         const totalMinutes = Math.floor((grandTotalTimeSecs % 3600) / 60);
         document.getElementById('totalDistanceStat').textContent = `${(grandTotalDistanceMeters / 1000).toFixed(0)} km`;
         document.getElementById('totalTimeStat').textContent = `${totalHours}h ${totalMinutes}m`;
-        document.getElementById('totalGasStat').textContent = '$' + grandTotalGasUSD.toFixed(0);
+        document.getElementById('totalGasStat').textContent = currencySymbol()+convertFromUSD(grandTotalGasUSD).toFixed(0); const _gsl2=document.getElementById('gasStatLabel'); if(_gsl2)_gsl2.textContent='Est. Gas ('+currencyLabel()+')';
     }
     
-    function renderDayRoute(date, dayData, dayCounter) { const routeResults = document.getElementById('routeResults'); const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayDistanceKm = dayData.totalDistance / 1000; const dayGasCost = calculateGasCost(dayDistanceKm); const dayId = `day-${dayCounter}`; const daySummary = document.createElement('div'); daySummary.className = 'day-summary-box'; daySummary.dataset.dayId = dayId; daySummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ✅</h4><div class="stats-grid stats-grid-3-col"><div class="stat-card"><div class="stat-value">${dayDistanceKm.toFixed(0)} km</div><div class="stat-label">Day Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Day Drive Time</div></div><div class="stat-card"><div class="stat-value day-gas-value">$${dayGasCost.toFixed(0)}</div><div class="stat-label">Est. Gas (USD)</div></div></div>`; routeResults.appendChild(daySummary); dayData.legs.forEach((leg, index) => { const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); const toStop = dayData.stops[index+1]; const routeSegment = document.createElement('div'); routeSegment.className = `route-item cached ${toStop.type === 'Venue' ? 'show-day' : ''}`; routeSegment.dataset.dayId = dayId; routeSegment.dataset.distanceKm = legKm; routeSegment.innerHTML = `<div class="route-header"><strong>${dayData.stops[index].name} → ${toStop.name}</strong></div><div class="route-info"><strong>Distance:</strong> ${leg.distanceText} | <strong>Time (traffic):</strong> ${leg.durationText}<br><strong>Est. Gas:</strong> <span class="gas-cost">$${gasCost.toFixed(2)} USD</span></div>`; routeResults.appendChild(routeSegment); }); }
+    function renderDayRoute(date, chunks, dayCounter, totalDist, totalTime) {
+            const routeResults = document.getElementById('routeResults');
+            const dayDistanceKm = totalDist / 1000;
+            const dayGasCost = calculateGasCost(dayDistanceKm);
+            const dayHours = Math.floor(totalTime / 3600);
+            const dayMinutes = Math.floor((totalTime % 3600) / 60);
+            const dayId = 'day-' + dayCounter;
+
+            // ONE header per date — add flight durations to travel time
+            const stateForDayHeader = (tourData.routePlannerState || []).filter(s => s.dateValue === date);
+            let flightTimeSecs = 0;
+            const ukKwH = ['gatwick','heathrow','lgw','lhr','stansted','manchester','england'];
+            for (let si = 0; si < stateForDayHeader.length - 1; si++) {
+                const hSegType = stateForDayHeader[si+1].segmentType||'drive';
+                if (hSegType !== 'flight' && hSegType !== 'ferry') continue;
+                const hIsFerry = hSegType === 'ferry';
+                const fDet2 = getLocationDetails(stateForDayHeader[si].selectValue||'');
+                const tDet2 = getLocationDetails(stateForDayHeader[si+1].selectValue||'');
+                // Normalize date formats (YYYY-MM-DD or MM/DD/YYYY)
+                const normDate = (d) => {
+                    if (!d) return '';
+                    if (d.includes('-')) return d;
+                    const p = d.split('/');
+                    return p.length===3 ? p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0') : d;
+                };
+                const normDate2 = normDate(date);
+                // Match any flight on this date that has time data — take first match
+                const matchFlight = (tourData.flights||[]).find(f => {
+                    const fIsFerry = f.bookingType==='ferry';
+                    const fIsFlight = f.bookingType==='flight';
+                    if (hIsFerry && !fIsFerry) return false;
+                    if (!hIsFerry && !fIsFlight) return false;
+                    return normDate(f.date || f.pickupDate) === normDate2 &&
+                        (f.time || f.pickupTime) && f.dropoffTime;
+                });
+                if (matchFlight) {
+                    // Simple direct calculation: use pickupTime and dropoffTime as local times
+                    // Convert both to minutes-since-midnight, handle overnight flights via dropoffDate
+                    const fDate2  = matchFlight.pickupDate || matchFlight.date || '';
+                    const fTime2  = matchFlight.pickupTime || matchFlight.time || '';
+                    const fATime2 = matchFlight.dropoffTime || '';
+                    const ad2     = matchFlight.dropoffDate || fDate2;
+                    if (fDate2 && fTime2 && fATime2) {
+                        const depMins = parseInt(fTime2.split(':')[0])*60 + parseInt(fTime2.split(':')[1]);
+                        const arrMins = parseInt(fATime2.split(':')[0])*60 + parseInt(fATime2.split(':')[1]);
+                        const dayDiff = Math.round((new Date(ad2) - new Date(fDate2)) / 86400000);
+                        // Detect UK departure from toFrom field to add 5hr offset
+                        const toFromStr = (matchFlight.toFrom||'').toLowerCase();
+                        const ukKwHlocal = ['gatwick','heathrow','lgw','lhr','stansted','manchester'];
+                        // PST airports (UTC-8): Vancouver, Victoria, YVR, YYJ, Kelowna, YLW, Abbotsford, YXX, Prince George, YXS, Kamloops, YKA
+                        const pstKw = ['yvr','yyj','ylw','yxx','yxs','yka','vancouver','victoria','kelowna','abbotsford','prince george','kamloops'];
+                        // MST airports (UTC-7): Calgary, Edmonton, YYC, YEG
+                        const mstKw = ['yyc','yeg','calgary','edmonton'];
+                        const arrowPos2 = toFromStr.indexOf('→');
+                        const depPart2 = arrowPos2 > -1 ? toFromStr.substring(0, arrowPos2) : toFromStr;
+                        const arrPart2 = arrowPos2 > -1 ? toFromStr.substring(arrowPos2) : '';
+                        const depIsUK2 = !hIsFerry && ukKwHlocal.some(k => depPart2.includes(k));
+                        const arrIsUK2 = !hIsFerry && ukKwHlocal.some(k => arrPart2.includes(k));
+                        // Canada cross-timezone: EST dep → PST arr = clocks go back 3h → add 180 mins
+                        const depIsPST = pstKw.some(k => depPart2.includes(k));
+                        const arrIsPST = pstKw.some(k => arrPart2.includes(k));
+                        const depIsMST = mstKw.some(k => depPart2.includes(k));
+                        const arrIsMST = mstKw.some(k => arrPart2.includes(k));
+                        // offset = how many minutes to ADD to compensate for clock difference
+                        // EST→PST: arr clock 3h behind dep clock → +180; PST→EST: arr clock 3h ahead → -180
+                        // EST→MST: arr clock 2h behind → +120; MST→EST: -120
+                        // PST→MST: arr clock 1h ahead → -60; MST→PST: +60
+                        const canadaOffset = (!hIsFerry && !depIsUK2 && !arrIsUK2)
+                            ? (arrIsPST && !depIsPST && !depIsMST) ? 180
+                            : (depIsPST && !arrIsPST && !arrIsMST) ? -180
+                            : (arrIsMST && !depIsMST && !depIsPST) ? 120
+                            : (depIsMST && !arrIsMST && !arrIsPST) ? -120
+                            : (arrIsMST && depIsPST) ? -60
+                            : (depIsMST && arrIsPST) ? 60 : 0
+                            : 0;
+                        const ukOffset = depIsUK2 ? 300 : arrIsUK2 ? -300 : 0;
+                        const diff2 = arrMins - depMins + ukOffset + canadaOffset + (dayDiff * 1440);
+                        if (diff2 > 0) flightTimeSecs += diff2 * 60;
+                    }
+                }
+            }
+            const totalTravelTime = totalTime + flightTimeSecs;
+            const travelHours   = Math.floor(totalTravelTime / 3600);
+            const travelMinutes = Math.floor((totalTravelTime % 3600) / 60);
+
+            const daySummary = document.createElement('div');
+            daySummary.className = 'day-summary-box';
+            daySummary.dataset.dayId = dayId;
+            daySummary.innerHTML = '<h4>Day ' + dayCounter + ' (' + (date === 'No Date' ? 'No Date' : formatDate(date)) + ') ✅</h4>'
+                + '<div class="stats-grid stats-grid-3-col">'
+                + '<div class="stat-card"><div class="stat-value">' + dayDistanceKm.toFixed(0) + ' km</div><div class="stat-label">Day Distance</div></div>'
+                + '<div class="stat-card"><div class="stat-value">' + travelHours + 'h ' + travelMinutes + 'm</div><div class="stat-label">Travel Time</div></div>'
+                + '<div class="stat-card"><div class="stat-value day-gas-value">' + currencySymbol() + convertFromUSD(dayGasCost).toFixed(0) + '</div><div class="stat-label">Est. Gas (' + currencyLabel() + ')</div></div>'
+                + '</div>';
+            routeResults.appendChild(daySummary);
+
+            // Walk routePlannerState in order for this date
+            const stateForDay = (tourData.routePlannerState || []).filter(s => s.dateValue === date);
+
+            function renderFlightCard(booking) {
+                let dur = '';
+                try {
+                    const bTime = booking.pickupTime || booking.time || '';
+                    const bDate = booking.pickupDate || booking.date || '';
+                    if (bTime && booking.dropoffTime) {
+                        const ad = booking.dropoffDate || bDate;
+                        const ukKwFc = ['gatwick','heathrow','lgw','lhr','stansted','manchester'];
+                        const toFromFc = (booking.toFrom||'').toLowerCase();
+                        // Find position of → to determine which side is departure
+                        const arrowPos = toFromFc.indexOf('→');
+                        const depPart = arrowPos > -1 ? toFromFc.substring(0, arrowPos) : toFromFc;
+                        const arrPart = arrowPos > -1 ? toFromFc.substring(arrowPos) : '';
+                        const depIsUK = ukKwFc.some(k => depPart.includes(k));
+                        const arrIsUK = ukKwFc.some(k => arrPart.includes(k));
+                        const depMins = parseInt(bTime.split(':')[0])*60 + parseInt(bTime.split(':')[1]);
+                        const arrMins = parseInt(booking.dropoffTime.split(':')[0])*60 + parseInt(booking.dropoffTime.split(':')[1]);
+                        const dayDiff = Math.round((new Date(ad) - new Date(bDate)) / 86400000);
+                        // UK↔Canada = 5hr offset; Canada cross-TZ offsets
+                        const pstKwFc = ['yvr','yyj','ylw','yxx','yxs','yka','vancouver','victoria','kelowna','abbotsford','prince george','kamloops'];
+                        const mstKwFc = ['yyc','yeg','calgary','edmonton'];
+                        const depIsPST = pstKwFc.some(k => depPart.includes(k));
+                        const arrIsPST = pstKwFc.some(k => arrPart.includes(k));
+                        const depIsMST = mstKwFc.some(k => depPart.includes(k));
+                        const arrIsMST = mstKwFc.some(k => arrPart.includes(k));
+                        const canadaOffsetFc = (!depIsUK && !arrIsUK && booking.bookingType !== 'ferry')
+                            ? (arrIsPST && !depIsPST && !depIsMST) ? 180
+                            : (depIsPST && !arrIsPST && !arrIsMST) ? -180
+                            : (arrIsMST && !depIsMST && !depIsPST) ? 120
+                            : (depIsMST && !arrIsMST && !arrIsPST) ? -120
+                            : (arrIsMST && depIsPST) ? -60
+                            : (depIsMST && arrIsPST) ? 60 : 0
+                            : 0;
+                        const tzOffset = depIsUK ? 300 : arrIsUK ? -300 : 0;
+                        const diff = arrMins - depMins + tzOffset + canadaOffsetFc + (dayDiff * 1440);
+                        if (diff>0) dur = '<strong>'+(booking.bookingType==='ferry'?'Sail Time':'Flight Time')+':</strong> '+Math.floor(diff/60)+'h '+(diff%60)+'m';
+                    }
+                } catch(e){}
+                const fc = document.createElement('div');
+                fc.className = 'route-item';
+                fc.style.cssText = 'border-left-color:#00a8ff;';
+                const isFerryCard = booking.bookingType==='ferry';
+                const cardAccent = isFerryCard ? '#00aaff' : '#00a8ff';
+                const cardHeaderIcon = isFerryCard ? '🛥️ FERRY' : '✈️ FLIGHT';
+                const cardFootNote = isFerryCard ? '🛥️ Ferry segment — excluded from drive totals' : '✈️ Flight segment — excluded from drive totals';
+                const cardDetailLine = isFerryCard
+                    ? '<strong>Ferry Line:</strong> '+(booking.airline||'')
+                    : '<strong>Airline:</strong> '+(booking.airline||'')+' &nbsp;|&nbsp; <strong>Flight #:</strong> '+(booking.conf||'');
+                fc.style.cssText = 'border-left-color:'+cardAccent+';'+(isFerryCard?'background:rgba(0,170,255,0.07);':'');
+                fc.innerHTML = '<div class="route-header" style="color:'+cardAccent+'"><strong>'+cardHeaderIcon+': '+(booking.toFrom||'')+'</strong></div>'
+                    +'<div class="route-info" style="margin-top:5px;">'+cardDetailLine
+                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||booking.time||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')+((booking.dropoffDate && booking.pickupDate && booking.dropoffDate !== booking.pickupDate) ? ' <sup style="color:'+cardAccent+';">+1</sup>' : '')
+                    +(dur ? '<br>'+dur : '')
+                    +'<br><small style="color:'+cardAccent+';">'+cardFootNote+'</small></div>';
+                routeResults.appendChild(fc);
+            }
+
+            // Build a flat ordered legs iterator across all chunks
+            // chunks[0].legs = drive legs before first flight
+            // chunks[1].legs = drive legs after first flight, etc.
+            const allChunkLegs = chunks.map(c => ({ legs: c.legs.slice(), stops: c.stops.slice() }));
+            let chunkIdx = 0;
+            let legIdx   = 0;
+
+            for (let si = 0; si < stateForDay.length - 1; si++) {
+                const fromState = stateForDay[si];
+                const toState   = stateForDay[si + 1];
+                const segType   = toState.segmentType || 'drive';
+                const fDet = getLocationDetails(fromState.selectValue || '');
+                const tDet = getLocationDetails(toState.selectValue   || '');
+
+                if (segType === 'flight' || segType === 'ferry') {
+                    const isFerrySegment = segType === 'ferry';
+                    const segAccent = isFerrySegment ? '#00aaff' : '#00a8ff';
+                    const segEmoji  = isFerrySegment ? '🛥️' : '✈️';
+                    const segLabel  = isFerrySegment ? 'FERRY' : 'FLIGHT';
+                    if (!window._renderedFlightIds) window._renderedFlightIds = {};
+                    const fdKey = date + '_' + dayCounter;
+                    if (!window._renderedFlightIds[fdKey]) window._renderedFlightIds[fdKey] = new Set();
+                    const normDateInline = (d) => {
+                        if (!d) return '';
+                        if (d.includes('-')) return d;
+                        const p = d.split('/'); return p.length===3?p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0'):d;
+                    };
+                    const matchedFlight = (tourData.flights||[]).find(f => {
+                        const fIsFerry = f.bookingType==='ferry';
+                        const fIsFlight = f.bookingType==='flight';
+                        if (isFerrySegment && !fIsFerry) return false;
+                        if (!isFerrySegment && !fIsFlight) return false;
+                        return normDateInline(f.date||f.pickupDate) === normDateInline(date) &&
+                            (f.time||f.pickupTime) && f.dropoffTime &&
+                            !window._renderedFlightIds[fdKey].has(f.id);
+                    });
+                    if (matchedFlight) window._renderedFlightIds[fdKey].add(matchedFlight.id);
+                    if (matchedFlight) {
+                        renderFlightCard(matchedFlight);
+                    } else {
+                        const fc = document.createElement('div');
+                        fc.className = 'route-item';
+                        fc.style.cssText = 'border-left-color:'+segAccent+';'+(isFerrySegment?'background:rgba(0,170,255,0.07);':'');
+                        fc.innerHTML = '<div class="route-header" style="color:'+segAccent+'"><strong>'+segEmoji+' '+segLabel+': '+(fDet.name||'?')+' → '+(tDet.name||'?')+'</strong></div>'
+                            +'<div class="route-info"><small style="color:'+segAccent+';">Add a '+(isFerrySegment?'Ferry':'Flight')+' booking to see details</small></div>';
+                        routeResults.appendChild(fc);
+                    }
+                    const curChunk = allChunkLegs[chunkIdx];
+                    if (!curChunk || legIdx >= curChunk.legs.length) {
+                        chunkIdx++;
+                        legIdx = 0;
+                    }
+                    continue;
+                }
+
+                // Drive or Uber — pull next leg from current chunk
+                const currentChunk = allChunkLegs[chunkIdx];
+                if (!currentChunk || legIdx >= currentChunk.legs.length) continue;
+                const leg      = currentChunk.legs[legIdx];
+                const fromStop = currentChunk.stops[legIdx];
+                const toStop   = currentChunk.stops[legIdx + 1];
+                legIdx++;
+
+                if (!leg) continue;
+                const legKm    = leg.distanceValue / 1000;
+                const gasCost  = calculateGasCost(legKm);
+                const isUber   = segType === 'uber';
+                const cardEmoji   = isUber ? '🚕' : '🚗';
+                const cardLabel   = isUber ? 'UBER' : 'DRIVE';
+                const cardColor   = isUber ? '#b464ff' : '#ffffff';
+                const borderColor = isUber ? '#b464ff' : '#e74c3c';
+                const fromName = (fromStop && fromStop.name) ? fromStop.name : (fDet.name || '');
+                const toName   = (toStop   && toStop.name  ) ? toStop.name   : (tDet.name || '');
+
+                const seg = document.createElement('div');
+                seg.className = 'route-item cached ' + (tDet.type === 'Venue' ? 'show-day' : '');
+                seg.style.cssText = 'border-left-color:' + borderColor + ';';
+                seg.dataset.dayId = dayId;
+                seg.dataset.distanceKm = legKm;
+                seg.innerHTML = '<div class="route-header" style="color:' + cardColor + '"><strong>' + cardEmoji + ' ' + cardLabel + ': ' + fromName + ' → ' + toName + '</strong></div>'
+                    + '<div class="route-info"><strong>Distance:</strong> ' + leg.distanceText + ' | <strong>Time (traffic):</strong> ' + leg.durationText
+                    + '<br><strong>' + (isUber ? 'Uber Cost:' : 'Est. Gas:') + '</strong> <span class="gas-cost"' + (isUber ? ' style="color:#b464ff"' : '') + '>'
+                    + (isUber ? 'See Expenses tab' : currencySymbol() + gasCost.toFixed(2) + ' ' + currencyLabel()) + '</span></div>';
+                routeResults.appendChild(seg);
+            }
+        }
+
     function renderErrorDay(date, dayCounter, errorMessage) { const routeResults = document.getElementById('routeResults'); const errorSummary = document.createElement('div'); errorSummary.className = 'day-summary-box'; errorSummary.style.borderColor = '#e74c3c'; errorSummary.innerHTML = `<h4>Day ${dayCounter} (${date === 'No Date' ? 'No Date' : formatDate(date)}) ❌</h4><div class="route-item error"><strong>Error:</strong> ${errorMessage}</div>`; routeResults.appendChild(errorSummary); }
-    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; const today = new Date(); const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day ${dateStr === todayStr ? 'today' : ''}" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isFlight) { eventIcons += '✈️'; } if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
-    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = Object.keys(tourData.routeCache || {}).some(key => key.startsWith(dateStr)); let isFlight = (tourData.flights || []).some(f => f.pickupDate === dateStr && f.bookingType === 'flight'); return { isVenue, isTravel, isFlight }; }
+    function renderCalendar() { const calendarEl = document.getElementById('calendar-grid'); const monthYearEl = document.getElementById('month-year'); if (!calendarEl || !monthYearEl) return; calendarEl.innerHTML = ''; const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthYearEl.textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`; const today = new Date(); const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; for (let i = 0; i < firstDay; i++) { calendarEl.innerHTML += `<div class="calendar-day other-month"></div>`; } for (let day = 1; day <= daysInMonth; day++) { const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; let dayHtml = `<div class="calendar-day ${dateStr === todayStr ? 'today' : ''}" onclick="showDayDetails('${dateStr}')"><div class="day-number">${day}</div>`; const events = getEventsForDate(dateStr); let eventIcons = ''; if (events.isFlight) { eventIcons += '✈️'; } if (events.isFerry) { eventIcons += '🛥️'; } if (events.isVenue) { eventIcons += '🎵'; } else if (events.isTravel) { eventIcons += '🚗'; } dayHtml += `<div class="day-events">${eventIcons}</div>`; dayHtml += '</div>'; calendarEl.innerHTML += dayHtml; } }
+    function getEventsForDate(dateStr) { let isVenue = tourData.venues.some(v => v.date === dateStr); let isTravel = Object.keys(tourData.routeCache || {}).some(key => key.startsWith(dateStr)); let isFlight = (tourData.flights || []).some(f => f.pickupDate === dateStr && f.bookingType === 'flight');
+        const isFerry  = (tourData.flights || []).some(f => f.pickupDate === dateStr && f.bookingType === 'ferry');
+        return { isVenue, isTravel, isFlight, isFerry }; }
     function showDayDetails(dateStr) { const modal = document.getElementById('calendarModal');
-    document.body.appendChild(modal); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const flightsOnDay = (tourData.flights || []).filter(f => f.pickupDate === dateStr); let travelDayData = null; for (const key in tourData.routeCache) { if (key.startsWith(dateStr)) { travelDayData = tourData.routeCache[key]; break; } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (flightsOnDay.length > 0) { html += `<h3>✈️ Flights & Rentals</h3>` + flightsOnDay.map(f => `<div class="route-item">${f.bookingType === 'flight' ? '✈️' : '🚗'} ${f.airline}: ${f.toFrom}<br><small>${f.bookingType === 'flight' ? 'Flight' : 'Conf'} #: ${f.conf}</small></div>`).join(''); } if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (travelDayData) { const dayData = travelDayData; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas (USD)</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distanceText} | Time: ${leg.durationText}</small></div>`; }); } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && !travelDayData && flightsOnDay.length === 0) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'flex'; currentModalDate = dateStr; addSwipeListeners(modal); }
+    document.body.appendChild(modal); const content = document.getElementById('calendarModalContent'); const venuesOnDay = tourData.venues.filter(v => v.date === dateStr); const hotelsOnDay = tourData.hotels.filter(h => dateStr >= h.checkin && dateStr <= h.checkout); const flightsOnDay = (tourData.flights || []).filter(f => f.pickupDate === dateStr); let travelDayData = null; for (const key in tourData.routeCache) { if (key.startsWith(dateStr)) { travelDayData = tourData.routeCache[key]; break; } } let html = `<div class="modal-header"><button class="modal-nav prev" onclick="showPrevDay()">◄</button><div>Details for ${formatDate(dateStr)}</div><button class="modal-nav next" onclick="showNextDay()">►</button><span class="close" onclick="closeModal('calendarModal')">×</span></div>`; if (flightsOnDay.length > 0) { html += `<h3>🚀 Travel Logistics</h3>` + flightsOnDay.map(f => `<div class="route-item">${f.bookingType === 'flight' ? '✈️' : f.bookingType === 'ferry' ? '🛥️' : (f.bookingType === 'uber' ? '🚕' : '🚗')} ${f.airline}: ${f.toFrom}<br><small>${f.bookingType === 'flight' ? 'Flight' : f.bookingType === 'ferry' ? 'Reservation' : 'Conf'} #: ${f.conf}</small></div>`).join(''); } if (venuesOnDay.length > 0) { html += `<h3>🎵 Venues</h3>` + venuesOnDay.map(v => `<div class="route-item">${v.name} @ ${formatTime(v.time)}<br><small>${v.address}</small></div>`).join(''); } if (hotelsOnDay.length > 0) { html += `<h3>🏨 Hotels</h3>` + hotelsOnDay.map(h => `<div class="route-item">${h.name}<br><small>Check-in: ${formatDate(h.checkin)} | Check-out: ${formatDate(h.checkout)}</small></div>`).join(''); } if (travelDayData) { const dayData = travelDayData; const dayHours = Math.floor(dayData.totalTime / 3600); const dayMinutes = Math.floor((dayData.totalTime % 3600) / 60); const dayGas = calculateGasCost(dayData.totalDistance / 1000); html += `<h3>🚗 Travel Summary</h3><div class="day-summary-box" style="margin-top:0;"><div class="stats-grid stats-grid-3-col" style="margin-bottom:0;"><div class="stat-card"><div class="stat-value">${(dayData.totalDistance/1000).toFixed(0)} km</div><div class="stat-label">Distance</div></div><div class="stat-card"><div class="stat-value">${dayHours}h ${dayMinutes}m</div><div class="stat-label">Time</div></div><div class="stat-card"><div class="stat-value">$${dayGas.toFixed(0)}</div><div class="stat-label">Gas (USD)</div></div></div></div><h3>Route Segments</h3>`; dayData.legs.forEach((leg, index) => { html += `<div class="route-item"><strong>${dayData.stops[index].name} → ${dayData.stops[index+1].name}</strong><br><small>Distance: ${leg.distanceText} | Time: ${leg.durationText}</small></div>`; }); } if (venuesOnDay.length === 0 && hotelsOnDay.length === 0 && !travelDayData && flightsOnDay.length === 0) { html += `<p style="text-align:center; padding: 20px;">No events scheduled for this day.</p>`; } content.innerHTML = html; modal.style.display = 'flex'; currentModalDate = dateStr; addSwipeListeners(modal); }
     function showPrevDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() - 1); showDayDetails(date.toISOString().split('T')[0]); }
     function showNextDay() { if (!currentModalDate) return; let date = new Date(currentModalDate + 'T12:00:00Z'); date.setDate(date.getDate() + 1); showDayDetails(date.toISOString().split('T')[0]); }
     let touchstartX = 0; let touchendX = 0; function handleSwipe() { if (touchendX < touchstartX - 50) showNextDay(); if (touchendX > touchstartX + 50) showPrevDay(); } function addSwipeListeners(element) { element.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true}); element.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true}); }
@@ -1301,11 +1795,18 @@ input:checked + .slider:before { transform: translateX(22px); }
     function openVenueModal(venueId) { const venue = tourData.venues.find(v => v.id === venueId); if (!venue) return; currentEditId = venueId; const modal = document.getElementById('venueModal'); document.body.appendChild(modal);
     modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editVenueName').value = venue.name; document.getElementById('editVenueAddress').value = venue.address; document.getElementById('editShowDate').value = venue.date; document.getElementById('editShowTime').value = venue.time; document.getElementById('editStartInventory').value = venue.startInventory; document.getElementById('editEndInventory').value = venue.endInventory; document.getElementById('editTotalSales').value = venue.totalSales; document.getElementById('editVenueNotes').value = venue.notes || ''; modal.style.display = 'flex'; }
     function openFlightRentalModal(itemId) { const item = (tourData.flights || []).find(f => f.id === itemId); if (!item) return; currentEditId = itemId; const modal = document.getElementById('flightModal'); document.body.appendChild(modal);
-    modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editBookingType').value = item.bookingType; toggleFlightRentalFields(item.bookingType, true); document.getElementById('editFlightName').value = item.name; document.getElementById('editFlightToFrom').value = item.toFrom; document.getElementById('editFlightAirline').value = item.airline; document.getElementById('editFlightConf').value = item.conf; document.getElementById('editPickupDate').value = item.pickupDate; document.getElementById('editPickupTime').value = item.pickupTime; document.getElementById('editDropoffDate').value = item.dropoffDate; document.getElementById('editDropoffTime').value = item.dropoffTime; document.getElementById('editFlightCostUSD').value = item.costUSD; document.getElementById('editFlightCostCAD').value = item.costCAD; document.getElementById('editFlightPickupAddress').value = item.pickupAddress; document.getElementById('editFlightDropoffAddress').value = item.dropoffAddress; document.getElementById('editFlightNotes').value = item.notes; modal.style.display = 'flex'; }
+    modal.querySelectorAll('input, textarea, select').forEach(el => el.disabled = !isAdmin() && !isManager()); modal.querySelectorAll('.btn').forEach(btn => btn.style.display = (isAdmin() || isManager()) ? 'inline-block' : 'none'); document.getElementById('editBookingType').value = item.bookingType; toggleFlightRentalFields(item.bookingType, true); populateFlightNameDropdown('editFlightName', item.passengerNames||[item.name||''], document); document.getElementById('editFlightToFrom').value = item.toFrom; document.getElementById('editFlightAirline').value = item.airline; document.getElementById('editFlightConf').value = item.conf; document.getElementById('editPickupDate').value = item.pickupDate; document.getElementById('editPickupTime').value = item.pickupTime; document.getElementById('editDropoffDate').value = item.dropoffDate; document.getElementById('editDropoffTime').value = item.dropoffTime; document.getElementById('editFlightCostUSD').value = item.costUSD; document.getElementById('editFlightCostCAD').value = item.costCAD; 
+    wireEditBookingAddressDropdowns();
+    document.getElementById('editFlightPickupAddress').value = item.pickupAddress || ''; 
+    if (!document.getElementById('editFlightPickupAddress').value) document.getElementById('editFlightPickupAddressCustom').value = item.pickupAddress || '';
+    document.getElementById('editFlightDropoffAddress').value = item.dropoffAddress || ''; 
+    if (!document.getElementById('editFlightDropoffAddress').value) document.getElementById('editFlightDropoffAddressCustom').value = item.dropoffAddress || '';
+    document.getElementById('editFlightNotes').value = item.notes; modal.style.display = 'flex'; }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; currentEditId = null; }
     function saveHotelEdit(button) { if (!isAdmin() && !isManager()) return; const hotelIndex = tourData.hotels.findIndex(h => h.id === currentEditId); if (hotelIndex === -1) return; const selectedOptions = document.getElementById('editHotelGuestNames').selectedOptions; tourData.hotels[hotelIndex].guestNames = Array.from(selectedOptions).map(option => option.value); tourData.hotels[hotelIndex].name = document.getElementById('editHotelName').value; tourData.hotels[hotelIndex].address = document.getElementById('editHotelAddress').value; tourData.hotels[hotelIndex].checkin = document.getElementById('editCheckinDate').value; tourData.hotels[hotelIndex].checkout = document.getElementById('editCheckoutDate').value; tourData.hotels[hotelIndex].costUSD = parseFloat(document.getElementById('editHotelCostUSD').value) || 0; tourData.hotels[hotelIndex].costCAD = parseFloat(document.getElementById('editHotelCostCAD').value) || 0; tourData.hotels[hotelIndex].notes = document.getElementById('editHotelNotes').value; saveDataWithFeedback(button, saveData()); }
     function saveVenueEdit(button) { if (!isAdmin() && !isManager()) return; const venueIndex = tourData.venues.findIndex(v => v.id === currentEditId); if (venueIndex === -1) return; tourData.venues[venueIndex].name = document.getElementById('editVenueName').value; tourData.venues[venueIndex].address = document.getElementById('editVenueAddress').value; tourData.venues[venueIndex].date = document.getElementById('editShowDate').value; tourData.venues[venueIndex].time = document.getElementById('editShowTime').value; tourData.venues[venueIndex].startInventory = parseInt(document.getElementById('editStartInventory').value) || 0; tourData.venues[venueIndex].endInventory = parseInt(document.getElementById('editEndInventory').value) || 0; tourData.venues[venueIndex].totalSales = parseFloat(document.getElementById('editTotalSales').value) || 0; tourData.venues[venueIndex].notes = document.getElementById('editVenueNotes').value; saveDataWithFeedback(button, saveData()); }
-    function saveFlightRentalEdit(button) { if (!isAdmin() && !isManager()) return; const itemIndex = (tourData.flights || []).findIndex(f => f.id === currentEditId); if (itemIndex === -1) return; tourData.flights[itemIndex] = { ...tourData.flights[itemIndex], bookingType: document.getElementById('editBookingType').value, name: document.getElementById('editFlightName').value, toFrom: document.getElementById('editFlightToFrom').value, airline: document.getElementById('editFlightAirline').value, conf: document.getElementById('editFlightConf').value, pickupDate: document.getElementById('editPickupDate').value, pickupTime: document.getElementById('editPickupTime').value, dropoffDate: document.getElementById('editDropoffDate').value, dropoffTime: document.getElementById('editDropoffTime').value, costUSD: parseFloat(document.getElementById('editFlightCostUSD').value) || 0, costCAD: parseFloat(document.getElementById('editFlightCostCAD').value) || 0, pickupAddress: document.getElementById('editFlightPickupAddress').value, dropoffAddress: document.getElementById('editFlightDropoffAddress').value, notes: document.getElementById('editFlightNotes').value, }; saveDataWithFeedback(button, saveData()); }
+    function saveFlightRentalEdit(button) { if (!isAdmin() && !isManager()) return; const itemIndex = (tourData.flights || []).findIndex(f => f.id === currentEditId); if (itemIndex === -1) return; tourData.flights[itemIndex] = { ...tourData.flights[itemIndex], bookingType: document.getElementById('editBookingType').value, name: Array.from(document.getElementById('editFlightName').selectedOptions).map(o=>o.value).join(', '),
+                passengerNames: Array.from(document.getElementById('editFlightName').selectedOptions).map(o=>o.value), toFrom: document.getElementById('editFlightToFrom').value, airline: document.getElementById('editFlightAirline').value, conf: document.getElementById('editFlightConf').value, pickupDate: document.getElementById('editPickupDate').value, pickupTime: document.getElementById('editPickupTime').value, dropoffDate: document.getElementById('editDropoffDate').value, dropoffTime: document.getElementById('editDropoffTime').value, costUSD: parseFloat(document.getElementById('editFlightCostUSD').value) || 0, costCAD: parseFloat(document.getElementById('editFlightCostCAD').value) || 0, pickupAddress: (document.getElementById('editFlightPickupAddress').value || document.getElementById('editFlightPickupAddressCustom').value), dropoffAddress: (document.getElementById('editFlightDropoffAddress').value || document.getElementById('editFlightDropoffAddressCustom').value), notes: document.getElementById('editFlightNotes').value, }; saveDataWithFeedback(button, saveData()); }
     function deleteItem(typeKey, id) { if (!isAdmin() && !isManager()) return; if (!confirm(`Delete this item?`)) return; const itemIndex = tourData[typeKey].findIndex(i => i.id === id); if (itemIndex === -1) return; tourData[typeKey].splice(itemIndex, 1); const singularType = typeKey.slice(0, -1); saveDataWithFeedback(null, saveData()); closeModal(singularType + 'Modal'); }
     function updateAllDisplays() { updateHotelsDisplay(); updateVenuesDisplay(); updateFlightsDisplay(); updateExpensesDisplay(); renderCalendar(); }
     
@@ -1323,12 +1824,12 @@ input:checked + .slider:before { transform: translateX(22px); }
             const hotelCard = document.createElement('div'); 
             hotelCard.className = 'hotel-card'; 
             hotelCard.onclick = () => openHotelModal(hotel.id); 
-            hotelCard.innerHTML = `<div class="card-header"><div class="card-title">${hotel.name}<br><span style="font-size:0.8em; color: #ccc; font-weight: normal;">Guests: ${(hotel.guestNames || []).join(', ')}</span></div><small class="card-date">${formatDate(hotel.checkin)}<br>${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${hotel.costUSD.toFixed(0)} | CAD: ${hotel.costCAD.toFixed(0)}</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotels', ${hotel.id})">×</button>` : ''}</div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; 
+            hotelCard.innerHTML = `<div class="card-header"><div class="card-title">${hotel.name}<br><span style="font-size:0.8em; color: #ccc; font-weight: normal;">Guests: ${(hotel.guestNames || []).map(n => getNickname(n)).join(', ')}</span></div><small class="card-date">${formatDate(hotel.checkin)}<br>${formatDate(hotel.checkout)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${hotel.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>${currencySymbol()}${bestCost(hotel.costUSD,hotel.costCAD).toFixed(0)} ${currencyLabel()}</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('hotels', ${hotel.id})">×</button>` : ''}</div>${hotel.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${hotel.notes}</div>` : ''}`; 
             hotelsList.appendChild(hotelCard); 
         }); 
         document.getElementById('hotelCountStat').textContent = sortedHotels.length; 
         document.getElementById('hotelDaysStat').textContent = Math.round(totalNights); 
-        document.getElementById('hotelCostStat').textContent = '$' + totalUSD.toFixed(0); 
+        document.getElementById('hotelCostStat').textContent = currencySymbol()+convertFromUSD(totalUSD).toFixed(0); document.querySelectorAll('.total-cur-label').forEach(el=>el.textContent='Total ('+currencyLabel()+')'); 
     }
     
     function updateFlightsDisplay() { 
@@ -1340,15 +1841,16 @@ input:checked + .slider:before { transform: translateX(22px); }
         sortedFlights.forEach(item => { 
             let costInUSD = (item.costCAD > 0) ? item.costCAD * CAD_TO_USD_RATE : item.costUSD;
             totalUSD += costInUSD;
-            const icon = item.bookingType === 'flight' ? '✈️' : '🚗'; 
+            const isFerry = item.bookingType === 'ferry';
+            const icon = item.bookingType === 'flight' ? '✈️' : isFerry ? '🛥️' : (item.bookingType === 'uber' ? '🚕' : '🚗'); 
             const card = document.createElement('div'); 
-            card.className = 'flight-card'; 
+            card.className = 'flight-card' + (isFerry ? ' ferry-card' : ''); 
             card.onclick = () => openFlightRentalModal(item.id); 
-            card.innerHTML = `<div class="card-header"><div class="card-title">${icon} <strong>${item.name || 'No Name'}</strong><br><span style="font-size:0.8em; color: #ccc; font-weight: normal;">${item.toFrom}</span></div><small class="card-date">${formatDate(item.pickupDate)}<br>${formatTime(item.pickupTime)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${item.airline} - ${item.conf}</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>USD: ${item.costUSD.toFixed(0)} | CAD: ${item.costCAD.toFixed(0)}</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('flights', ${item.id})">×</button>` : ''}</div>${item.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${item.notes}</div>` : ''}`; 
+            card.innerHTML = `<div class="card-header"><div class="card-title">${icon} <strong>${(() => { const passengers = item.passengerNames || (item.name ? [item.name] : []); if (currentUser && passengers.includes(currentUser.name)) return getNickname(currentUser.name); return passengers.map(n => getNickname(n)).join(', ') || 'No Passenger'; })()}</strong><br><span style="font-size:0.8em; color: #ccc; font-weight: normal;">${item.toFrom}</span></div><small class="card-date">${formatDate(item.pickupDate)}<br>${formatTime(item.pickupTime)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${item.airline} - ${item.conf}</div><div style="display: flex; justify-content: space-between; align-items: center;"><span>${currencySymbol()}${bestCost(item.costUSD,item.costCAD).toFixed(0)} ${currencyLabel()}</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('flights', ${item.id})">×</button>` : ''}</div>${item.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${item.notes}</div>` : ''}`; 
             flightsList.appendChild(card); 
         }); 
         document.getElementById('flightCountStat').textContent = sortedFlights.length; 
-        document.getElementById('flightCostStat').textContent = '$' + totalUSD.toFixed(0); 
+        document.getElementById('flightCostStat').textContent = currencySymbol()+convertFromUSD(totalUSD).toFixed(0); 
     }
     
     function updateExpensesDisplay() { 
@@ -1360,21 +1862,349 @@ input:checked + .slider:before { transform: translateX(22px); }
             let costInUSD = (expense.amountCAD > 0) ? expense.amountCAD * CAD_TO_USD_RATE : expense.amountUSD;
             totalUSD += costInUSD;
             const row = tbody.insertRow(); 
-            row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${expense.amountUSD.toFixed(2)}</td><td>${expense.amountCAD.toFixed(2)}</td><td>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="deleteItem('expenses', ${expense.id})">×</button>` : ''}</td>`; 
+            row.innerHTML = `<td>${formatDate(expense.date)}</td><td>${expense.type}</td><td>${(expense.location || 'N/A').substring(0, 15)}...</td><td>${currencySymbol()}${bestCost(expense.amountUSD,expense.amountCAD).toFixed(2)} ${currencyLabel()}</td><td>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="deleteItem('expenses', ${expense.id})">×</button>` : ''}</td>`; 
         }); 
         document.getElementById('expenseCountStat').textContent = tourData.expenses.length; 
-        document.getElementById('expenseCostStat').textContent = '$' + totalUSD.toFixed(0); 
+        document.getElementById('expenseCostStat').textContent = currencySymbol()+convertFromUSD(totalUSD).toFixed(0); 
     }
 
     function updateVenuesDisplay() { const venuesList = document.getElementById('venuesList'); venuesList.innerHTML = ''; const sortedVenues = [...tourData.venues].sort((a, b) => new Date(a.date) - new Date(b.date)); let totalSales = 0; sortedVenues.forEach(venue => { totalSales += venue.totalSales; const soldItems = venue.startInventory - venue.endInventory; const venueCard = document.createElement('div'); venueCard.className = 'venue-card'; venueCard.onclick = () => openVenueModal(venue.id); venueCard.innerHTML = `<div class="card-header"><strong class="card-title">${venue.name}</strong><small class="card-date">${formatDate(venue.date)} @ ${formatTime(venue.time)}</small></div><div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">📍 ${venue.address.substring(0, 50)}...</div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 12px;">Inventory: Start ${venue.startInventory} | End ${venue.endInventory} | Sold ${soldItems}</span></div><div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #4CAF50; font-weight: bold;">Sales: ${venue.totalSales.toLocaleString()} USD</span>${(isAdmin() || isManager()) ? `<button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteItem('venues', ${venue.id})">×</button>` : ''}</div>${venue.notes ? `<div style="margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 11px;">📝 ${venue.notes}</div>` : ''}`; venuesList.appendChild(venueCard); }); document.getElementById('venueCountStat').textContent = tourData.venues.length; document.getElementById('venueSalesStat').textContent = '$' + totalSales.toLocaleString(); }
-    function toggleFlightRentalFields(type, isEdit = false) { const prefix = isEdit ? 'edit' : ''; const modalContent = isEdit ? document.getElementById('flightEditForm') : document.getElementById('settingsModalContent'); const flightNameLabel = modalContent.querySelector(`#${prefix}FlightNameLabel`); const airlineAgencyLabel = modalContent.querySelector(`#${prefix}AirlineAgencyLabel`); const flightConfLabel = modalContent.querySelector(`#${prefix}FlightConfLabel`); const pickupDateLabel = modalContent.querySelector(`#${prefix}PickupDateLabel`); const dropoffDateLabel = modalContent.querySelector(`#${prefix}DropoffDateLabel`); const pickupAddressLabel = modalContent.querySelector(`#${prefix}PickupAddressLabel`); const dropoffAddressLabel = modalContent.querySelector(`#${prefix}DropoffAddressLabel`); if (type === 'flight') { flightNameLabel.textContent = 'Passenger Name'; airlineAgencyLabel.textContent = 'Airline'; flightConfLabel.textContent = 'Flight #'; pickupDateLabel.textContent = 'Departure Date & Time'; dropoffDateLabel.textContent = 'Arrival Date & Time'; pickupAddressLabel.textContent = 'Departure Airport Address'; dropoffAddressLabel.textContent = 'Arrival Airport Address'; } else { flightNameLabel.textContent = 'Driver Name'; airlineAgencyLabel.textContent = 'Rental Agency'; flightConfLabel.textContent = 'Confirmation #'; pickupDateLabel.textContent = 'Pickup Date & Time'; dropoffDateLabel.textContent = 'Drop-off Date & Time'; pickupAddressLabel.textContent = 'Pickup Address'; dropoffAddressLabel.textContent = 'Drop-off Address'; } }
-    function duplicateBooking() { if (!isAdmin() && !isManager()) return; const item = (tourData.flights || []).find(f => f.id === currentEditId); if (!item) return; closeModal('flightModal'); openSettingsModal('add-flight-rental'); setTimeout(() => { const formContent = document.getElementById('settingsModalContent'); formContent.querySelector('#bookingType').value = item.bookingType; toggleFlightRentalFields(item.bookingType, false); formContent.querySelector('#flightToFrom').value = item.toFrom; formContent.querySelector('#flightAirline').value = item.airline; formContent.querySelector('#flightConf').value = item.conf; formContent.querySelector('#pickupDate').value = item.pickupDate; formContent.querySelector('#pickupTime').value = item.pickupTime; formContent.querySelector('#dropoffDate').value = item.dropoffDate; formContent.querySelector('#dropoffTime').value = item.dropoffTime; formContent.querySelector('#flightCostUSD').value = item.costUSD; formContent.querySelector('#flightCostCAD').value = item.costCAD; formContent.querySelector('#flightPickupAddress').value = item.pickupAddress; formContent.querySelector('#flightDropoffAddress').value = item.dropoffAddress; formContent.querySelector('#flightNotes').value = item.notes; }, 100); }
-    function renderUsers() { const modalContent = document.getElementById('settingsModalContent'); const tbody = modalContent.querySelector('#usersBody'); tbody.innerHTML = ''; const roleSelect = modalContent.querySelector('#newUserRole'); roleSelect.innerHTML = `<option value="user only">User Only</option><option value="viewer">View All</option>`; if(isAdmin() || isManager()) roleSelect.innerHTML += `<option value="management">Management</option>`; if(isAdmin()) roleSelect.innerHTML += `<option value="admin">Admin</option>`; const accessCodes = tourData.access_codes || {}; for(const code in accessCodes) { const user = accessCodes[code]; if(isManager() && (user.role === 'admin' || user.role === 'management')) continue; const row = tbody.insertRow(); row.innerHTML = `<td>${user.name}</td><td>${code}</td><td>${user.role}</td><td><button class="btn btn-small btn-danger" onclick="deleteUser('${code}')">×</button></td>`; } }
-    function addUser(button) { if (!isAdmin() && !isManager()) return; const form = button.closest('.form-section'); const name = form.querySelector('#newUserName').value; const code = form.querySelector('#newAccessCode').value.trim(); const role = form.querySelector('#newUserRole').value; if (name && code) { if (tourData.access_codes[code]) { alert('This access code is already in use.'); return; } tourData.access_codes[code] = { name, role }; saveDataWithFeedback(button, saveData(), () => { form.querySelector('#newUserName').value = ''; form.querySelector('#newAccessCode').value = ''; renderUsers(); }); } else { alert('Please fill in all fields.'); } }
+    function toggleFlightRentalFields(type, isEdit = false) {
+        const prefix = isEdit ? 'edit' : '';
+        const modalContent = isEdit ? document.getElementById('flightEditForm') : document.getElementById('settingsModalContent');
+        const flightNameLabel = modalContent.querySelector(isEdit ? '#editFlightNameLabel' : '#flightNameLabel');
+        const airlineAgencyLabel = modalContent.querySelector(isEdit ? '#editAirlineAgencyLabel' : '#airlineAgencyLabel');
+        const flightConfLabel = modalContent.querySelector(isEdit ? '#editFlightConfLabel' : '#flightConfLabel');
+        const pickupDateLabel = modalContent.querySelector(isEdit ? '#editPickupDateLabel' : '#pickupDateLabel');
+        const dropoffDateLabel = modalContent.querySelector(isEdit ? '#editDropoffDateLabel' : '#dropoffDateLabel');
+        const pickupAddressLabel = modalContent.querySelector(isEdit ? '#editPickupAddressLabel' : '#pickupAddressLabel');
+        const dropoffAddressLabel = modalContent.querySelector(isEdit ? '#editDropoffAddressLabel' : '#dropoffAddressLabel');
+        if (type === 'flight') {
+            flightNameLabel.textContent = 'Passenger Name';
+            airlineAgencyLabel.textContent = 'Airline';
+            flightConfLabel.textContent = 'Flight #';
+            pickupDateLabel.textContent = 'Departure Date & Time';
+            dropoffDateLabel.textContent = 'Arrival Date & Time';
+            pickupAddressLabel.textContent = 'Departure Airport Address';
+            dropoffAddressLabel.textContent = 'Arrival Airport Address';
+            const toFromLbl2 = modalContent.querySelector(isEdit ? '#editToFromLabel' : '#toFromLabel');
+            const toFromInp2 = modalContent.querySelector(isEdit ? '#editFlightToFrom' : '#flightToFrom');
+            if (toFromLbl2) toFromLbl2.textContent = 'Route (From → To)';
+            if (toFromInp2) toFromInp2.placeholder = 'e.g., YYZ → LAX';
+        } else if (type === 'uber') {
+            flightNameLabel.textContent = 'Passenger Name';
+            airlineAgencyLabel.textContent = 'Uber';
+            flightConfLabel.textContent = 'Transfer';
+            pickupDateLabel.textContent = 'Pickup Date & Time';
+            dropoffDateLabel.textContent = 'Drop-off Date & Time';
+            pickupAddressLabel.textContent = 'Pickup Address';
+            dropoffAddressLabel.textContent = 'Drop-off Address';
+        } else if (type === 'ferry') {
+            flightNameLabel.textContent = 'Passenger Name';
+            airlineAgencyLabel.textContent = 'Ferry Line';
+            flightConfLabel.textContent = 'Reservation #';
+            pickupDateLabel.textContent = 'Departure Date & Time';
+            dropoffDateLabel.textContent = 'Arrival Date & Time';
+            pickupAddressLabel.textContent = 'Departure Terminal';
+            dropoffAddressLabel.textContent = 'Arrival Terminal';
+            const toFromLbl = modalContent.querySelector(isEdit ? '#editToFromLabel' : '#toFromLabel');
+            const toFromInp = modalContent.querySelector(isEdit ? '#editFlightToFrom' : '#flightToFrom');
+            if (toFromLbl) toFromLbl.textContent = 'Route (From → To)';
+            if (toFromInp) toFromInp.placeholder = 'e.g., Tobermory → South Baymouth';
+        } else {
+            flightNameLabel.textContent = 'Driver Name';
+            airlineAgencyLabel.textContent = 'Rental Agency';
+            flightConfLabel.textContent = 'Confirmation #';
+            pickupDateLabel.textContent = 'Pickup Date & Time';
+            dropoffDateLabel.textContent = 'Drop-off Date & Time';
+            pickupAddressLabel.textContent = 'Pickup Address';
+            dropoffAddressLabel.textContent = 'Drop-off Address';
+        }
+    }
+ 
+    function saveCurrencySettings() {
+        if (!isAdmin() && !isManager()) return;
+        const contentEl = document.getElementById('settingsModalContent');
+        const selected = contentEl.querySelector('input[name="displayCurrency"]:checked');
+        if (!selected) { alert('Please select a currency.'); return; }
+        const cadVal = parseFloat(contentEl.querySelector('#cadPerUsdRate').value) || 1.35;
+        const eurVal = parseFloat(contentEl.querySelector('#eurPerUsdRate').value) || 0.92;
+        tourData.displayCurrency = selected.value;
+        tourData.currencyRates = { cadPerUsd: cadVal, eurPerUsd: eurVal };
+        saveData();
+        closeModal('settingsModal');
+        updateHotelsDisplay();
+        updateFlightsDisplay();
+        updateExpensesDisplay();
+        renderRouteResults();
+        document.querySelectorAll('.total-cur-label').forEach(el=>el.textContent='Total ('+selected.value+')');
+        alert('✅ Currency set to ' + selected.value + '. Re-generate route to update gas estimates.');
+    }
+    function duplicateBooking() {
+        if (!isAdmin() && !isManager()) return;
+        const item = (tourData.flights || []).find(f => f.id === currentEditId);
+        if (!item) return;
+        const dupData = JSON.parse(JSON.stringify(item));
+        closeModal('flightModal');
+        openSettingsModal('add-flight-rental', dupData);
+    }
+
+    function renderUsers() {
+        const modalContent = document.getElementById('settingsModalContent');
+        const tbody = modalContent.querySelector('#usersBody');
+        tbody.innerHTML = '';
+        const roleSelect = modalContent.querySelector('#newUserRole');
+        roleSelect.innerHTML = `<option value="user only">User Only</option><option value="viewer">View All</option>`;
+        if(isAdmin() || isManager()) roleSelect.innerHTML += `<option value="management">Management</option>`;
+        if(isAdmin()) roleSelect.innerHTML += `<option value="admin">Admin</option>`;
+        const accessCodes = tourData.access_codes || {};
+        for(const code in accessCodes) {
+            const user = accessCodes[code];
+            if(isManager() && (user.role === 'admin' || user.role === 'management')) continue;
+            const row = tbody.insertRow();
+            row.innerHTML = `<td>${user.name}</td>`
+                + `<td><input type="text" value="${user.nickname||''}" placeholder="Nickname" style="width:90px;padding:2px 4px;background:#1a2a3a;color:#fff;border:1px solid #2a3a4a;border-radius:4px;" onchange="updateNickname('${code}', this.value)"/></td>`
+                + `<td>${code}</td><td>${user.role}</td>`
+                + `<td><button class="btn btn-small btn-danger" onclick="deleteUser('${code}')">×</button></td>`;
+        }
+    }
+    function addUser(button) { if (!isAdmin() && !isManager()) return; const form = button.closest('.form-section'); const name = form.querySelector('#newUserName').value; const nickname = (form.querySelector('#newUserNickname')||{}).value||''; const code = form.querySelector('#newAccessCode').value.trim(); const role = form.querySelector('#newUserRole').value; if (name && code) { if (tourData.access_codes[code]) { alert('This access code is already in use.'); return; } tourData.access_codes[code] = { name, nickname, role }; saveDataWithFeedback(button, saveData(), () => { form.querySelector('#newUserName').value = ''; form.querySelector('#newAccessCode').value = ''; renderUsers(); }); } else { alert('Please fill in all fields.'); } }
     function deleteUser(code) { if ((!isAdmin() && !isManager()) || (currentUser && code === currentUser.code)) { alert("Action not allowed."); return; } if (confirm(`Are you sure you want to delete the user with access code "${code}"?`)) { delete tourData.access_codes[code]; saveData().then(() => renderUsers()); } }
-    function populateUserSelect(selectId, selectedNames = [], context = document) { const select = context.querySelector(`#${selectId}`); if (!select) return; select.innerHTML = ''; if (!isAdmin() && !isManager()) { selectedNames.sort().forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); } else { const allUsers = Object.values(tourData.access_codes || {}).map(u => u.name); const selectedUsers = allUsers.filter(name => selectedNames.includes(name)).sort(); const unselectedUsers = allUsers.filter(name => !selectedNames.includes(name)).sort(); selectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); unselectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); }); } }
+
+    function updateNickname(code, nickname) {
+        if (!tourData.access_codes[code]) return;
+        tourData.access_codes[code].nickname = nickname.trim();
+        saveData();
+    }
+
+    // Helper: get nickname by full name, fallback to full name
+    function getNickname(fullName) {
+        if (!fullName) return '';
+        const codes = tourData.access_codes || {};
+        for (const code in codes) {
+            if (codes[code].name === fullName) {
+                return codes[code].nickname || fullName;
+            }
+        }
+        return fullName;
+    }
+    function populateFlightNameDropdown(selectId, selectedNames, context) {
+        const ctx = context || document;
+        const select = ctx.querySelector ? ctx.querySelector('#'+selectId) : document.getElementById(selectId);
+        if (!select) return;
+        const prevNames = Array.isArray(selectedNames) ? selectedNames : (selectedNames ? [selectedNames] : []);
+        select.innerHTML = '';
+        const codes = tourData.access_codes || {};
+        // Only show users WITH a nickname set
+        Object.values(codes).filter(u => u.nickname).forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.name;
+            opt.textContent = u.nickname + ' (' + u.name + ')';
+            if (prevNames.includes(u.name)) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function populateUserSelect(selectId, selectedNames = [], context = document) { const select = context.querySelector(`#${selectId}`); if (!select) return; select.innerHTML = ''; if (!isAdmin() && !isManager()) { selectedNames.sort().forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); } else { const allUsers = Object.values(tourData.access_codes || {}).filter(u => u.nickname).map(u => u.name); const selectedUsers = allUsers.filter(name => selectedNames.includes(name)).sort(); const unselectedUsers = allUsers.filter(name => !selectedNames.includes(name)).sort(); selectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = true; option.classList.add('selected-guest'); select.appendChild(option); }); unselectedUsers.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); }); } }
     function exportTourData() { if (!isAdmin() && !isManager()) return; saveRoutePlannerState(false); const form = document.getElementById('settingsModalContent'); const includeHotels = form.querySelector('#exportHotels').checked; const includeVenues = form.querySelector('#exportVenues').checked; const includeExpenses = form.querySelector('#exportExpenses').checked; const includeFlights = form.querySelector('#exportFlights').checked; const includeRoute = form.querySelector('#exportRoute').checked; let csvData = [['Category', 'Date', 'Name/Info', 'Location/Address', 'Amount', 'Currency', 'Notes']]; if(includeHotels) tourData.hotels.forEach(h => csvData.push(['Hotel', h.checkin, h.name, h.address, (h.costCAD || h.costUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', `Guests: ${(h.guestNames || []).join(', ')} | Check-out: ${h.checkout} | ${h.notes}`])); if(includeVenues) tourData.venues.forEach(v => csvData.push(['Venue', v.date, v.name, v.address, v.totalSales, 'USD', `Time: ${v.time} | Sold: ${v.startInventory-v.endInventory}`])); if(includeFlights) (tourData.flights || []).forEach(f => csvData.push([f.bookingType, f.pickupDate, f.airline, f.toFrom, f.conf, 'N/A', `Passenger/Driver: ${f.name} | Pickup: ${f.pickupAddress} at ${f.pickupTime} | Dropoff: ${f.dropoffAddress} at ${f.dropoffTime} | Notes: ${f.notes}`])); if(includeExpenses) tourData.expenses.forEach(e => csvData.push(['Expense', e.date, e.type, e.location, (e.amountCAD || e.amountUSD * 1.35).toFixed(2), 'CAD (Estimate if not Manual)', e.notes])); if (includeRoute) { csvData.push(['---','---','---','---','---','---','---']); csvData.push(['ROUTE ITINERARY', 'Date', 'From', 'To', 'Distance', 'Time', 'Est. Gas (CAD)']); Object.keys(tourData.routeCache).sort((a,b) => new Date(a.split('_')[0]) - new Date(b.split('_')[0])).forEach(key => { const dayData = tourData.routeCache[key]; const date = key.split('_')[0]; dayData.legs.forEach((leg, index) => { const fromStop = dayData.stops[index]; const toStop = dayData.stops[index+1]; const legKm = leg.distanceValue / 1000; const gasCost = calculateGasCost(legKm); csvData.push(['Segment', date, fromStop.name, toStop.name, leg.distanceText, leg.durationText, gasCost.toFixed(2)]); }); }); } const csv = csvData.map(row => row.map(cell => `"${(cell ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.setAttribute('download', `${TOUR_NAME}-tour-data-${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) { closeModal(event.target.id); } }
+
+
+    function addLocation(btn) {
+        if (!isAdmin() && !isManager()) return;
+        const name = document.getElementById('locationName').value.trim();
+        const address = document.getElementById('locationAddress').value.trim();
+        const category = document.getElementById('locationCategory').value;
+        if (!name || !address) { alert('Name and Address are required.'); return; }
+        if (!tourData.locations) tourData.locations = []; if (!Array.isArray(tourData.locations)) tourData.locations = [];
+        tourData.locations.push({ id: Date.now(), name, address, category });
+        saveDataWithFeedback(btn, saveData());
+        renderLocationsList();
+        document.getElementById('locationName').value = '';
+        document.getElementById('locationAddress').value = '';
+    }
+
+    function deleteLocation(id) {
+        if (!isAdmin() && !isManager()) return;
+        tourData.locations = (tourData.locations || []).filter(l => l.id !== id);
+        saveData();
+        renderLocationsList();
+    }
+
+    function renderLocationsList() {
+        const container = document.getElementById('locationsListContent');
+        if (!container) return;
+        const locs = tourData.locations || [];
+        if (locs.length === 0) { container.innerHTML = '<p style="color:#aaa;">No locations saved yet.</p>'; return; }
+        const grouped = {};
+        locs.forEach(l => { if (!grouped[l.category]) grouped[l.category] = []; grouped[l.category].push(l); });
+        let html = '';
+        const catEmoji = { 'Airport':'✈️', 'Ferry Terminal':'🛥️', 'Rental Agency':'🚗', 'Important Location':'📍' };
+        Object.keys(grouped).forEach(cat => {
+            const catIcon = catEmoji[cat] || '📌';
+            html += `<div style="margin-bottom:10px;"><strong style="color:#7b2fff;">${catIcon} ${cat}</strong>`;
+            grouped[cat].forEach(l => {
+                html += `<div class="route-item" style="margin-top:6px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+                    <div><strong>${l.name}</strong><br><small style="color:#aaa;">${l.address}</small></div>
+                    <button onclick="deleteLocation(${l.id})" style="background:#c0392b;border:none;color:white;border-radius:6px;padding:4px 10px;cursor:pointer;">✕</button>
+                </div>`;
+            });
+            html += '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+
+
+    // Populate address dropdowns in booking add form with all known addresses
+    function buildAddressOptionGroups() {
+        const groups = [];
+        // Airports from locations
+        const airports = (tourData.locations || []).filter(l => l.category === 'Airport');
+        if (airports.length) groups.push({ label: '✈️ Airports', items: airports });
+        // Ferry Terminals
+        const ferries = (tourData.locations || []).filter(l => l.category === 'Ferry Terminal');
+        if (ferries.length) groups.push({ label: '🛥️ Ferry Terminals', items: ferries });
+        // Rental Agencies
+        const rentals = (tourData.locations || []).filter(l => l.category === 'Rental Agency');
+        if (rentals.length) groups.push({ label: '🚗 Rental Agencies', items: rentals });
+        // Important Locations
+        const important = (tourData.locations || []).filter(l => l.category === 'Important Location');
+        if (important.length) groups.push({ label: '📍 Important Locations', items: important });
+        // Hotels
+        const hotels = (tourData.hotels || []).filter(h => h.address);
+        if (hotels.length) groups.push({ label: '🏨 Hotels', items: hotels });
+        // Venues
+        const venues = (tourData.venues || []).filter(v => v.address);
+        if (venues.length) groups.push({ label: '🎤 Venues', items: venues });
+        return groups;
+    }
+
+    function populateAddressSelect(sel, currentValue) {
+        const groups = buildAddressOptionGroups();
+        sel.innerHTML = '<option value="">-- Select address --</option>';
+        groups.forEach(g => {
+            const og = document.createElement('optgroup');
+            og.label = g.label;
+            g.items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.address;
+                opt.textContent = item.name;
+                og.appendChild(opt);
+            });
+            sel.appendChild(og);
+        });
+        if (currentValue) sel.value = currentValue;
+    }
+
+    function wireBookingAddressDropdowns(container) {
+        const pickupSel = container ? container.querySelector('#flightPickupAddress') : document.getElementById('flightPickupAddress');
+        const dropoffSel = container ? container.querySelector('#flightDropoffAddress') : document.getElementById('flightDropoffAddress');
+        if (!pickupSel || !dropoffSel) return;
+        populateAddressSelect(pickupSel, pickupSel.value);
+        populateAddressSelect(dropoffSel, dropoffSel.value);
+    }
+
+    // Auto-populate To→From field based on selected pickup/dropoff addresses
+    function wireEditBookingAddressDropdowns() {
+        const pickupSel = document.getElementById('editFlightPickupAddress');
+        const dropoffSel = document.getElementById('editFlightDropoffAddress');
+        if (!pickupSel || !dropoffSel) return;
+        populateAddressSelect(pickupSel, pickupSel.value);
+        populateAddressSelect(dropoffSel, dropoffSel.value);
+    }
+    function getSelectedName(sel, customInput) {
+        if (sel && sel.value) {
+            const opt = sel.options[sel.selectedIndex];
+            return opt ? opt.textContent.trim() : sel.value.split(',')[0];
+        }
+        return customInput && customInput.value ? customInput.value.split(',')[0] : '';
+    }
+    function updateBookingToFrom() {
+        const container = document.getElementById('settingsModalContent');
+        if (!container) return;
+        const pickupSel = container.querySelector('#flightPickupAddress');
+        const dropoffSel = container.querySelector('#flightDropoffAddress');
+        const pickupCustom = container.querySelector('#flightPickupAddressCustom');
+        const dropoffCustom = container.querySelector('#flightDropoffAddressCustom');
+        const toFromField = container.querySelector('#flightToFrom');
+        if (!toFromField) return;
+        const from = getSelectedName(pickupSel, pickupCustom);
+        const to = getSelectedName(dropoffSel, dropoffCustom);
+        if (from && to) toFromField.value = from + ' → ' + to;
+    }
+    function updateEditBookingToFrom() {
+        const container = document.getElementById('flightEditForm');
+        if (!container) return;
+        const pickupSel = container.querySelector('#editFlightPickupAddress');
+        const dropoffSel = container.querySelector('#editFlightDropoffAddress');
+        const pickupCustom = container.querySelector('#editFlightPickupAddressCustom');
+        const dropoffCustom = container.querySelector('#editFlightDropoffAddressCustom');
+        const toFromField = container.querySelector('#editFlightToFrom');
+        if (!toFromField) return;
+        const from = getSelectedName(pickupSel, pickupCustom);
+        const to = getSelectedName(dropoffSel, dropoffCustom);
+        if (from && to) toFromField.value = from + ' → ' + to;
+    }
 </script>
+
+    <template id="manage-locations-template">
+        <div class="form-section">
+            <h3>📍 Manage Locations</h3>
+            <p style="color:#aaa;font-size:0.9em;">Add airports, rental agencies, and important places to use in booking address dropdowns.</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input id="locationName" placeholder="e.g., Toronto Pearson Airport" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="locationCategory">
+                        <option value="Airport">✈️ Airport</option>
+                        <option value="Ferry Terminal">🛥️ Ferry Terminal</option>
+                        <option value="Rental Agency">🚗 Rental Agency</option>
+                        <option value="Important Location">📍 Important Location</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Full Address</label>
+                <input id="locationAddress" placeholder="e.g., 6301 Silver Dart Dr, Mississauga, ON" type="text"/>
+            </div>
+            <button class="btn btn-primary" onclick="addLocation(this)">+ Add Location</button>
+        </div>
+        <div class="form-section" id="locationsList">
+            <h3>Saved Locations</h3>
+            <div id="locationsListContent"></div>
+        </div>
+    </template>
+
+    <div id="currency-settings-template" style="display:none;">
+        <div class="form-section">
+            <h3>💱 Display Currency</h3>
+            <p style="color:#aaa;font-size:0.9em;">All costs, gas estimates, and totals display in the selected currency. Internal data stays in USD — switch anytime without re-entering data.</p>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="display:block;margin-bottom:10px;font-weight:bold;">Select Currency</label>
+                <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.1em;"><input type="radio" name="displayCurrency" value="USD"> 🇺🇸 USD</label>
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.1em;"><input type="radio" name="displayCurrency" value="CAD"> 🇨🇦 CAD</label>
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1.1em;"><input type="radio" name="displayCurrency" value="EUR"> 🇪🇺 EUR</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CAD per 1 USD</label>
+                    <input id="cadPerUsdRate" type="number" step="0.01" min="0.5" max="3" placeholder="1.35" style="width:100%;padding:8px;background:#1a2a3a;border:1px solid #2a3a4a;border-radius:6px;color:#fff;"/>
+                    <small style="color:#aaa;">e.g. 1.35 = $1 USD → $1.35 CAD</small>
+                </div>
+                <div class="form-group">
+                    <label>EUR per 1 USD</label>
+                    <input id="eurPerUsdRate" type="number" step="0.01" min="0.3" max="2" placeholder="0.92" style="width:100%;padding:8px;background:#1a2a3a;border:1px solid #2a3a4a;border-radius:6px;color:#fff;"/>
+                    <small style="color:#aaa;">e.g. 0.92 = $1 USD → €0.92</small>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:12px;" onclick="saveCurrencySettings()">💾 Save Currency Settings</button>
+        </div>
+    </div>
 </body>
 </html>
