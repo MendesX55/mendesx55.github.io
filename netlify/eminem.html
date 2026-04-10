@@ -1409,7 +1409,8 @@ input:checked + .slider:before { transform: translateX(22px); }
         let grandTotalDistanceMeters = 0, grandTotalTimeSecs = 0;
 
         // Sort all cache keys by date then chunk index
-        const sortedKeys = Object.keys(tourData.routeCache).sort((a, b) => {
+        // Filter out legacy cache keys (old format without __ separator)
+        const sortedKeys = Object.keys(tourData.routeCache).filter(k => k.includes('__')).sort((a, b) => {
             const dateA = a.split('__')[0], dateB = b.split('__')[0];
             const ciA = parseInt((a.split('__')[1]||'0').split('_')[0]);
             const ciB = parseInt((b.split('__')[1]||'0').split('_')[0]);
@@ -1457,14 +1458,42 @@ input:checked + .slider:before { transform: translateX(22px); }
             const dayMinutes = Math.floor((totalTime % 3600) / 60);
             const dayId = 'day-' + dayCounter;
 
-            // ONE header per date
+            // ONE header per date — add flight durations to travel time
+            const stateForDayHeader = (tourData.routePlannerState || []).filter(s => s.dateValue === date);
+            let flightTimeSecs = 0;
+            const ukKwH = ['gatwick','heathrow','lgw','lhr','stansted','manchester','england'];
+            for (let si = 0; si < stateForDayHeader.length - 1; si++) {
+                if ((stateForDayHeader[si+1].segmentType||'drive') !== 'flight') continue;
+                const fDet2 = getLocationDetails(stateForDayHeader[si].selectValue||'');
+                const tDet2 = getLocationDetails(stateForDayHeader[si+1].selectValue||'');
+                const matchFlight = (tourData.flights||[]).find(f =>
+                    f.bookingType==='flight' && f.pickupDate===date && f.pickupTime && f.dropoffTime &&
+                    ((f.toFrom||'').toLowerCase().includes((fDet2.name||'').toLowerCase().split(' ')[0]) ||
+                     (f.toFrom||'').toLowerCase().includes((tDet2.name||'').toLowerCase().split(' ')[0]))
+                );
+                if (matchFlight) {
+                    try {
+                        const ad2 = matchFlight.dropoffDate || matchFlight.pickupDate;
+                        const dUK2 = ukKwH.some(k=>(matchFlight.pickupAddress||'').toLowerCase().includes(k));
+                        const aUK2 = ukKwH.some(k=>(matchFlight.dropoffAddress||'').toLowerCase().includes(k));
+                        const dm2 = new Date(matchFlight.pickupDate+'T'+matchFlight.pickupTime+':00'+(dUK2?'+01:00':'-04:00')).getTime();
+                        const am2 = new Date(ad2+'T'+matchFlight.dropoffTime+':00'+(aUK2?'+01:00':'-04:00')).getTime();
+                        const diff2 = Math.round((am2-dm2)/60000);
+                        if (diff2 > 0) flightTimeSecs += diff2 * 60;
+                    } catch(e){}
+                }
+            }
+            const totalTravelTime = totalTime + flightTimeSecs;
+            const travelHours   = Math.floor(totalTravelTime / 3600);
+            const travelMinutes = Math.floor((totalTravelTime % 3600) / 60);
+
             const daySummary = document.createElement('div');
             daySummary.className = 'day-summary-box';
             daySummary.dataset.dayId = dayId;
             daySummary.innerHTML = '<h4>Day ' + dayCounter + ' (' + (date === 'No Date' ? 'No Date' : formatDate(date)) + ') ✅</h4>'
                 + '<div class="stats-grid stats-grid-3-col">'
                 + '<div class="stat-card"><div class="stat-value">' + dayDistanceKm.toFixed(0) + ' km</div><div class="stat-label">Day Distance</div></div>'
-                + '<div class="stat-card"><div class="stat-value">' + dayHours + 'h ' + dayMinutes + 'm</div><div class="stat-label">Day Drive Time</div></div>'
+                + '<div class="stat-card"><div class="stat-value">' + dayHours + 'h ' + dayMinutes + 'm</div><div class="stat-label">Day Travel Time</div></div>'
                 + '<div class="stat-card"><div class="stat-value day-gas-value">$' + dayGasCost.toFixed(0) + '</div><div class="stat-label">Est. Gas (USD)</div></div>'
                 + '</div>';
             routeResults.appendChild(daySummary);
@@ -1528,9 +1557,13 @@ input:checked + .slider:before { transform: translateX(22px); }
                             +'<div class="route-info"><small style="color:#00a8ff;">Add a Flight booking to see flight details</small></div>';
                         routeResults.appendChild(fc);
                     }
-                    // Advance to next chunk after the flight
-                    chunkIdx++;
-                    legIdx = 0;
+                    // Flight boundary: advance to next available chunk for drive legs
+                    // Only advance if current chunk has been used (or doesn't exist)
+                    const curChunk = allChunkLegs[chunkIdx];
+                    if (!curChunk || legIdx >= curChunk.legs.length) {
+                        chunkIdx++;
+                        legIdx = 0;
+                    }
                     continue;
                 }
 
