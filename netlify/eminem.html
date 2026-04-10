@@ -290,6 +290,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         </div>
         <div class="tab-content" id="settings">
              <div class="settings-menu">
+                <button class="settings-menu-item" id="logout-settings-btn" onclick="logoutUser()" style="background:#c0392b;color:#fff;border-color:#e74c3c;">🚪 Logout</button>
                 <button class="settings-menu-item" id="user-management-btn" onclick="openSettingsModal('user-management')">👤 User Management</button>
                 <button class="settings-menu-item" id="route-builder-btn" onclick="openSettingsModal('route-builder')">🗺️ Build/Edit Tour Route</button>
                 <button class="settings-menu-item" onclick="openSettingsModal('add-hotel')">🏨 Add Hotel Confirmation</button>
@@ -467,6 +468,11 @@ input:checked + .slider:before { transform: translateX(22px); }
     let currentUser = null;
     
     // --- ACCESS CONTROL & LOGOUT ---
+    function logoutUser() {
+        localStorage.removeItem('tourAccess_' + TOUR_NAME);
+        location.reload();
+    }
+
     function initializeAccessControl() {
         const storedAccess = localStorage.getItem(`tourAccess_${TOUR_NAME}`);
         if (storedAccess) {
@@ -542,7 +548,15 @@ input:checked + .slider:before { transform: translateX(22px); }
         document.querySelectorAll('.viewer-notice').forEach(n => n.remove());
 
         if (!isAdmin()) {
-            document.getElementById('settingsTabBtn').style.display = (isManager()) ? 'block' : 'none';
+            document.getElementById('settingsTabBtn').style.display = 'block';
+                if (!isManager() && !isAdmin()) {
+                    // User-only: show settings tab but hide everything except logout
+                    document.querySelectorAll('.settings-menu-item:not(#logout-settings-btn)').forEach(btn => btn.style.display = 'none');
+                } else {
+                    // Admin/manager/viewer already have logout elsewhere — hide the extra one
+                    const extraLogout = document.getElementById('logout-settings-btn');
+                    if (extraLogout) extraLogout.style.display = 'none';
+                }
             
             const noticeContainer = document.querySelector('.viewer-notice-container');
             if (noticeContainer && currentUser.role !== 'admin') {
@@ -1565,7 +1579,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                 fc.style.cssText = 'border-left-color:#00a8ff;';
                 fc.innerHTML = '<div class="route-header" style="color:#00a8ff"><strong>✈️ FLIGHT: '+(booking.toFrom||'')+'</strong></div>'
                     +'<div class="route-info" style="margin-top:5px;"><strong>Airline:</strong> '+(booking.airline||'')+' &nbsp;|&nbsp; <strong>Flight #:</strong> '+(booking.conf||'')
-                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')
+                    +'<br><strong>Depart:</strong> '+(booking.pickupTime||booking.time||'')+' &nbsp;|&nbsp; <strong>Arrive:</strong> '+(booking.dropoffTime||'')+((booking.dropoffDate && booking.pickupDate && booking.dropoffDate !== booking.pickupDate) ? ' <sup style="color:#00a8ff;">+1</sup>' : '')
                     +(dur ? '<br>'+dur : '')
                     +'<br><small style="color:#00a8ff;">✈️ Flight segment — excluded from drive totals</small></div>';
                 routeResults.appendChild(fc);
