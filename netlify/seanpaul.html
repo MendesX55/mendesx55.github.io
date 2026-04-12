@@ -579,7 +579,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div id="admin-panel-template">
         <div class="form-section">
             <h3>📋 Worksheet Data</h3>
-            <p style="font-size:12px;color:#aaa;margin-bottom:12px;line-height:1.45;">Use one HTML file for multiple tours: the <strong>dataset ID</strong> selects which Firestore document loads (<code style="color:#ccc;">tourData</code> collection, document ID <code id="adminPanelDocIdPreview" style="color:#ccc;">tourData_choclair</code>). Change it, save, and the page reloads on that dataset. Artist names update in the header immediately if you keep the same dataset.</p>
+            <p style="font-size:12px;color:#aaa;margin-bottom:12px;line-height:1.45;">Use one HTML file for multiple tours: the <strong>dataset ID</strong> selects which Firestore document loads (<code style="color:#ccc;">tourData</code> collection, document ID <code id="adminPanelDocIdPreview" style="color:#ccc;">tourData_choclair</code>). This file is pinned to its dataset. Save only the artist/header labels here; dataset changes should be made in the source export tool, not in the live page. Artist names update in the header immediately if you keep the same dataset.</p>
             <div class="form-group"><label>Firebase dataset ID</label><input type="text" id="adminDatasetSlug" placeholder="e.g. choclair, swollen2026" autocomplete="off"/><small style="color:#888;display:block;margin-top:4px;">Lowercase letters, numbers, underscores, hyphens only (auto-sanitized). Admin settings are stored in this browser <strong>per saved file</strong> (file path/URL): duplicate HTML files keep their own dataset. Not synced to Firebase.</small></div>
             <div class="form-group"><label>Artist / logo 1 (left)</label><input type="text" id="adminArtist1" placeholder="CHOCLAIR" maxlength="40"/></div>
             <div class="form-group"><label>Artist / logo 2 (center)</label><input type="text" id="adminArtist2" placeholder="PREVAIL" maxlength="40"/></div>
@@ -598,6 +598,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     // --- App Configuration (dataset + header labels; localStorage keyed per HTML file URL so Save-As copies stay independent) ---
     const LEGACY_APP_CONFIG_STORAGE_KEY = 'tourManager_appConfig_v1';
     const DEFAULT_APP_CONFIG = { datasetSlug: 'choclair', artist1: 'CHOCLAIR', artist2: 'PREVAIL', artist3: 'MOKA ONLY', merchWebsiteUrl: '' };
+    // Per-file pinned dataset slug. Set this once per exported HTML file.
+    const FILE_DATASET_SLUG = (typeof window !== 'undefined' && window.__TOUR_DATASET_SLUG__) ? window.__TOUR_DATASET_SLUG__ : null;
     function tourManagerStorageFileId() {
         try {
             const s = String(location.href || location.pathname || 'default');
@@ -636,7 +638,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         return s || DEFAULT_APP_CONFIG.datasetSlug;
     }
     let appConfig = loadAppConfigFromStorage();
-    let TOUR_NAME = sanitizeDatasetSlug(appConfig.datasetSlug);
+    let TOUR_NAME = sanitizeDatasetSlug(FILE_DATASET_SLUG || appConfig.datasetSlug);
     let STORAGE_KEY = 'tourData_' + TOUR_NAME;
     appConfig.datasetSlug = TOUR_NAME;
     function persistAppConfigToStorage() {
