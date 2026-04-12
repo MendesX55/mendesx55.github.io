@@ -599,7 +599,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     const LEGACY_APP_CONFIG_STORAGE_KEY = 'tourManager_appConfig_v1';
     const DEFAULT_APP_CONFIG = { datasetSlug: 'choclair', artist1: 'CHOCLAIR', artist2: 'PREVAIL', artist3: 'MOKA ONLY', merchWebsiteUrl: '' };
     // Per-file pinned dataset slug. Set this once per exported HTML file.
-    const FILE_DATASET_SLUG = (typeof window !== 'undefined' && window.__TOUR_DATASET_SLUG__) ? window.__TOUR_DATASET_SLUG__ : null;
+    const FILE_DATASET_SLUG = 'eminem';
     function tourManagerStorageFileId() {
         try {
             const s = String(location.href || location.pathname || 'default');
