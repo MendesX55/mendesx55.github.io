@@ -597,9 +597,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 <script>
     // --- App Configuration (dataset + header labels; localStorage keyed per HTML file URL so Save-As copies stay independent) ---
     const LEGACY_APP_CONFIG_STORAGE_KEY = 'tourManager_appConfig_v1';
-    const DEFAULT_APP_CONFIG = { datasetSlug: 'choclair', artist1: 'CHOCLAIR', artist2: 'PREVAIL', artist3: 'MOKA ONLY', merchWebsiteUrl: '' };
+    const DEFAULT_APP_CONFIG = { datasetSlug: 'eminen', artist1: 'M. MATHERS', artist2: 'EMINEM', artist3: 'TRIBUTE', merchWebsiteUrl: 'http://itouragency.square.site' };
     // Per-file pinned dataset slug. Set this once per exported HTML file.
     const FILE_DATASET_SLUG = 'eminem';
+    const FILE_CONFIG_ID = 'eminem';
     function tourManagerStorageFileId() {
         try {
             const s = String(location.href || location.pathname || 'default');

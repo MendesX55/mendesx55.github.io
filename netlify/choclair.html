@@ -600,6 +600,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     const DEFAULT_APP_CONFIG = { datasetSlug: 'choclair', artist1: 'CHOCLAIR', artist2: 'PREVAIL', artist3: 'MOKA ONLY', merchWebsiteUrl: '' };
     // Per-file pinned dataset slug. Set this once per exported HTML file.
     const FILE_DATASET_SLUG = 'choclair';
+    const FILE_CONFIG_ID = 'choclair';
     function tourManagerStorageFileId() {
         try {
             const s = String(location.href || location.pathname || 'default');
