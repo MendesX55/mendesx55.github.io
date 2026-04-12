@@ -38,61 +38,30 @@
             gap: 14px;
             transition: transform 0.25s ease, max-width 0.25s ease;
         }
-        .page-shell.expanded {
-            max-width: 520px;
-        }
+        .page-shell.expanded { max-width: 520px; }
         .hero-logo {
-            width: 160px;
-            height: auto;
-            margin-bottom: 10px;
-            mix-blend-mode: screen;
-            flex-shrink: 0;
+            width: 160px; height: auto; margin-bottom: 10px; mix-blend-mode: screen; flex-shrink: 0;
             transition: width 0.25s ease, margin-bottom 0.25s ease;
         }
-        .page-shell.expanded .hero-logo {
-            width: 178px;
-            margin-bottom: 4px;
-        }
-        .content-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .page-shell.expanded .hero-logo { width: 178px; margin-bottom: 4px; }
+        .content-wrapper { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .section-label {
-            font-size: 0.68em;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            text-align: center;
-            padding: 8px 0 4px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: 4px;
+            font-size: 0.68em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.35); text-align: center; padding: 8px 0 4px;
+            border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4px;
         }
         .section-label:first-child { border-top: none; margin-top: 0; }
         .btn, .archive-toggle {
-            width: 100%;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: transform 0.2s ease, background-color 0.2s ease, max-height 0.3s ease, opacity 0.3s ease;
+            width: 100%; border-radius: 15px; text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         .btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 18px 24px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: white; border: 1px solid rgba(255,255,255,0.2); padding: 18px 24px; font-size: 1.1em;
+            font-weight: 600; text-align: left; display: flex; align-items: center; gap: 15px;
         }
-        .btn:hover, .archive-toggle:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .btn:hover, .archive-toggle:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
         .btn:active, .archive-toggle:active { transform: scale(0.98); }
         .btn-icon { font-size: 1.8em; width: 30px; text-align: center; flex-shrink: 0; }
         .btn-text { display: flex; flex-direction: column; }
@@ -100,33 +69,20 @@
         .btn-text .tour-title { display: block; font-size: 0.9em; opacity: 0.9; margin-bottom: 2px; }
         .btn-text .tour-dates { font-size: 0.8em; opacity: 0.8; }
         .archive-toggle {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.6);
-            padding: 12px 18px;
-            font-size: 0.82em;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);
+            padding: 12px 18px; font-size: 0.82em; font-weight: 700; letter-spacing: 0.06em;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
         }
-        .archive-list { display: none; flex-direction: column; gap: 10px; margin-top: 2px; width: 100%; }
-        .archive-list.open { display: flex; }
+        .archive-list, .mini-list { display: none; flex-direction: column; gap: 10px; margin-top: 2px; width: 100%; }
+        .archive-list.open, .mini-list.open { display: flex; }
         .btn.archived {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.42);
-            box-shadow: none;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.42); box-shadow: none;
         }
         .btn.archived .tour-artist { color: rgba(255,255,255,0.5); }
         .btn.archived .tour-title, .btn.archived .tour-dates { opacity: 0.55; }
         .arrow { transition: transform 0.25s ease; display: inline-block; }
         .arrow.open { transform: rotate(180deg); }
-        .mini-list { display: none; flex-direction: column; gap: 10px; width: 100%; }
-        .mini-list.open { display: flex; }
-        .spacer { height: 1px; }
         @media (max-width: 420px) {
             body { padding: 16px 12px 26px; }
             .hero-logo { width: 142px; }
@@ -142,12 +98,12 @@
         <div class="content-wrapper">
             <div class="section-label">Current Tour</div>
 
-            <a class="btn" href="choclair.html">
-                <span class="btn-icon">🎵</span>
+            <a class="btn" href="eminem.html">
+                <span class="btn-icon">🎤</span>
                 <span class="btn-text">
-                    <span class="tour-artist">Choclair ft. Prevail & Moka Only</span>
-                    <span class="tour-title">Tour 2025</span>
-                    <span class="tour-dates">🗓 April 29 – May 2</span>
+                    <span class="tour-artist">Michael Mathers</span>
+                    <span class="tour-title">Eminem Tribute Tour</span>
+                    <span class="tour-dates">🗓 April 15–19</span>
                 </span>
             </a>
 
@@ -157,12 +113,12 @@
                 <span class="arrow" id="upcomingArrow">▼</span>
             </button>
             <div class="mini-list" id="upcomingList">
-                <a class="btn" href="eminem.html">
-                    <span class="btn-icon">🎤</span>
+                <a class="btn" href="choclair.html">
+                    <span class="btn-icon">🎵</span>
                     <span class="btn-text">
-                        <span class="tour-artist">Michael Mathers</span>
-                        <span class="tour-title">Eminem Tribute Tour</span>
-                        <span class="tour-dates">🗓 April 15–19</span>
+                        <span class="tour-artist">Choclair ft. Prevail & Moka Only</span>
+                        <span class="tour-title">Tour 2025</span>
+                        <span class="tour-dates">🗓 April 29 – May 2</span>
                     </span>
                 </a>
             </div>
