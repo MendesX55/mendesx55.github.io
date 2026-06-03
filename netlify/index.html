@@ -98,37 +98,29 @@
         <div class="content-wrapper">
             <div class="section-label">Current Tour</div>
 
-            <a class="btn" href="choclair.html">
-                <span class="btn-icon">🎵</span>
+            <a class="btn" href="eminem1.html">
+                <span class="btn-icon">🎤</span>
                 <span class="btn-text">
-                    <span class="tour-artist">Choclair ft. Prevail & Moka Only</span>
-                    <span class="tour-title">Tour 2025</span>
-                    <span class="tour-dates">🗓 April 29 – May 2</span>
+                    <span class="tour-artist">Michael Mathers</span>
+                    <span class="tour-title">Eminem Tribute Tour</span>
+                    <span class="tour-dates">🗓 June 4–7</span>
                 </span>
             </a>
 
-            <div class="section-label">Upcoming Tours</div>
-            <button class="archive-toggle" onclick="toggleUpcoming()">
-                <span>🗓 Upcoming Tours (1)</span>
-                <span class="arrow" id="upcomingArrow">▼</span>
-            </button>
-            <div class="mini-list" id="upcomingList">
-                <a class="btn" href="eminem1.html">
-                    <span class="btn-icon">🎤</span>
-                    <span class="btn-text">
-                        <span class="tour-artist">Michael Mathers</span>
-                        <span class="tour-title">Eminem Tribute Tour</span>
-                        <span class="tour-dates">🗓 June 4–6</span>
-                    </span>
-                </a>
-            </div>
-
             <div class="section-label">Past Tours</div>
             <button class="archive-toggle" onclick="toggleArchive()">
-                <span>📁 Past Tours (4)</span>
+                <span>📁 Past Tours (5)</span>
                 <span class="arrow" id="archiveArrow">▼</span>
             </button>
             <div class="archive-list" id="archiveList">
+                <a class="btn archived" href="choclair.html">
+                    <span class="btn-icon">🎵</span>
+                    <span class="btn-text">
+                        <span class="tour-artist">Choclair ft. Prevail & Moka Only</span>
+                        <span class="tour-title">Tour 2025</span>
+                        <span class="tour-dates">🗓 April 29 – May 2</span>
+                    </span>
+                </a>
                 <a class="btn archived" href="eminem.html">
                     <span class="btn-icon">🎤</span>
                     <span class="btn-text">
@@ -168,14 +160,8 @@
     <script>
         function syncShell() {
             const shell = document.getElementById('pageShell');
-            const upcomingOpen = document.getElementById('upcomingList').classList.contains('open');
             const pastOpen = document.getElementById('archiveList').classList.contains('open');
-            shell.classList.toggle('expanded', upcomingOpen || pastOpen);
-        }
-        function toggleUpcoming() {
-            document.getElementById('upcomingList').classList.toggle('open');
-            document.getElementById('upcomingArrow').classList.toggle('open');
-            syncShell();
+            shell.classList.toggle('expanded', pastOpen);
         }
         function toggleArchive() {
             document.getElementById('archiveList').classList.toggle('open');
