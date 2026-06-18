@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nymph</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    :root {
+      --bg:       #0d0d0f;
+      --surface:  #18181c;
+      --surface2: #222228;
+      --border:   #2e2e38;
+      --rose:     #e8537a;
+      --rose-dim: #9c2f4a;
+      --blush:    #f4a0b8;
+      --text:     #f0eaf0;
+      --muted:    #8a7f8a;
+      --green:    #4caf87;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── SCREEN SYSTEM ── */
+    .screen { display: none; min-height: 100vh; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* ── START SCREEN ── */
+    #startScreen {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      background: radial-gradient(ellipse at 50% 30%, #2a0f1a 0%, var(--bg) 70%);
+    }
+
+    .logo-mark {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--blush);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+      opacity: 0.7;
+    }
+
+    .start-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .start-sub {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .btn-start {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose) 0%, #c23060 100%);
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      box-shadow: 0 0 60px rgba(232, 83, 122, 0.3), 0 20px 40px rgba(0,0,0,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-start::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-start:active { transform: scale(0.95); box-shadow: 0 0 30px rgba(232,83,122,0.2); }
+
+    .triple-hint {
+      margin-top: 48px;
+      font-size: 11px;
+      color: #333;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+
+    /* ── BROWSER SCREEN ── */
+    #browserScreen { padding: 0; }
+
+    .browser-bar {
+      background: var(--surface);
+      padding: 12px 16px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      padding-top: max(12px, env(safe-area-inset-top));
+    }
+
+    .url-bar {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .url-bar:focus { border-color: var(--rose-dim); }
+
+    .go-btn {
+      background: var(--rose);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+
+    #webview {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    .browser-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 18px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
+    .btn-done {
+      background: linear-gradient(135deg, var(--rose) 0%, #c23060 100%);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 32px;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    /* ── LOGGING SCREENS ── */
+    .log-screen {
+      padding: 0;
+    }
+
+    .log-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      padding-top: max(20px, env(safe-area-inset-top));
+    }
+
+    .log-step {
+      font-size: 11px;
+      color: var(--rose);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .log-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: var(--text);
+    }
+
+    .log-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+    }
+
+    .log-footer {
+      padding: 16px 20px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    /* ── TOYS ── */
+    .toy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .toy-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 8px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .toy-card.selected {
+      border-color: var(--rose);
+      background: rgba(232, 83, 122, 0.1);
+    }
+
+    .toy-emoji {
+      font-size: 32px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .toy-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .toy-desc {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    /* ── LINK INPUT ── */
+    .link-input-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .link-input-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .link-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .link-input:focus { border-color: var(--rose-dim); }
+
+    .link-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── REMARKS ── */
+    .remarks-area {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 15px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      resize: none;
+      min-height: 140px;
+    }
+
+    .remarks-area:focus { border-color: var(--rose-dim); }
+    .remarks-area::placeholder { color: var(--muted); }
+
+    /* ── SCORE ── */
+    .score-display {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .score-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 80px;
+      font-weight: 700;
+      color: var(--rose);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .score-track {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .score-pip {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .score-pip.active {
+      border-color: var(--rose);
+      background: var(--rose);
+      color: #fff;
+    }
+
+    /* ── PRIMARY BUTTON ── */
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--rose) 0%, #c23060 100%);
+      border: none;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 18px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:active { opacity: 0.85; }
+
+    .btn-secondary {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 500;
+      padding: 16px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      margin-top: 10px;
+    }
+
+    /* ── SAVE CONFIRM ── */
+    #saveScreen {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      background: radial-gradient(ellipse at 50% 40%, #0d2a1f 0%, var(--bg) 70%);
+    }
+
+    .save-icon { font-size: 72px; margin-bottom: 24px; }
+
+    .save-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .save-sub {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    /* ── ADMIN SCREEN ── */
+    #adminScreen {
+      background: var(--bg);
+    }
+
+    .admin-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--blush);
+    }
+
+    .admin-close {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .admin-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+    .session-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .session-card-header {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .session-card.open .session-card-header {
+      border-bottom-color: var(--border);
+    }
+
+    .session-date {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .session-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .session-score-badge {
+      background: var(--rose);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .session-detail {
+      display: none;
+      padding: 16px 18px;
+    }
+
+    .session-card.open .session-detail { display: block; }
+
+    .detail-label {
+      font-size: 10px;
+      color: var(--rose);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    .detail-label:first-child { margin-top: 0; }
+
+    .detail-value {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .detail-link {
+      color: var(--blush);
+      font-size: 12px;
+      word-break: break-all;
+      display: block;
+      margin-bottom: 4px;
+      text-decoration: none;
+    }
+
+    .toy-tag {
+      display: inline-block;
+      background: rgba(232,83,122,0.15);
+      border: 1px solid var(--rose-dim);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--blush);
+      margin: 3px 3px 3px 0;
+    }
+
+    .empty-admin {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-admin-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-admin-text { font-size: 14px; color: var(--muted); }
+
+    /* ── PROGRESS DOTS ── */
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+
+    .dot.active { background: var(--rose); }
+    .dot.done { background: var(--rose-dim); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
+      color: var(--text);
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     START SCREEN
+══════════════════════════════════ -->
+<div id="startScreen" class="screen active" id="startScreen">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 32px;">
+    <div class="logo-mark">private</div>
+    <div class="start-title">Nymph</div>
+    <div class="start-sub">Your secret session tracker</div>
+    <button class="btn-start" onclick="startSession()">
+      Begin<br>Session
+    </button>
+    <div class="triple-hint" id="tripleHint" onclick="handleTripleTap()">· · ·</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     BROWSER SCREEN
+══════════════════════════════════ -->
+<div id="browserScreen" class="screen">
+  <div class="browser-bar">
+    <button class="nav-btn" onclick="goBack()">‹</button>
+    <input class="url-bar" id="urlBar" type="url" placeholder="Enter address…" 
+           value="https://www.google.com"
+           onkeydown="if(event.key==='Enter') navigate()">
+    <button class="go-btn" onclick="navigate()">Go</button>
+  </div>
+  <iframe id="webview" src="https://www.google.com" 
+          allow="autoplay; fullscreen"
+          onload="trackUrl()"></iframe>
+  <div class="browser-footer">
+    <button class="nav-btn" onclick="goBack()">‹ Back</button>
+    <button class="btn-done" onclick="imDone()">I'm Done ✓</button>
+    <button class="nav-btn" onclick="goForward()">Fwd ›</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STEP 1 — LINK
+══════════════════════════════════ -->
+<div id="linkScreen" class="screen log-screen">
+  <div class="log-header">
+    <div class="progress-dots">
+      <div class="dot active" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+      <div class="dot" id="d4"></div>
+    </div>
+    <div class="log-step">Step 1 of 4</div>
+    <div class="log-title">Session link</div>
+  </div>
+  <div class="log-body">
+    <div class="link-input-wrap">
+      <div class="link-input-label">Last link visited</div>
+      <input class="link-input" id="linkInput" type="url" placeholder="https://…">
+      <div class="link-hint">We grabbed the last page you were on. Edit or paste a new one if needed.</div>
+    </div>
+    <div id="linkTimeline" style="margin-top:8px;"></div>
+  </div>
+  <div class="log-footer">
+    <button class="btn-primary" onclick="goToToys()">Next → Pick toys</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STEP 2 — TOYS
+══════════════════════════════════ -->
+<div id="toysScreen" class="screen log-screen">
+  <div class="log-header">
+    <div class="progress-dots">
+      <div class="dot done"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="log-step">Step 2 of 4</div>
+    <div class="log-title">Toys used</div>
+  </div>
+  <div class="log-body">
+    <div class="toy-grid" id="toyGrid"></div>
+  </div>
+  <div class="log-footer">
+    <button class="btn-primary" onclick="goToRemarks()">Next → Remarks</button>
+    <button class="btn-secondary" onclick="showScreen('linkScreen')">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STEP 3 — REMARKS
+══════════════════════════════════ -->
+<div id="remarksScreen" class="screen log-screen">
+  <div class="log-header">
+    <div class="progress-dots">
+      <div class="dot done"></div>
+      <div class="dot done"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="log-step">Step 3 of 4</div>
+    <div class="log-title">Any remarks?</div>
+  </div>
+  <div class="log-body">
+    <textarea class="remarks-area" id="remarksInput" 
+              placeholder="What was the vibe? Anything stand out? Totally optional…"
+              rows="6"></textarea>
+  </div>
+  <div class="log-footer">
+    <button class="btn-primary" onclick="goToScore()">Next → Score it</button>
+    <button class="btn-secondary" onclick="showScreen('toysScreen')">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STEP 4 — SCORE
+══════════════════════════════════ -->
+<div id="scoreScreen" class="screen log-screen">
+  <div class="log-header">
+    <div class="progress-dots">
+      <div class="dot done"></div>
+      <div class="dot done"></div>
+      <div class="dot done"></div>
+      <div class="dot active"></div>
+    </div>
+    <div class="log-step">Step 4 of 4</div>
+    <div class="log-title">Rate this session</div>
+  </div>
+  <div class="log-body">
+    <div class="score-display">
+      <div class="score-number" id="scoreDisplay">8</div>
+      <div class="score-label">out of 10</div>
+    </div>
+    <div class="score-track" id="scorePips"></div>
+  </div>
+  <div class="log-footer">
+    <button class="btn-primary" onclick="saveSession()">Save &amp; Close Session</button>
+    <button class="btn-secondary" onclick="showScreen('remarksScreen')">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SAVE CONFIRM
+══════════════════════════════════ -->
+<div id="saveScreen" class="screen">
+  <div class="save-icon">✨</div>
+  <div class="save-title">Session saved</div>
+  <div class="save-sub">All logged. See you next time.</div>
+  <button class="btn-primary" style="max-width:260px;" onclick="resetApp()">Close</button>
+</div>
+
+<!-- ══════════════════════════════════
+     ADMIN SCREEN
+══════════════════════════════════ -->
+<div id="adminScreen" class="screen">
+  <div class="admin-header">
+    <div class="admin-title">Session History</div>
+    <button class="admin-close" onclick="showScreen('startScreen')">✕ Close</button>
+  </div>
+  <div class="admin-body" id="adminBody"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// DATA & STATE
+// ══════════════════════════════════
+const TOYS = [
+  { id: 'og_pink',   emoji: '🌸', name: 'OG Pink',    desc: 'Egg tip vibrator' },
+  { id: 'pink',      emoji: '💗', name: 'Pink',        desc: 'Lush 3 by Lovense' },
+  { id: 'new_pink',  emoji: '🌷', name: 'New Pink',    desc: 'Egg tip (new)' },
+  { id: 'white',     emoji: '🤍', name: 'White',       desc: 'Satisfyer 2' },
+  { id: 'sucky',     emoji: '🌹', name: 'Sucky',       desc: 'Satisfyer Pro (rose)' },
+  { id: 'black',     emoji: '🖤', name: 'Black',       desc: 'Wand by Lovense' },
+  { id: 'purple',    emoji: '💜', name: 'Purple',      desc: 'Silicone dildo' },
+  { id: 'talk',      emoji: '👅', name: 'Talk',        desc: 'Talk of the Town' },
+  { id: 'bunny',     emoji: '🐰', name: 'Bunny',       desc: 'Rabbit vibrator' },
+  { id: 'plug',      emoji: '🔌', name: 'Plug',        desc: 'Anal plug' },
+  { id: 'machine',   emoji: '⚙️',  name: 'Machine',    desc: 'Hismith' },
+  { id: 'bullet',    emoji: '💫', name: 'Bullet',      desc: 'Small bullet vibe' },
+  { id: 'remote',    emoji: '📡', name: 'Remote',      desc: 'Egg on string/remote' },
+  { id: 'dick',      emoji: '🎮', name: 'Dick w/ Remote', desc: 'Silicone cock + remote' },
+];
+
+let session = {
+  startTime: null,
+  links: [],          // all links visited
+  currentLink: '',
+  selectedToys: new Set(),
+  remarks: '',
+  score: 8,
+};
+
+let tripleCount = 0;
+let tripleTimer = null;
+let currentScore = 8;
+
+// ══════════════════════════════════
+// SCREEN SYSTEM
+// ══════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════
+// START SESSION
+// ══════════════════════════════════
+function startSession() {
+  session.startTime = new Date().toISOString();
+  session.links = [];
+  session.selectedToys = new Set();
+  session.remarks = '';
+  session.score = 8;
+  currentScore = 8;
+  showScreen('browserScreen');
+}
+
+// ══════════════════════════════════
+// BROWSER
+// ══════════════════════════════════
+function navigate() {
+  let url = document.getElementById('urlBar').value.trim();
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  document.getElementById('urlBar').value = url;
+  document.getElementById('webview').src = url;
+}
+
+function goBack() {
+  try { document.getElementById('webview').contentWindow.history.back(); } catch(e) {}
+}
+
+function goForward() {
+  try { document.getElementById('webview').contentWindow.history.forward(); } catch(e) {}
+}
+
+function trackUrl() {
+  try {
+    const src = document.getElementById('webview').src;
+    if (src && src !== 'about:blank') {
+      document.getElementById('urlBar').value = src;
+      session.currentLink = src;
+      if (!session.links.includes(src)) session.links.push(src);
+    }
+  } catch(e) {
+    // cross-origin — grab from urlBar
+    const bar = document.getElementById('urlBar').value;
+    if (bar) {
+      session.currentLink = bar;
+      if (!session.links.includes(bar)) session.links.push(bar);
+    }
+  }
+}
+
+// ══════════════════════════════════
+// I'M DONE → step 1
+// ══════════════════════════════════
+function imDone() {
+  trackUrl();
+  document.getElementById('linkInput').value = session.currentLink || '';
+  renderLinkTimeline();
+  showScreen('linkScreen');
+}
+
+function renderLinkTimeline() {
+  const el = document.getElementById('linkTimeline');
+  if (session.links.length <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="detail-label">Links visited this session</div>
+    ${session.links.map((l, i) => `
+      <a class="detail-link" href="${l}" target="_blank" rel="noopener">${i+1}. ${l}</a>
+    `).join('')}
+  `;
+}
+
+// ══════════════════════════════════
+// TOYS
+// ══════════════════════════════════
+function goToToys() {
+  session.currentLink = document.getElementById('linkInput').value.trim();
+  renderToys();
+  showScreen('toysScreen');
+}
+
+function renderToys() {
+  const grid = document.getElementById('toyGrid');
+  grid.innerHTML = TOYS.map(t => `
+    <div class="toy-card ${session.selectedToys.has(t.id) ? 'selected' : ''}"
+         onclick="toggleToy('${t.id}', this)">
+      <span class="toy-emoji">${t.emoji}</span>
+      <div class="toy-name">${t.name}</div>
+      <div class="toy-desc">${t.desc}</div>
+    </div>
+  `).join('');
+}
+
+function toggleToy(id, el) {
+  if (session.selectedToys.has(id)) {
+    session.selectedToys.delete(id);
+    el.classList.remove('selected');
+  } else {
+    session.selectedToys.add(id);
+    el.classList.add('selected');
+  }
+}
+
+// ══════════════════════════════════
+// REMARKS
+// ══════════════════════════════════
+function goToRemarks() {
+  document.getElementById('remarksInput').value = session.remarks;
+  showScreen('remarksScreen');
+}
+
+// ══════════════════════════════════
+// SCORE
+// ══════════════════════════════════
+function goToScore() {
+  session.remarks = document.getElementById('remarksInput').value;
+  renderScorePips();
+  showScreen('scoreScreen');
+}
+
+function renderScorePips() {
+  const container = document.getElementById('scorePips');
+  container.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const pip = document.createElement('button');
+    pip.className = 'score-pip' + (i === currentScore ? ' active' : '');
+    pip.textContent = i;
+    pip.onclick = () => setScore(i);
+    container.appendChild(pip);
+  }
+  document.getElementById('scoreDisplay').textContent = currentScore;
+}
+
+function setScore(n) {
+  currentScore = n;
+  document.getElementById('scoreDisplay').textContent = n;
+  document.querySelectorAll('.score-pip').forEach((p, i) => {
+    p.classList.toggle('active', i + 1 === n);
+  });
+}
+
+// ══════════════════════════════════
+// SAVE SESSION
+// ══════════════════════════════════
+function saveSession() {
+  session.score = currentScore;
+  const toyNames = [...session.selectedToys].map(id => TOYS.find(t => t.id === id)?.name || id);
+
+  const record = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }),
+    dateISO: new Date().toISOString().slice(0, 10),
+    time: new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }),
+    links: [...session.links],
+    lastLink: session.currentLink,
+    toys: toyNames,
+    remarks: session.remarks,
+    score: session.score,
+  };
+
+  // Load existing, push new, save
+  const existing = JSON.parse(localStorage.getItem('nymph_sessions') || '[]');
+  existing.unshift(record);
+  localStorage.setItem('nymph_sessions', JSON.stringify(existing));
+
+  showScreen('saveScreen');
+}
+
+// ══════════════════════════════════
+// RESET
+// ══════════════════════════════════
+function resetApp() {
+  session = { startTime: null, links: [], currentLink: '', selectedToys: new Set(), remarks: '', score: 8 };
+  currentScore = 8;
+  document.getElementById('webview').src = 'https://www.google.com';
+  showScreen('startScreen');
+}
+
+// ══════════════════════════════════
+// ADMIN — triple tap on dots
+// ══════════════════════════════════
+function handleTripleTap() {
+  tripleCount++;
+  clearTimeout(tripleTimer);
+  if (tripleCount >= 3) {
+    tripleCount = 0;
+    openAdmin();
+    return;
+  }
+  tripleTimer = setTimeout(() => { tripleCount = 0; }, 800);
+}
+
+function openAdmin() {
+  renderAdmin();
+  showScreen('adminScreen');
+}
+
+function renderAdmin() {
+  const sessions = JSON.parse(localStorage.getItem('nymph_sessions') || '[]');
+  const body = document.getElementById('adminBody');
+
+  if (sessions.length === 0) {
+    body.innerHTML = `
+      <div class="empty-admin">
+        <div class="empty-admin-icon">📋</div>
+        <div class="empty-admin-text">No sessions recorded yet.</div>
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = sessions.map((s, i) => `
+    <div class="session-card" id="card_${i}">
+      <div class="session-card-header" onclick="toggleCard(${i})">
+        <div>
+          <div class="session-date">${s.date}</div>
+          <div class="session-meta">${s.time} · ${s.toys.length} toy${s.toys.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="session-score-badge">${s.score}/10</div>
+      </div>
+      <div class="session-detail">
+        ${s.toys.length > 0 ? `
+          <div class="detail-label">Toys used</div>
+          <div>${s.toys.map(t => `<span class="toy-tag">${t}</span>`).join('')}</div>
+        ` : ''}
+        ${s.remarks ? `
+          <div class="detail-label">Remarks</div>
+          <div class="detail-value">${s.remarks}</div>
+        ` : ''}
+        <div class="detail-label">Last link</div>
+        <a class="detail-link" href="${s.lastLink}" target="_blank" rel="noopener">${s.lastLink || '—'}</a>
+        ${s.links.length > 1 ? `
+          <div class="detail-label">All links this session</div>
+          ${s.links.map((l, n) => `<a class="detail-link" href="${l}" target="_blank" rel="noopener">${n+1}. ${l}</a>`).join('')}
+        ` : ''}
+        <div style="margin-top:16px;">
+          <button onclick="deleteSession(${s.id})" style="background:none;border:1px solid #3a1a1a;border-radius:8px;color:#6a3333;font-size:12px;padding:6px 14px;cursor:pointer;">Delete session</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(i) {
+  document.getElementById('card_' + i).classList.toggle('open');
+}
+
+function deleteSession(id) {
+  let sessions = JSON.parse(localStorage.getItem('nymph_sessions') || '[]');
+  sessions = sessions.filter(s => s.id !== id);
+  localStorage.setItem('nymph_sessions', JSON.stringify(sessions));
+  renderAdmin();
+  showToast('Session deleted');
+}
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

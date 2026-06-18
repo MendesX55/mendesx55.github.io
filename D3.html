@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Nymph Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: rgba(24, 24, 27, 0.84);
+      --surface-2: rgba(39, 39, 42, 0.9);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --accent: #ec4899;
+      --accent-2: #fb7185;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif; }
+    body {
+      background:
+        radial-gradient(circle at top, rgba(236,72,153,.18), transparent 32%),
+        radial-gradient(circle at 85% 15%, rgba(251,113,133,.12), transparent 22%),
+        linear-gradient(180deg, #121216 0%, #09090b 46%, #050507 100%);
+      min-height: 100dvh;
+      overscroll-behavior: none;
+    }
+    .app-shell {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: calc(var(--safe-top) + 14px) 14px calc(var(--safe-bottom) + 18px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .glass {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 999px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .02em;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .hero-card, .browser-card, .sheet-card { border-radius: 32px; overflow: hidden; }
+    .hero-card { padding: 28px 22px 22px; }
+    .brand-mark {
+      width: 58px; height: 58px; border-radius: 18px;
+      background: linear-gradient(135deg, rgba(236,72,153,.95), rgba(251,113,133,.72));
+      display: grid; place-items: center; box-shadow: 0 10px 24px rgba(236,72,153,.28);
+      margin-bottom: 18px; font-size: 24px;
+    }
+    .title {
+      font-size: 34px; line-height: 1.02; font-weight: 700; letter-spacing: -0.04em; margin: 0 0 10px;
+    }
+    .subtitle { color: var(--muted); font-size: 15px; line-height: 1.5; margin: 0; }
+    .stat-row { margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.05); border-radius: 20px; padding: 14px 12px;
+    }
+    .stat strong { display: block; font-size: 18px; margin-bottom: 4px; }
+    .stat span { color: var(--muted); font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
+    .primary-btn, .danger-btn, .save-btn {
+      width: 100%; border: 0; border-radius: 24px; color: white; font-weight: 700; cursor: pointer; min-height: 58px; font-size: 17px;
+    }
+    .primary-btn {
+      margin-top: 22px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 16px 34px rgba(236,72,153,.28);
+    }
+    .danger-btn {
+      background: linear-gradient(135deg, #fb7185, var(--danger)); box-shadow: 0 16px 34px rgba(239,68,68,.24);
+    }
+    .save-btn {
+      background: linear-gradient(135deg, #34d399, var(--success)); box-shadow: 0 16px 34px rgba(34,197,94,.24);
+    }
+    .browser-card {
+      height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 112px);
+      display: flex; flex-direction: column; background: rgba(10,10,11,.92); border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .browser-toolbar {
+      padding: 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.035);
+    }
+    .toolbar-row { display: flex; align-items: center; gap: 10px; }
+    .toolbar-chip {
+      width: 38px; height: 38px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); color: #fafafa; font-size: 15px; flex: 0 0 auto;
+    }
+    .address-bar {
+      flex: 1; min-height: 38px; border-radius: 16px; padding: 0 14px; display: flex; align-items: center; background: rgba(255,255,255,.06); color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .site-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .site-btn {
+      border: 0; border-radius: 14px; padding: 10px 6px; background: rgba(255,255,255,.045); color: var(--text); font-size: 11px; line-height: 1.2; min-height: 58px; border: 1px solid rgba(255,255,255,.05);
+    }
+    #browser { width: 100%; flex: 1; border: 0; background: #000; }
+    .browser-footer { padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,.03); }
+    .sheet-card { padding: 18px; }
+    .section-title { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 4px; }
+    .section-subtitle { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+    .toy-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px;
+    }
+    .toy-item {
+      border-radius: 22px; padding: 12px 10px; text-align: center; cursor: pointer; background: var(--surface-2); border: 1.5px solid transparent; transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .toy-item:active { transform: scale(.98); }
+    .toy-item.selected {
+      border-color: rgba(236,72,153,.95); background: rgba(131,24,67,.45); box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 10px 24px rgba(236,72,153,.16);
+    }
+    .toy-item img {
+      width: 72px; height: 72px; object-fit: cover; margin: 0 auto 8px; border-radius: 18px; background: rgba(255,255,255,.08);
+    }
+    .toy-item div { font-size: 12px; line-height: 1.25; color: #f4f4f5; }
+    .field-label { display: block; font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+    textarea {
+      width: 100%; min-height: 116px; resize: none; border-radius: 22px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--text); padding: 16px; font-size: 16px; outline: none;
+    }
+    .score-card {
+      margin: 18px 0 20px; padding: 16px; border-radius: 24px; background: rgba(255,255,255,.04); border: 1px solid var(--line);
+    }
+    .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .score-value {
+      width: 52px; height: 52px; border-radius: 18px; display: grid; place-items: center; font-size: 24px; font-weight: 700; background: rgba(236,72,153,.16); color: #fff;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .helper-row { margin-top: 8px; display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; }
+    @media (max-width: 390px) {
+      .toy-grid { grid-template-columns: repeat(2, 1fr); }
+      .site-grid { grid-template-columns: repeat(3, 1fr); }
+      .title { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar glass">
+      <div class="pill">🔒 Private mode</div>
+      <div class="pill" id="todayLabel">Session</div>
+    </header>
+
+    <section id="startScreen" class="screen active">
+      <div class="hero-card glass">
+        <div class="brand-mark">✦</div>
+        <h1 class="title">Nymph Session</h1>
+        <p class="subtitle">This version is tuned to feel more like a native iPhone Pro Max screen, with bigger tap zones, safe-area spacing, and a cleaner full-height layout.</p>
+        <div class="stat-row">
+          <div class="stat"><strong>5</strong><span>Quick sites</span></div>
+          <div class="stat"><strong>3</strong><span>Save steps</span></div>
+          <div class="stat"><strong>1</strong><span>CSV export</span></div>
+        </div>
+        <button onclick="startSession()" class="primary-btn">Start session</button>
+      </div>
+    </section>
+
+    <section id="browserScreen" class="screen">
+      <div class="browser-card">
+        <div class="browser-toolbar">
+          <div class="toolbar-row">
+            <div class="toolbar-chip">←</div>
+            <div class="address-bar" id="addressBar">Ready to browse</div>
+            <div class="toolbar-chip">⟳</div>
+          </div>
+          <div class="site-grid" id="siteGrid"></div>
+        </div>
+        <iframe id="browser" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+        <div class="browser-footer">
+          <button onclick="imDone()" class="danger-btn">I’m done</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="loggingScreen" class="screen">
+      <div class="sheet-card glass">
+        <h2 class="section-title">Session details</h2>
+        <p class="section-subtitle">Pick toys used, add remarks, then save the final score.</p>
+        <div class="toy-grid" id="toyGrid"></div>
+        <label class="field-label" for="remarks">Remarks</label>
+        <textarea id="remarks" placeholder="Anything worth noting?"></textarea>
+        <div class="score-card">
+          <div class="score-header">
+            <span class="field-label" style="margin:0;color:#f4f4f5;">Score</span>
+            <div class="score-value" id="scoreValue">8</div>
+          </div>
+          <input type="range" id="score" min="1" max="10" value="8">
+          <div class="helper-row"><span>Low</span><span>High</span></div>
+        </div>
+        <button onclick="saveSession()" class="save-btn">Save session</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let sessionData = { links: [] };
+    const sites = [
+      { label: 'Site 1', url: 'https://www.pornhub.com' },
+      { label: 'Site 2', url: 'https://www.xvideos.com' },
+      { label: 'Site 3', url: 'https://www.xhamster.com' },
+      { label: 'Site 4', url: 'https://www.redtube.com' },
+      { label: 'Site 5', url: 'https://www.youjizz.com' }
+    ];
+    const toys = [
+      {id: 'pink', label: 'Pink Lush', img: 'https://via.placeholder.com/80/FF69B4/fff?text=PINK'},
+      {id: 'white', label: 'White Wand', img: 'https://via.placeholder.com/80/FFF/000?text=WHITE'},
+      {id: 'sucky', label: 'Sucky', img: 'https://via.placeholder.com/80/00FF00/000?text=SUCKY'},
+      {id: 'talk', label: 'Talk', img: 'https://via.placeholder.com/80/FFD700/000?text=TALK'},
+      {id: 'black', label: 'Black', img: 'https://via.placeholder.com/80/000/fff?text=BLACK'},
+      {id: 'mini', label: 'Mini', img: 'https://via.placeholder.com/80/7C3AED/fff?text=MINI'}
+    ];
+    const startScreen = document.getElementById('startScreen');
+    const browserScreen = document.getElementById('browserScreen');
+    const loggingScreen = document.getElementById('loggingScreen');
+    const browser = document.getElementById('browser');
+    const addressBar = document.getElementById('addressBar');
+    const siteGrid = document.getElementById('siteGrid');
+    const toyGrid = document.getElementById('toyGrid');
+    const score = document.getElementById('score');
+    const scoreValue = document.getElementById('scoreValue');
+    const todayLabel = document.getElementById('todayLabel');
+    todayLabel.textContent = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    function showScreen(screen) {
+      [startScreen, browserScreen, loggingScreen].forEach(el => el.classList.remove('active'));
+      screen.classList.add('active');
+    }
+    function renderSites() {
+      siteGrid.innerHTML = sites.map(site => `<button class="site-btn" onclick="openSite('${site.url.replace(/'/g, "\\'")}')">${site.label}</button>`).join('');
+    }
+    function renderToys() {
+      toyGrid.innerHTML = toys.map(t => `
+        <div onclick="toggleToy(this)" data-id="${t.id}" class="toy-item">
+          <img src="${t.img}" alt="${t.label}">
+          <div>${t.label}</div>
+        </div>
+      `).join('');
+    }
+    function openSite(url) {
+      browser.src = url;
+      addressBar.textContent = url;
+      sessionData.links.push(url);
+    }
+    function startSession() {
+      showScreen(browserScreen);
+      renderSites();
+      openSite(sites[0].url);
+    }
+    function imDone() {
+      if (browser.src && !sessionData.links.includes(browser.src)) {
+        sessionData.links.push(browser.src);
+      }
+      renderToys();
+      showScreen(loggingScreen);
+    }
+    function toggleToy(el) {
+      el.classList.toggle('selected');
+    }
+    function saveSession() {
+      const selected = Array.from(document.querySelectorAll('.toy-item.selected')).map(el => el.dataset.id);
+      const remarks = document.getElementById('remarks').value.replace(/"/g, '""');
+      const currentScore = score.value;
+      const summary = {
+        date: new Date().toISOString().slice(0, 10),
+        link: sessionData.links[sessionData.links.length - 1] || '',
+        toys: selected.join(', '),
+        remarks,
+        score: currentScore
+      };
+      let csv = 'Date,Link,Toys,Remarks,Score\n';
+      csv += `${summary.date},"${summary.link}","${summary.toys}","${summary.remarks}",${summary.score}\n`;
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `session-${summary.date}.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      alert('Session saved.');
+      location.reload();
+    }
+    score.addEventListener('input', e => { scoreValue.textContent = e.target.value; });
+  </script>
+</body>
+</html>
