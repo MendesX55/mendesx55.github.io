@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nymph Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui; background: #111; color: #ddd; }
+    .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; }
+    #browser { height: 400px; border: 1px solid #333; width: 100%; }
+  </style>
+</head>
+<body class="min-h-screen p-4">
+  <div class="max-w-md mx-auto bg-zinc-900 rounded-2xl p-6">
+    <h1 class="text-2xl font-bold mb-6 text-pink-400">Nymph Session</h1>
+    
+    <button onclick="startSession()" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl text-lg font-medium mb-8">
+      START SESSION
+    </button>
+
+    <div id="sessionUI" class="hidden">
+      <input id="urlInput" type="text" placeholder="Paste or type porn URL here" class="w-full bg-zinc-800 p-4 rounded-xl mb-4">
+      <button onclick="loadURL()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl mb-6">LOAD URL IN APP</button>
+
+      <iframe id="browser" class="w-full rounded-xl hidden" sandbox="allow-scripts allow-same-origin"></iframe>
+
+      <div class="mb-6">
+        <button onclick="imDone()" class="w-full bg-red-600 hover:bg-red-700 py-6 rounded-2xl text-xl font-bold">
+          I'M DONE
+        </button>
+      </div>
+
+      <div class="toy-grid mb-8" id="toyGrid"></div>
+
+      <textarea id="remarks" placeholder="Remarks... (optional)" class="w-full h-24 bg-zinc-800 rounded-xl p-4 mb-6"></textarea>
+
+      <div class="flex items-center gap-4 mb-8">
+        <span class="text-sm">Score</span>
+        <input type="range" id="score" min="1" max="10" value="8" class="flex-1 accent-pink-500">
+        <span id="scoreValue" class="font-mono text-2xl w-8 text-center">8</span>
+      </div>
+
+      <label class="flex items-center gap-2 mb-6">
+        <input type="checkbox" id="enableCamera" checked>
+        <span>Enable front snaps every 30s (for admin view only)</span>
+      </label>
+
+      <button onclick="saveSession()" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-xl text-lg font-medium">
+        SAVE & CLOSE
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let sessionData = { links: [], keys: [], snaps: [], startTime: Date.now() };
+    let stream = null;
+
+    const toys = [
+      {id: 'pink', label: 'Pink Lush', img: 'https://via.placeholder.com/80/FF69B4/fff?text=PINK'},
+      {id: 'white', label: 'White Wand', img: 'https://via.placeholder.com/80/FFF/000?text=WHITE'},
+      {id: 'sucky', label: 'Sucky', img: 'https://via.placeholder.com/80/00FF00/000?text=SUCKY'},
+      {id: 'talk', label: 'Talk', img: 'https://via.placeholder.com/80/FFD700/000?text=TALK'},
+      {id: 'black', label: 'Black', img: 'https://via.placeholder.com/80/000/fff?text=BLACK'},
+    ];
+
+    function renderToys() {
+      const grid = document.getElementById('toyGrid');
+      grid.innerHTML = toys.map(t => `
+        <div onclick="toggleToy(this)" data-id="${t.id}" class="toy-item border-2 border-transparent hover:border-pink-500 rounded-xl p-2 text-center cursor-pointer">
+          <img src="${t.img}" class="w-20 h-20 mx-auto rounded-lg object-cover">
+          <div class="text-xs mt-1">${t.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function toggleToy(el) {
+      el.classList.toggle('border-pink-500');
+      el.classList.toggle('bg-zinc-800');
+    }
+
+    function startSession() {
+      document.getElementById('sessionUI').classList.remove('hidden');
+      renderToys();
+    }
+
+    function loadURL() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (url) {
+        let fullUrl = url.startsWith('http') ? url : 'https://' + url;
+        document.getElementById('browser').src = fullUrl;
+        document.getElementById('browser').classList.remove('hidden');
+      }
+    }
+
+    function imDone() {
+      const currentUrl = document.getElementById('browser').src || document.getElementById('urlInput').value;
+      if (currentUrl) sessionData.links.push(currentUrl);
+      alert("Link captured. Now pick toys, remarks, score.");
+    }
+
+    function saveSession() {
+      if (document.getElementById('enableCamera').checked) {
+        startCameraSnaps();
+      }
+      const selectedToys = Array.from(document.querySelectorAll('.toy-item.border-pink-500')).map(el => el.dataset.id);
+      const remarks = document.getElementById('remarks').value;
+      const score = document.getElementById('score').value;
+
+      const summary = {
+        date: new Date().toISOString().slice(0,10),
+        link: sessionData.links[sessionData.links.length-1] || 'unknown',
+        toys: selectedToys.join(', '),
+        remarks: remarks,
+        score: score
+      };
+
+      let csv = "Date,Link,Toys,Remarks,Score\n";
+      csv += `${summary.date},"${summary.link}",${summary.toys},"${summary.remarks}",${summary.score}\n`;
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `session-${summary.date}.csv`;
+      a.click();
+
+      localStorage.setItem('fullSession_' + Date.now(), JSON.stringify(sessionData));
+
+      alert("Session saved.");
+      sessionData = { links: [], keys: [], snaps: [], startTime: Date.now() };
+      document.getElementById('sessionUI').classList.add('hidden');
+    }
+
+    async function startCameraSnaps() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        setInterval(() => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 640; canvas.height = 480;
+          canvas.getContext('2d').drawImage(video, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          sessionData.snaps.push({time: Date.now(), data: dataUrl});
+        }, 30000);
+      } catch(e) { console.log("Camera permission needed"); }
+    }
+
+    if (window.location.search.includes('admin')) {
+      const pass = prompt("Admin password");
+      if (pass === "yourpasswordhere") {
+        let html = "<h1>Full Sessions</h1>";
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('fullSession')) {
+            const data = JSON.parse(localStorage.getItem(key));
+            html += `<pre>${JSON.stringify(data, null, 2)}</pre><hr>`;
+          }
+        }
+        document.body.innerHTML = html;
+      }
+    }
+  </script>
+</body>
+</html>
