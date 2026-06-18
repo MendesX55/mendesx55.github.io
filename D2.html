@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nymph Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui; background: #111; color: #ddd; }
+    .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; }
+    #browser { height: 500px; border: none; width: 100%; background: #000; }
+  </style>
+</head>
+<body class="min-h-screen p-4 bg-black">
+  <div class="max-w-md mx-auto">
+    <div id="startScreen">
+      <h1 class="text-3xl font-bold mb-8 text-pink-400 text-center">Nymph Session</h1>
+      <button onclick="startSession()" class="w-full bg-pink-600 hover:bg-pink-700 py-8 rounded-3xl text-2xl font-bold">
+        START SESSION
+      </button>
+    </div>
+
+    <div id="browserScreen" class="hidden flex flex-col h-screen">
+      <iframe id="browser" class="flex-1 w-full" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+      <button onclick="imDone()" class="mt-4 bg-red-600 hover:bg-red-700 py-6 rounded-3xl text-xl font-bold mx-4">
+        I'M DONE
+      </button>
+    </div>
+
+    <div id="loggingScreen" class="hidden">
+      <div class="toy-grid mb-8" id="toyGrid"></div>
+      <textarea id="remarks" placeholder="Remarks... (optional)" class="w-full h-32 bg-zinc-800 rounded-2xl p-4 mb-6"></textarea>
+      <div class="flex items-center gap-4 mb-8">
+        <span class="text-sm">Score</span>
+        <input type="range" id="score" min="1" max="10" value="8" class="flex-1 accent-pink-500">
+        <span id="scoreValue" class="font-mono text-3xl">8</span>
+      </div>
+      <button onclick="saveSession()" class="w-full bg-green-600 hover:bg-green-700 py-6 rounded-3xl text-xl font-bold">
+        SAVE SESSION
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let sessionData = { links: [] };
+
+    const toys = [
+      {id: 'pink', label: 'Pink Lush', img: 'https://via.placeholder.com/80/FF69B4/fff?text=PINK'},
+      {id: 'white', label: 'White Wand', img: 'https://via.placeholder.com/80/FFF/000?text=WHITE'},
+      {id: 'sucky', label: 'Sucky', img: 'https://via.placeholder.com/80/00FF00/000?text=SUCKY'},
+      {id: 'talk', label: 'Talk', img: 'https://via.placeholder.com/80/FFD700/000?text=TALK'},
+      {id: 'black', label: 'Black', img: 'https://via.placeholder.com/80/000/fff?text=BLACK'},
+    ];
+
+    function startSession() {
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('browserScreen').classList.remove('hidden');
+      document.getElementById('browser').src = 'https://www.pornhub.com';
+    }
+
+    function imDone() {
+      const currentUrl = document.getElementById('browser').src;
+      if (currentUrl) sessionData.links.push(currentUrl);
+      document.getElementById('browserScreen').classList.add('hidden');
+      document.getElementById('loggingScreen').classList.remove('hidden');
+      renderToys();
+    }
+
+    function renderToys() {
+      const grid = document.getElementById('toyGrid');
+      grid.innerHTML = toys.map(t => `
+        <div onclick="toggleToy(this)" data-id="${t.id}" class="toy-item border-2 border-transparent hover:border-pink-500 rounded-xl p-3 text-center cursor-pointer bg-zinc-800">
+          <img src="${t.img}" class="w-16 h-16 mx-auto rounded-lg">
+          <div class="text-xs mt-2">${t.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function toggleToy(el) {
+      el.classList.toggle('border-pink-500');
+      el.classList.toggle('bg-pink-900');
+    }
+
+    function saveSession() {
+      const selected = Array.from(document.querySelectorAll('.toy-item.border-pink-500')).map(el => el.dataset.id);
+      const remarks = document.getElementById('remarks').value;
+      const score = document.getElementById('score').value;
+
+      const summary = {
+        date: new Date().toISOString().slice(0,10),
+        link: sessionData.links.join(' | '),
+        toys: selected.join(', '),
+        remarks: remarks,
+        score: score
+      };
+
+      let csv = "Date,Link,Toys,Remarks,Score\n";
+      csv += `${summary.date},"${summary.link}",${summary.toys},"${summary.remarks}",${summary.score}\n`;
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `session-${summary.date}.csv`;
+      a.click();
+
+      alert("Session saved! Resetting.");
+      location.reload();
+    }
+
+    document.getElementById('score').addEventListener('input', (e) => document.getElementById('scoreValue').textContent = e.target.value);
+  </script>
+</body>
+</html>
