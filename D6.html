@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Nymph Web App</title>
+  <style>
+    body {
+      background: #0b0b0f;
+      color: #f4eef3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      background: #16161c;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 40px 30px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #e8537a, #f07aa0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: #9b92a0;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+    .dl-btn {
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      background: #3fb985;
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 20px;
+      border-radius: 14px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+    .dl-btn:hover {
+      background: #34a873;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Nymph PWA Installer</h1>
+  <p>Tap the button below to generate and download the unified HTML app file directly to your device storage.</p>
+  <button class="dl-btn" onclick="triggerDownload()">Download Nymph.html</button>
+</div>
+
+<script>
+function triggerDownload() {
+  // Complete unified application source text definition
+  const appSource = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Nymph</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nymph">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --bg:#0b0b0f; --surface:#16161c; --surface2:#20202a; --surface3:#2a2a34; --border:#32323d;
+      --text:#f4eef3; --muted:#9b92a0; --rose:#e8537a; --rose2:#f07aa0; --green:#3fb985;
+      --shadow:0 18px 42px rgba(0,0,0,.38); --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+    body { background:radial-gradient(circle at top, rgba(232,83,122,.15), transparent 30%), linear-gradient(180deg,#141218 0%,#0b0b0f 42%); }
+    .screen { display:none; min-height:100dvh; }
+    .screen.active { display:block; }
+    .app { max-width:430px; margin:0 auto; min-height:100dvh; padding:calc(var(--safe-top) + 16px) 14px calc(var(--safe-bottom) + 18px); }
+    .card { background:rgba(22,22,28,.88); border:1px solid rgba(255,255,255,.07); border-radius:30px; box-shadow:var(--shadow); backdrop-filter:blur(18px); }
+    .hero { padding:28px 22px; min-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 34px); display:flex; flex-direction:column; justify-content:center; }
+    .mark { font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--rose2); margin-bottom:26px; }
+    .title { font-family:'Playfair Display',serif; font-size:48px; margin-bottom:10px; }
+    .sub { color:var(--muted); font-size:15px; max-width:28ch; }
+    .main-actions { margin-top:34px; display:grid; gap:14px; }
+    .big-btn { border:0; border-radius:26px; min-height:78px; padding:18px 20px; text-align:left; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+    .big-btn .lbl { font-weight:700; font-size:18px; display:block; }
+    .big-btn .hint { display:block; margin-top:4px; color:rgba(255,255,255,.7); font-size:13px; }
+    .btn-primary { background:linear-gradient(135deg,var(--rose),#c23060); }
+    .btn-secondary { background:linear-gradient(135deg,#262632,#1a1a22); border:1px solid rgba(255,255,255,.06); }
+    .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .icon-btn { width:44px; height:44px; border-radius:14px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.04); color:var(--text); cursor:pointer; }
+    .pill { padding:10px 14px; border-radius:999px; background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; }
+    .panel { padding:18px; }
+    .section-title { font-family:'Playfair Display',serif; font-size:28px; margin-bottom:4px; }
+    .section-sub { color:var(--muted); font-size:14px; margin-bottom:18px; }
+    .field { margin-bottom:16px; }
+    .field label { display:block; font-size:13px; color:var(--muted); margin-bottom:8px; }
+    .input, .textarea, .select { width:100%; border:1px solid var(--border); background:rgba(255,255,255,.04); color:var(--text); border-radius:18px; padding:15px 16px; outline:none; }
+    .textarea { min-height:110px; resize:none; }
+    .toy-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+    .toy { border:1px solid rgba(255,255,255,.06); background:var(--surface2); border-radius:20px; padding:12px 8px; text-align:center; cursor:pointer; min-height:96px; display:flex; flex-direction:column; justify-content:center; gap:6px; }
+    .toy.selected { border-color:var(--rose); background:rgba(122,28,59,.45); }
+    .toy .e { font-size:24px; }
+    .toy .n { font-size:12px; font-weight:600; }
+    .score-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:12px; }
+    .score-btn, .decimal-btn { min-height:54px; border-radius:18px; border:1px solid rgba(255,255,255,.06); background:var(--surface2); color:var(--text); cursor:pointer; font-weight:700; }
+    .score-btn.active, .decimal-btn.active { background:linear-gradient(135deg,var(--rose),#c23060); border-color:transparent; }
+    .decimal-wrap { display:none; gap:10px; grid-template-columns:repeat(4,1fr); margin-bottom:12px; }
+    .decimal-wrap.show { display:grid; }
+    .custom-score { display:none; margin-bottom:12px; }
+    .custom-score.show { display:block; }
+    .save-btn { width:100%; min-height:60px; border:0; border-radius:22px; background:linear-gradient(135deg,var(--green),#2d996d); color:#fff; font-weight:700; font-size:17px; cursor:pointer; }
+    .filter-stack { display:grid; gap:12px; margin-bottom:16px; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { padding:9px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); color:var(--muted); font-size:12px; cursor:pointer; }
+    .chip.active { background:rgba(232,83,122,.18); border-color:var(--rose); color:#fff; }
+    .meta-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .list { display:grid; gap:12px; }
+    .item { padding:14px; border-radius:24px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); }
+    .item-top { display:flex; gap:12px; align-items:flex-start; }
+    .thumb { width:92px; height:68px; border-radius:16px; background:#2a2a34; flex:0 0 auto; overflow:hidden; display:grid; place-items:center; color:var(--muted); font-size:20px; }
+    .thumb img { width:100%; height:100%; object-fit:cover; }
+    .item h3 { font-size:15px; margin-bottom:6px; }
+    .item h3 a { color:#fff; text-decoration:underline; text-decoration-color:rgba(255,255,255,.2); }
+    .meta { color:var(--muted); font-size:12px; }
+    .tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+    .tag { padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.05); font-size:11px; }
+    .remarks { margin-top:10px; color:#ddd; font-size:13px; }
+    .empty { padding:34px; text-align:center; color:var(--muted); }
+  </style>
+</head>
+<body>
+
+  <section id="homeScreen" class="screen active">
+    <main class="app">
+      <div class="card hero">
+        <div class="mark">private</div>
+        <h1 class="title">Nymph</h1>
+        <p class="sub">One-screen manual entry and filterable system dashboard.</p>
+        <div class="main-actions">
+          <button class="big-btn btn-primary" onclick="switchScreen('manualScreen')">
+            <div><span class="lbl">Manual add</span><span class="hint">Single screen workflow entry</span></div><div>＋</div>
+          </button>
+          <button class="big-btn btn-secondary" onclick="switchScreen('listScreen')">
+            <div><span class="lbl">View list</span><span class="hint">Filter entries, metadata, titles</span></div><div>≡</div>
+          </button>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <section id="manualScreen" class="screen">
+    <main class="app">
+      <div class="topbar"><button class="icon-btn" onclick="switchScreen('homeScreen')">←</button><div class="pill">Manual add</div></div>
+      <div class="card panel">
+        <h2 class="section-title">Quick entry</h2>
+        <p class="section-sub">Consolidated form submission controls.</p>
+        <div class="field"><label>Link</label><input id="linkInput" class="input" placeholder="Paste link"></div>
+        <div class="field"><label>Custom Title</label><input id="titleInput" class="input" placeholder="Optional descriptor text"></div>
+        <div class="field"><label>Toys involved</label><div id="toyGrid" class="toy-grid"></div></div>
+        <div class="field"><label>Remarks</label><textarea id="remarksInput" class="textarea" placeholder="Notes..."></textarea></div>
+        <div class="field">
+          <label>Score</label>
+          <div id="scoreGrid" class="score-grid"></div>
+          <div id="decimalWrap" class="decimal-wrap"></div>
+          <div id="customScoreWrap" class="custom-score"><input id="customScoreInput" class="input" placeholder="Custom value"></div>
+        </div>
+        <button class="save-btn" onclick="saveManualEntry()">Save and exit</button>
+      </div>
+    </main>
+  </section>
+
+  <section id="listScreen" class="screen">
+    <main class="app">
+      <div class="topbar"><button class="icon-btn" onclick="switchScreen('homeScreen')">←</button><div class="pill" id="countPill">0 results</div></div>
+      <div class="card panel">
+        <h2 class="section-title">History Logs</h2>
+        <div class="filter-stack">
+          <input id="searchInput" class="input" placeholder="Search text..." oninput="applyFilters()">
+          <div class="meta-row"><select id="scoreMin" class="select" onchange="applyFilters()"></select><select id="scoreMax" class="select" onchange="applyFilters()"></select></div>
+          <div class="meta-row"><input id="dateFrom" type="date" class="input" onchange="applyFilters()"><input id="dateTo" type="date" class="input" onchange="applyFilters()"></div>
+          <div class="chips">
+            <button class="chip" id="multiDayChip" onclick="toggleMultiDayFilter()">Multiple sessions same day</button>
+            <button class="chip" onclick="clearAllFilters()">Clear</button>
+          </div>
+          <div id="toyFilters" class="chips"></div>
+        </div>
+        <div id="results" class="list"></div>
+      </div>
+    </main>
+  </section>
+
+  <script>
+    const TOYS = [
+      { id:'og_pink', emoji:'🌸', name:'OG Pink' }, { id:'pink', emoji:'💗', name:'Pink' }, { id:'new_pink', emoji:'🌷', name:'New Pink' },
+      { id:'white', emoji:'🤍', name:'White' }, { id:'sucky', emoji:'🌹', name:'Sucky' }, { id:'black', emoji:'🖤', name:'Black' },
+      { id:'purple', emoji:'💜', name:'Purple' }, { id:'talk', emoji:'👅', name:'Talk' }, { id:'bunny', emoji:'🐰', name:'Bunny' },
+      { id:'plug', emoji:'🔌', name:'Plug' }, { id:'machine', emoji:'⚙️', name:'Machine' }, { id:'bullet', emoji:'💫', name:'Bullet' },
+      { id:'dick', emoji:'🎮', name:'Dick w Remote' }, { id:'other', emoji:'✨', name:'Other' }
+    ];
+
+    let userSessions = JSON.parse(localStorage.getItem('nymph_sessions')) || [];
+    let metaCache = JSON.parse(localStorage.getItem('nymph_meta_cache')) || {};
+    let selectedToys = [], selectedBaseScore = null, selectedDecimal = "0.0", activeToyFilters = [], filterMultiDayOnly = false;
+
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'listScreen') applyFilters();
+      else if (id === 'manualScreen') resetForm();
+    }
+
+    function initUI() {
+      document.getElementById('toyGrid').innerHTML = TOYS.map(t => \`<div class="toy" id="toy-\${t.id}" onclick="toggleFormToy('\${t.id}')"><span class="e">\${t.emoji}</span><span class="n">\${t.name}</span></div>\`).join('');
+      let scoreHtml = '';
+      for(let i=1; i<=10; i++) scoreHtml += \`<button type="button" class="score-btn" id="sb-\${i}" onclick="selectBaseScore(\${i})">\${i}</button>\`;
+      document.getElementById('scoreGrid').innerHTML = scoreHtml + \`<button type="button" class="score-btn" id="sb-11" onclick="selectBaseScore(11)">11 ⭐</button>\`;
+      document.getElementById('decimalWrap').innerHTML = ["0.0", "0.25", "0.50", "0.75"].map(d => \`<button type="button" class="decimal-btn" id="db-\${d.replace('.','_')}" onclick="selectDecimalScore('\${d}')">+\${d}</button>\`).join('');
+      let opts = '<option value="">Score Filter</option>';
+      for(let s=1; s<=11; s+=0.25) opts += \`<option value="\${s}">\${s}</option>\`;
+      document.getElementById('scoreMin').innerHTML = opts; document.getElementById('scoreMax').innerHTML = opts;
+      document.getElementById('toyFilters').innerHTML = TOYS.map(t => \`<button type="button" class="chip" id="tf-\${t.id}" onclick="toggleFilterToy('\${t.id}')">\${t.emoji} \${t.name}</button>\`).join('');
+    }
+
+    function toggleFormToy(id) {
+      let idx = selectedToys.indexOf(id);
+      if(idx > -1) selectedToys.splice(idx, 1); else selectedToys.push(id);
+      document.getElementById(\`toy-\${id}\`).classList.toggle('selected');
+    }
+
+    function selectBaseScore(num) {
+      selectedBaseScore = num;
+      document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(\`sb-\${num}\`).classList.add('active');
+      if (num === 11) {
+        document.getElementById('decimalWrap').classList.remove('show');
+        document.getElementById('customScoreWrap').classList.add('show');
+      } else {
+        document.getElementById('customScoreWrap').classList.remove('show');
+        document.getElementById('decimalWrap').classList.add('show');
+        selectDecimalScore("0.0");
+      }
+    }
+
+    function selectDecimalScore(d) {
+      selectedDecimal = d;
+      document.querySelectorAll('.decimal-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(\`db-\${d.replace('.','_')}\`).classList.add('active');
+    }
+
+    function resetForm() {
+      selectedToys = []; selectedBaseScore = null; selectedDecimal = "0.0";
+      document.getElementById('linkInput').value = ''; document.getElementById('titleInput').value = '';
+      document.getElementById('remarksInput').value = ''; document.getElementById('customScoreInput').value = '';
+      document.querySelectorAll('.toy').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('decimalWrap').classList.remove('show');
+      document.getElementById('customScoreWrap').classList.remove('show');
+    }
+
+    function saveManualEntry() {
+      let scoreVal = null;
+      if (selectedBaseScore === 11) {
+        let r = document.getElementById('customScoreInput').value.trim();
+        scoreVal = r ? parseFloat(r) : 11;
+      } else if (selectedBaseScore !== null) {
+        scoreVal = parseFloat(selectedBaseScore) + parseFloat(selectedDecimal);
+      }
+      let link = document.getElementById('linkInput').value.trim();
+      let title = document.getElementById('titleInput').value.trim();
+      if(link && title) {
+        metaCache[link] = { title: title, thumb: '' };
+        localStorage.setItem('nymph_meta_cache', JSON.stringify(metaCache));
+      }
+      let now = new Date();
+      userSessions.unshift({
+        id: Date.now(),
+        dateISO: now.toISOString().split('T')[0],
+        dateLabel: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+        time: now.toTimeString().split(' ')[0].substring(0,5),
+        lastLink: link,
+        toys: [...selectedToys],
+        remarks: document.getElementById('remarksInput').value.trim(),
+        score: scoreVal
+      });
+      localStorage.setItem('nymph_sessions', JSON.stringify(userSessions));
+      switchScreen('homeScreen');
+    }
+
+    function toggleFilterToy(id) {
+      let idx = activeToyFilters.indexOf(id);
+      if(idx > -1) activeToyFilters.splice(idx, 1); else activeToyFilters.push(id);
+      document.getElementById(\`tf-\${id}\`).classList.toggle('active');
+      applyFilters();
+    }
+
+    function toggleMultiDayFilter() {
+      filterMultiDayOnly = !filterMultiDayOnly;
+      document.getElementById('multiDayChip').classList.toggle('active', filterMultiDayOnly);
+      applyFilters();
+    }
+
+    function clearAllFilters() {
+      document.getElementById('searchInput').value = ''; document.getElementById('scoreMin').value = '';
+      document.getElementById('scoreMax').value = ''; document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = ''; activeToyFilters = []; filterMultiDayOnly = false;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let search = document.getElementById('searchInput').value.toLowerCase();
+      let min = parseFloat(document.getElementById('scoreMin').value) || -1;
+      let max = parseFloat(document.getElementById('scoreMax').value) || 999;
+      let from = document.getElementById('dateFrom').value;
+      let to = document.getElementById('dateTo').value;
+      
+      let occurrences = {};
+      userSessions.forEach(s => { occurrences[s.dateISO] = (occurrences[s.dateISO] || 0) + 1; });
+
+      let filtered = userSessions.filter(s => {
+        if(search) {
+          let t = (s.remarks || '') + ' ' + (s.lastLink || '') + ' ' + (metaCache[s.lastLink]?.title || '');
+          if(!t.toLowerCase().includes(search)) return false;
+        }
+        if(s.score !== null && (s.score < min || s.score > max)) return false;
+        if(from && s.dateISO < from) return false;
+        if(to && s.dateISO > to) return false;
+        if(activeToyFilters.length > 0 && !activeToyFilters.every(f => s.toys.includes(f))) return false;
+        if(filterMultiDayOnly && occurrences[s.dateISO] <= 1) return false;
+        return true;
+      });
+
+      document.getElementById('countPill').innerText = \`\${filtered.length} results\`;
+      
+      document.getElementById('results').innerHTML = filtered.map(s => {
+        let c = s.lastLink ? metaCache[s.lastLink] : null;
+        let title = c?.title || (s.lastLink ? s.lastLink.split('?')[0] : 'No link');
+        let thumb = c?.thumb ? \`<img src="\${c.thumb}">\` : '🎬';
+        let tags = s.toys.map(tid => { let m = TOYS.find(t=>t.id===tid); return \`<span class="tag">\${m?m.emoji+' '+m.name:tid}</span>\`; }).join('');
+        return \`<article class="item">
+          <div class="item-top">
+            <div class="thumb">\${thumb}</div>
+            <div>
+              <h3>\${s.lastLink?\`<a href="\${s.lastLink}" target="_blank">\${title}</a>\`:'No Link'}</h3>
+              <div class="meta">\${s.dateLabel} \${s.time||''} · Score: <strong>\text{\${s.score||'—'}}</strong> \${occurrences[s.dateISO]>1?'<span style="color:var(--rose)">· Multi-Session</span>':''}</div>
+            </div>
+          </div>
+          <div class="tags">\text{\${tags}}</div>
+          \text{\${s.remarks?\`<div class="remarks">\${s.remarks}</div>\`:''}}
+        </article>\`;
+      }).join('');
+    }
+
+    window.addEventListener('DOMContentLoaded', initUI);
+  </script>
+</body>
+</html>`;
+
+  // Create local object stream connection to initiate hardware-accelerated downloader link
+  const blob = new Blob([appSource], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Nymph.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
