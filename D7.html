@@ -4,11 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <title>Nymph</title>
-  
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Nymph">
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
     :root {
@@ -67,7 +62,7 @@
     .list { display:grid; gap:12px; }
     .item { padding:14px; border-radius:24px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); }
     .item-top { display:flex; gap:12px; align-items:flex-start; }
-    .thumb { width:92px; height:68px; border-radius:16px; background:linear-gradient(135deg,#2a2a34,#1a1a22); flex:0 0 auto; overflow:hidden; display:grid; place-items:center; color:var(--muted); font-size:20px; text-align:center; }
+    .thumb { width:92px; height:68px; border-radius:16px; background:linear-gradient(135deg,#2a2a34,#1a1a22); flex:0 0 auto; overflow:hidden; display:grid; place-items:center; color:var(--muted); font-size:11px; text-align:center; }
     .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     .item h3 { font-size:15px; line-height:1.35; margin-bottom:6px; }
     .item h3 a { color:#fff; text-decoration:underline; text-decoration-color:rgba(255,255,255,.22); text-underline-offset:3px; }
@@ -80,7 +75,6 @@
   </style>
 </head>
 <body>
-
   <section id="homeScreen" class="screen active">
     <main class="app">
       <div class="card hero">
@@ -88,10 +82,10 @@
         <h1 class="title">Nymph</h1>
         <p class="sub">One-screen manual entry and a full filterable list, tuned for iPhone Pro Max with minimal taps.</p>
         <div class="main-actions">
-          <button class="big-btn btn-primary" onclick="switchScreen('manualScreen')">
+          <button class="big-btn btn-primary" onclick="openManual()">
             <div><span class="lbl">Manual add</span><span class="hint">Paste link, pick toys, add score, save fast</span></div><div>＋</div>
           </button>
-          <button class="big-btn btn-secondary" onclick="switchScreen('listScreen')">
+          <button class="big-btn btn-secondary" onclick="openList()">
             <div><span class="lbl">View list</span><span class="hint">Filter sessions, dates, toys, scores, and repeat days</span></div><div>≡</div>
           </button>
         </div>
@@ -101,76 +95,49 @@
 
   <section id="manualScreen" class="screen">
     <main class="app">
-      <div class="topbar"><button class="icon-btn" onclick="switchScreen('homeScreen')">←</button><div class="pill">Manual add</div></div>
+      <div class="topbar"><button class="icon-btn" onclick="goHome()">←</button><div class="pill">Manual add</div></div>
       <div class="card panel">
         <h2 class="section-title">Quick entry</h2>
         <p class="section-sub">Everything is on one page for the fewest possible taps.</p>
-        
-        <div class="field">
-          <label for="linkInput">Link</label>
-          <input id="linkInput" class="input" placeholder="Paste video link">
-        </div>
-
-        <div class="field">
-          <label for="titleInput">Custom Video Title (Optional)</label>
-          <input id="titleInput" class="input" placeholder="Override link with clean title text">
-        </div>
-
-        <div class="field">
-          <label>Toys involved</label>
-          <div id="toyGrid" class="toy-grid"></div>
-        </div>
-
-        <div class="field">
-          <label for="remarksInput">Remarks</label>
-          <textarea id="remarksInput" class="textarea" placeholder="Optional remarks..."></textarea>
-        </div>
-
+        <div class="field"><label for="linkInput">Link</label><input id="linkInput" class="input" placeholder="Paste video link"></div>
+        <div class="field"><label>Toys involved</label><div id="toyGrid" class="toy-grid"></div></div>
+        <div class="field"><label for="remarksInput">Remarks</label><textarea id="remarksInput" class="textarea" placeholder="Optional remarks..."></textarea></div>
         <div class="field">
           <label>Score</label>
           <div id="scoreGrid" class="score-grid"></div>
           <div id="decimalWrap" class="decimal-wrap"></div>
-          <div id="customScoreWrap" class="custom-score">
-            <input id="customScoreInput" class="input" placeholder="Enter custom score, then tap Save">
-          </div>
+          <div id="customScoreWrap" class="custom-score"><input id="customScoreInput" class="input" placeholder="Custom score, e.g. 11, 11.5, 12"></div>
         </div>
-
-        <button class="save-btn" onclick="saveManualEntry()">Save and exit</button>
+        <button class="save-btn" onclick="saveManual()">Save and exit</button>
       </div>
     </main>
   </section>
 
   <section id="listScreen" class="screen">
     <main class="app">
-      <div class="topbar"><button class="icon-btn" onclick="switchScreen('homeScreen')">←</button><div class="pill" id="countPill">0 results</div></div>
+      <div class="topbar"><button class="icon-btn" onclick="goHome()">←</button><div class="pill" id="countPill">0 results</div></div>
       <div class="card panel">
         <h2 class="section-title">Session list</h2>
         <p class="section-sub">Filter by toy, score, date, repeat-session days, and search text.</p>
-        
         <div class="filter-stack">
           <input id="searchInput" class="input" placeholder="Search title, link, or remarks" oninput="applyFilters()">
-          
           <div class="meta-row">
             <select id="scoreMin" class="select" onchange="applyFilters()"></select>
             <select id="scoreMax" class="select" onchange="applyFilters()"></select>
           </div>
-          
           <div class="meta-row">
             <input id="dateFrom" type="date" class="input" onchange="applyFilters()">
             <input id="dateTo" type="date" class="input" onchange="applyFilters()">
           </div>
-          
           <div class="chips">
-            <button class="chip" id="multiDayChip" onclick="toggleMultiDayFilter()">Multiple sessions on same day</button>
-            <button class="chip" onclick="clearAllFilters()">Clear filters</button>
+            <button class="chip" id="multiDayChip" onclick="toggleMultiDay()">Multiple sessions on same day</button>
+            <button class="chip" onclick="clearFilters()">Clear filters</button>
           </div>
-          
           <div>
-            <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Filter by Toy</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Toys</div>
             <div id="toyFilters" class="chips"></div>
           </div>
         </div>
-
         <div class="results-meta" id="resultsMeta"></div>
         <div id="results" class="list"></div>
       </div>
@@ -178,7 +145,6 @@
   </section>
 
   <script>
-    // System Constants
     const TOYS = [
       { id:'og_pink', emoji:'🌸', name:'OG Pink' }, { id:'pink', emoji:'💗', name:'Pink' }, { id:'new_pink', emoji:'🌷', name:'New Pink' },
       { id:'white', emoji:'🤍', name:'White' }, { id:'sucky', emoji:'🌹', name:'Sucky' }, { id:'black', emoji:'🖤', name:'Black' },
@@ -187,298 +153,316 @@
       { id:'dick', emoji:'🎮', name:'Dick w Remote' }, { id:'other', emoji:'✨', name:'Other' }
     ];
 
-    // Local Storage Hydration States
-    let userSessions = JSON.parse(localStorage.getItem('nymph_sessions')) || [];
-    let metaCache = JSON.parse(localStorage.getItem('nymph_meta_cache')) || {};
+    const IMPORTED_SESSIONS = [
+      {"id":100000,"dateISO":"2022-09-30","dateLabel":"30 Sep 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5bf8334d439f2#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5bf8334d439f2#1","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100001,"dateISO":"2022-10-01","dateLabel":"1 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph61f9163d6f08d"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph61f9163d6f08d","toys":["pink"],"remarks":"","score":9,"source":"imported"},
+      {"id":100002,"dateISO":"2022-10-03","dateLabel":"3 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph6314e28f81c10#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph6314e28f81c10#1","toys":["pink"],"remarks":"","score":9,"source":"imported"},
+      {"id":100003,"dateISO":"2022-10-04","dateLabel":"4 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=624012147"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=624012147","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100004,"dateISO":"2022-10-16","dateLabel":"16 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62b1e3be16afb"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62b1e3be16afb","toys":["pink"],"remarks":"hot tatto jake started","score":5,"source":"imported"},
+      {"id":100005,"dateISO":"2022-10-18","dateLabel":"18 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph631fed0c1fe04#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph631fed0c1fe04#1","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100006,"dateISO":"2022-10-19","dateLabel":"19 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph631fed0c1fe04#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph631fed0c1fe04#1","toys":["pink"],"remarks":"Repeat link. Real quick","score":8,"source":"imported"},
+      {"id":100007,"dateISO":"2022-10-26","dateLabel":"26 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5ecb81682b546"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5ecb81682b546","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100008,"dateISO":"2022-10-27","dateLabel":"27 Oct 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62fa08a2d9032"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62fa08a2d9032","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100009,"dateISO":"2022-11-04","dateLabel":"4 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5edc967fe9d7c"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5edc967fe9d7c","toys":[], "remarks":"shower","score":9,"source":"imported"},
+      {"id":100010,"dateISO":"2022-11-10","dateLabel":"10 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5f2a974b878a2"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5f2a974b878a2","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100011,"dateISO":"2022-11-13","dateLabel":"13 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5df56ad6992b2"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5df56ad6992b2","toys":["pink"],"remarks":"","score":6.5,"source":"imported"},
+      {"id":100012,"dateISO":"2022-11-16","dateLabel":"16 Nov 2022","time":"","links":[],"lastLink":"","toys":["pink"],"remarks":"Double cum video","score":7,"source":"imported"},
+      {"id":100013,"dateISO":"2022-11-18","dateLabel":"18 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63584a18c1fd0#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63584a18c1fd0#1","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100014,"dateISO":"2022-11-19","dateLabel":"19 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62b3c67c35277"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62b3c67c35277","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100015,"dateISO":"2022-11-25","dateLabel":"25 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62007efe1bb33"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62007efe1bb33","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100016,"dateISO":"2022-11-30","dateLabel":"30 Nov 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph6350618cd8ce8"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph6350618cd8ce8","toys":["pink"],"remarks":"","score":5,"source":"imported"},
+      {"id":100017,"dateISO":"2022-12-05","dateLabel":"5 Dec 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5cc05aa3232dd"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5cc05aa3232dd","toys":["black"],"remarks":"","score":6.5,"source":"imported"},
+      {"id":100018,"dateISO":"2022-12-06","dateLabel":"6 Dec 2022","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5daf3eb5e1559"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5daf3eb5e1559","toys":["black"],"remarks":"","score":8,"source":"imported"},
+      {"id":100019,"dateISO":"2023-01-02","dateLabel":"2 Jan 2023","time":"","links":["https://www.test.ca"],"lastLink":"https://www.test.ca","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100020,"dateISO":"2023-01-06","dateLabel":"6 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph61bd2df41d187"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph61bd2df41d187","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100021,"dateISO":"2023-01-08","dateLabel":"8 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5ea6031028a7a"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5ea6031028a7a","toys":["pink","white"],"remarks":"finish just white, Vid on red","score":9,"source":"imported"},
+      {"id":100022,"dateISO":"2023-01-13","dateLabel":"13 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5af9e51c500d9"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5af9e51c500d9","toys":["white"],"remarks":"finished w white, Vid on red","score":8.5,"source":"imported"},
+      {"id":100023,"dateISO":"2023-01-22","dateLabel":"22 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph60f567f2216ce#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph60f567f2216ce#1","toys":["white"],"remarks":"","score":8,"source":"imported"},
+      {"id":100024,"dateISO":"2023-01-23","dateLabel":"23 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5fc4f8a5cec38"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5fc4f8a5cec38","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100025,"dateISO":"2023-01-24","dateLabel":"24 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5ef388294e3cf"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5ef388294e3cf","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100026,"dateISO":"2023-01-25","dateLabel":"25 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5fffb8565f829"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5fffb8565f829","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100027,"dateISO":"2023-01-29","dateLabel":"29 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph609ebe8351b3f"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph609ebe8351b3f","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100028,"dateISO":"2023-01-29","dateLabel":"29 Jan 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62e447a337e85"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62e447a337e85","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100029,"dateISO":"2023-02-01","dateLabel":"1 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63c5a73693072"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63c5a73693072","toys":["pink"],"remarks":"","score":8.5,"source":"imported"},
+      {"id":100030,"dateISO":"2023-02-02","dateLabel":"2 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63a1e14b2abf3"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63a1e14b2abf3","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100031,"dateISO":"2023-02-04","dateLabel":"4 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62eb9b7adee9a"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62eb9b7adee9a","toys":["pink"],"remarks":"","score":6,"source":"imported"},
+      {"id":100032,"dateISO":"2023-02-05","dateLabel":"5 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph61dee5335d3a5"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph61dee5335d3a5","toys":["pink"],"remarks":"","score":7,"source":"imported"},
+      {"id":100033,"dateISO":"2023-02-08","dateLabel":"8 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5c9dd9d053033"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5c9dd9d053033","toys":["pink","white"],"remarks":"","score":7,"source":"imported"},
+      {"id":100034,"dateISO":"2023-02-08","dateLabel":"8 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63bc4f12c84b7#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63bc4f12c84b7#1","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100035,"dateISO":"2023-02-09","dateLabel":"9 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph60d21e2ca7a71"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph60d21e2ca7a71","toys":["pink"],"remarks":"","score":9,"source":"imported"},
+      {"id":100036,"dateISO":"2023-02-10","dateLabel":"10 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62a1430ecf873"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62a1430ecf873","toys":["pink"],"remarks":"","score":9,"source":"imported"},
+      {"id":100037,"dateISO":"2023-02-12","dateLabel":"12 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5ea0853591429"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5ea0853591429","toys":["pink"],"remarks":"","score":9.5,"source":"imported"},
+      {"id":100038,"dateISO":"2023-02-13","dateLabel":"13 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph639f2ace57ded#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph639f2ace57ded#1","toys":["white"],"remarks":"after sex","score":9,"source":"imported"},
+      {"id":100039,"dateISO":"2023-02-14","dateLabel":"14 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5e7286e112102"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5e7286e112102","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100040,"dateISO":"2023-02-16","dateLabel":"16 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5de20203d51e5"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5de20203d51e5","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100041,"dateISO":"2023-02-18","dateLabel":"18 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph6350890c028d3"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph6350890c028d3","toys":["pink"],"remarks":"","score":9.5,"source":"imported"},
+      {"id":100042,"dateISO":"2023-02-21","dateLabel":"21 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=430825406"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=430825406","toys":["pink","white"],"remarks":"pink then white","score":8,"source":"imported"},
+      {"id":100043,"dateISO":"2023-02-21","dateLabel":"21 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5f8de6c2e77f3"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5f8de6c2e77f3","toys":["white"],"remarks":"","score":8,"source":"imported"},
+      {"id":100044,"dateISO":"2023-02-27","dateLabel":"27 Feb 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=63d29737068ff#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=63d29737068ff#1","toys":[],"remarks":"shower","score":9,"source":"imported"},
+      {"id":100045,"dateISO":"2023-03-01","dateLabel":"1 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph603ebb813631f"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph603ebb813631f","toys":["white","talk"],"remarks":"white inside","score":8,"source":"imported"},
+      {"id":100046,"dateISO":"2023-03-02","dateLabel":"2 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=63d6fd2a42653#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=63d6fd2a42653#1","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100047,"dateISO":"2023-03-02","dateLabel":"2 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph631b31763beff"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph631b31763beff","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100048,"dateISO":"2023-03-08","dateLabel":"8 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63b967854363c"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63b967854363c","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100049,"dateISO":"2023-03-08","dateLabel":"8 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph6367871262bb3"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph6367871262bb3","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100050,"dateISO":"2023-03-12","dateLabel":"12 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=63d411d86d6c7#1"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=63d411d86d6c7#1","toys":["white"],"remarks":"","score":8,"source":"imported"},
+      {"id":100051,"dateISO":"2023-03-13","dateLabel":"13 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63750779f34ea"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63750779f34ea","toys":["white"],"remarks":"","score":8,"source":"imported"},
+      {"id":100052,"dateISO":"2023-03-15","dateLabel":"15 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5fbd348210b41"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5fbd348210b41","toys":["white"],"remarks":"during sex","score":10,"source":"imported"},
+      {"id":100053,"dateISO":"2023-03-16","dateLabel":"16 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62ed3f1bba32b"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62ed3f1bba32b","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100054,"dateISO":"2023-03-16","dateLabel":"16 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph614e66aa30368"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph614e66aa30368","toys":["white"],"remarks":"","score":9,"source":"imported"},
+      {"id":100055,"dateISO":"2023-03-18","dateLabel":"18 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=63ecef5193044"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=63ecef5193044","toys":[],"remarks":"shower","score":9,"source":"imported"},
+      {"id":100056,"dateISO":"2023-03-22","dateLabel":"22 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph63a585095840c"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph63a585095840c","toys":["white"],"remarks":"","score":8,"source":"imported"},
+      {"id":100057,"dateISO":"2023-03-26","dateLabel":"26 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5ed1d5b559547"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5ed1d5b559547","toys":["plug"],"remarks":"","score":9,"source":"imported"},
+      {"id":100058,"dateISO":"2023-03-27","dateLabel":"27 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph5e12c7d5f0089"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph5e12c7d5f0089","toys":["pink"],"remarks":"","score":8,"source":"imported"},
+      {"id":100059,"dateISO":"2023-03-28","dateLabel":"28 Mar 2023","time":"","links":["https://www.pornhub.com/view_video.php?viewkey=ph62213e75691e7"],"lastLink":"https://www.pornhub.com/view_video.php?viewkey=ph62213e75691e7","toys":["pink"],"remarks":"","score":6,"source":"imported"}
+    ];
 
-    // Internal Variables for Interactive Setup
-    let selectedToys = [];
-    let selectedBaseScore = null;
-    let selectedDecimal = "0.0";
-    let activeToyFilters = [];
-    let filterMultiDayOnly = false;
+    let localSessions = [];
+    let selectedToysManual = [];
+    let activeFilters = { text: '', minScore: null, maxScore: null, fromDate: '', toDate: '', multiDayOnly: false, toys: [] };
+    const metaCache = {};
 
-    // View Routing Management
-    function switchScreen(screenId) {
+    function init() {
+      try { localSessions = JSON.parse(localStorage.getItem('nymph_sessions') || '[]'); } catch(e) { localSessions = []; }
+      buildToyGrid();
+      buildScoreGrid();
+      buildFilterOptions();
+      applyFilters();
+    }
+
+    function allSessions() {
+      const combined = [...localSessions, ...IMPORTED_SESSIONS];
+      return combined.sort((a,b) => new Date(b.dateISO + 'T00:00:00') - new Date(a.dateISO + 'T00:00:00') || b.id - a.id);
+    }
+
+    function escapeHtml(str) {
+      if(!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function changeScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-      if (screenId === 'listScreen') {
-        applyFilters();
-      } else if (screenId === 'manualScreen') {
-        resetForm();
-      }
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0,0);
     }
-
-    // Build Form Layout UI Components
-    function initUI() {
-      // Build Entry Toy Grid Items
-      const grid = document.getElementById('toyGrid');
-      grid.innerHTML = TOYS.map(t => `
-        <div class="toy" id="toy-${t.id}" onclick="toggleFormToy('${t.id}')">
-          <span class="e">${t.emoji}</span>
-          <span class="n">${t.name}</span>
-        </div>
-      `).join('');
-
-      // Build Entry Score Grid Layout
-      const scoreGrid = document.getElementById('scoreGrid');
-      let scoreHtml = '';
-      for(let i=1; i<=10; i++) {
-        scoreHtml += `<button type="button" class="score-btn" id="sb-${i}" onclick="selectBaseScore(${i})">${i}</button>`;
-      }
-      scoreHtml += `<button type="button" class="score-btn" id="sb-11" onclick="selectBaseScore(11)">11 ⭐</button>`;
-      scoreGrid.innerHTML = scoreHtml;
-
-      // Build Decimal Choice Panel
-      const decWrap = document.getElementById('decimalWrap');
-      const decimals = ["0.0", "0.25", "0.50", "0.75"];
-      decWrap.innerHTML = decimals.map(d => `
-        <button type="button" class="decimal-btn" id="db-${d.replace('.','_')}" onclick="selectDecimalScore('${d}')">+${d}</button>
-      `).join('');
-
-      // Build Filter Dropdowns for Querying Lists
-      const minSel = document.getElementById('scoreMin');
-      const maxSel = document.getElementById('scoreMax');
-      let selectOptions = '<option value="">Min Score</option>';
-      for(let s=1; s<=11; s+=0.25) {
-        selectOptions += `<option value="${s}">${s}</option>`;
-      }
-      minSel.innerHTML = selectOptions;
-      maxSel.innerHTML = selectOptions.replace('Min Score', 'Max Score');
-
-      // Build Filter Lists Tags Row
-      const filterRow = document.getElementById('toyFilters');
-      filterRow.innerHTML = TOYS.map(t => `
-        <button type="button" class="chip" id="tf-${t.id}" onclick="toggleFilterToy('${t.id}')">${t.emoji} ${t.name}</button>
-      `).join('');
-    }
-
-    // Interactive Entry Interactions
-    function toggleFormToy(id) {
-      const idx = selectedToys.indexOf(id);
-      if(idx > -1) selectedToys.splice(idx, 1);
-      else selectedToys.push(id);
-      document.getElementById(`toy-${id}`).classList.toggle('selected');
-    }
-
-    function selectBaseScore(num) {
-      selectedBaseScore = num;
-      document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`sb-${num}`).classList.add('active');
-
-      const decWrap = document.getElementById('decimalWrap');
-      const customWrap = document.getElementById('customScoreWrap');
-
-      if (num === 11) {
-        decWrap.classList.remove('show');
-        customWrap.classList.add('show');
-        selectedDecimal = "";
-      } else {
-        customWrap.classList.remove('show');
-        decWrap.classList.add('show');
-        selectDecimalScore("0.0");
-      }
-    }
-
-    function selectDecimalScore(decString) {
-      selectedDecimal = decString;
-      document.querySelectorAll('.decimal-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`db-${decString.replace('.','_')}`).classList.add('active');
-    }
-
-    function resetForm() {
-      selectedToys = [];
-      selectedBaseScore = null;
-      selectedDecimal = "0.0";
+    function goHome() { changeScreen('homeScreen'); }
+    function openManual() {
+      selectedToysManual = [];
       document.getElementById('linkInput').value = '';
-      document.getElementById('titleInput').value = '';
       document.getElementById('remarksInput').value = '';
       document.getElementById('customScoreInput').value = '';
-      document.querySelectorAll('.toy').forEach(b => b.classList.remove('selected'));
-      document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#manualScreen .toy').forEach(t => t.classList.remove('selected'));
+      document.querySelectorAll('#manualScreen .score-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#manualScreen .decimal-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('decimalWrap').classList.remove('show');
       document.getElementById('customScoreWrap').classList.remove('show');
+      changeScreen('manualScreen');
+    }
+    function openList() { applyFilters(); changeScreen('listScreen'); }
+
+    function buildToyGrid() {
+      const grid = document.getElementById('toyGrid');
+      grid.innerHTML = TOYS.map(t => `<div class="toy" data-id="${t.id}" onclick="toggleToyManual('${t.id}')"><span class="e">${t.emoji}</span><span class="n">${t.name}</span></div>`).join('');
+      const fGrid = document.getElementById('toyFilters');
+      fGrid.innerHTML = TOYS.map(t => `<button class="chip" id="f_toy_${t.id}" onclick="toggleToyFilter('${t.id}')">${t.emoji} ${t.name}</button>`).join('');
     }
 
-    // Save Logic to App Storage Stack
-    function saveManualEntry() {
-      let scoreVal = null;
-      if (selectedBaseScore === 11) {
-        const rawCustom = document.getElementById('customScoreInput').value.trim();
-        scoreVal = rawCustom ? parseFloat(rawCustom) : 11;
-      } else if (selectedBaseScore !== null) {
-        scoreVal = parseFloat(selectedBaseScore) + parseFloat(selectedDecimal);
-      }
-
-      const rawLink = document.getElementById('linkInput').value.trim();
-      const customTitle = document.getElementById('titleInput').value.trim();
-      const remarks = document.getElementById('remarksInput').value.trim();
-      
-      const now = new Date();
-      const isoDate = now.toISOString().split('T')[0];
-      const timeString = now.toTimeString().split(' ')[0].substring(0,5);
-
-      // Cache Manual Title configurations to prevent dynamic CORS scrapers checks
-      if (rawLink && customTitle) {
-        metaCache[rawLink] = { title: customTitle, thumb: '' };
-        localStorage.setItem('nymph_meta_cache', JSON.stringify(metaCache));
-      }
-
-      const newSession = {
-        id: Date.now(),
-        dateISO: isoDate,
-        dateLabel: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
-        time: timeString,
-        links: rawLink ? [rawLink] : [],
-        lastLink: rawLink,
-        toys: [...selectedToys],
-        remarks: remarks,
-        score: scoreVal,
-        source: 'local'
-      };
-
-      userSessions.unshift(newSession);
-      localStorage.setItem('nymph_sessions', JSON.stringify(userSessions));
-      switchScreen('homeScreen');
+    function toggleToyManual(id) {
+      const idx = selectedToysManual.indexOf(id);
+      const el = document.querySelector(`#manualScreen .toy[data-id="${id}"]`);
+      if(idx > -1) { selectedToysManual.splice(idx,1); el.classList.remove('selected'); }
+      else { selectedToysManual.push(id); el.classList.add('selected'); }
     }
 
-    // View Filter Engine Configuration
-    function toggleFilterToy(id) {
-      const idx = activeToyFilters.indexOf(id);
-      if(idx > -1) activeToyFilters.splice(idx, 1);
-      else activeToyFilters.push(id);
-      document.getElementById(`tf-${id}`).classList.toggle('active');
+    function toggleToyFilter(id) {
+      const idx = activeFilters.toys.indexOf(id);
+      const el = document.getElementById(`f_toy_${id}`);
+      if(idx > -1) { activeFilters.toys.splice(idx,1); el.classList.remove('active'); }
+      else { activeFilters.toys.push(id); el.classList.add('active'); }
       applyFilters();
     }
 
-    function toggleMultiDayFilter() {
-      filterMultiDayOnly = !filterMultiDayOnly;
-      document.getElementById('multiDayChip').classList.toggle('active', filterMultiDayOnly);
+    let selectedMainScore = null;
+    let selectedDecimal = null;
+
+    function buildScoreGrid() {
+      const wrap = document.getElementById('scoreGrid');
+      let html = '';
+      for(let i=5; i<=10; i++){ html += `<button class="score-btn" data-v="${i}" onclick="selectMainScore(${i})">${i}</button>`; }
+      html += `<button class="score-btn" data-v="custom" onclick="selectMainScore('custom')">Other</button>`;
+      wrap.innerHTML = html;
+
+      const decWrap = document.getElementById('decimalWrap');
+      let dHtml = '';
+      ['.0', '.25', '.5', '.75'].forEach(d => { dHtml += `<button class="decimal-btn" data-v="${d}" onclick="selectDecimal('${d}')">${d}</button>`; });
+      decWrap.innerHTML = dHtml;
+    }
+
+    function selectMainScore(v) {
+      selectedMainScore = v;
+      selectedDecimal = null;
+      document.querySelectorAll('#manualScreen .score-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#manualScreen .decimal-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('decimalWrap').classList.remove('show');
+      document.getElementById('customScoreWrap').classList.remove('show');
+
+      if(v === 'custom') {
+        document.querySelector('#manualScreen .score-btn[data-v="custom"]').classList.add('active');
+        document.getElementById('customScoreWrap').classList.add('show');
+      } else if(v !== null) {
+        document.querySelector(`#manualScreen .score-btn[data-v="${v}"]`).classList.add('active');
+        document.getElementById('decimalWrap').classList.add('show');
+        selectDecimal('.0');
+      }
+    }
+
+    function selectDecimal(d) {
+      selectedDecimal = d;
+      document.querySelectorAll('#manualScreen .decimal-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`#manualScreen .decimal-btn[data-v="${d}"]`).classList.add('active');
+    }
+
+    function getSelectedScore() {
+      if(selectedMainScore === 'custom') {
+        const val = parseFloat(document.getElementById('customScoreInput').value);
+        return isNaN(val) ? null : val;
+      }
+      if(selectedMainScore !== null && selectedDecimal !== null) {
+        return parseFloat(selectedMainScore) + parseFloat(selectedDecimal);
+      }
+      return null;
+    }
+
+    function buildFilterOptions() {
+      const mins = document.getElementById('scoreMin');
+      const maxs = document.getElementById('scoreMax');
+      let hMin = '<option value="">Min Score</option>';
+      let hMax = '<option value="">Max Score</option>';
+      for(let i=5; i<=10; i+=0.25){
+        hMin += `<option value="${i}">Score: ${i}</option>`;
+        hMax += `<option value="${i}">Score: ${i}</option>`;
+      }
+      mins.innerHTML = hMin; maxs.innerHTML = hMax;
+    }
+
+    function toggleMultiDay() {
+      activeFilters.multiDayOnly = !activeFilters.multiDayOnly;
+      document.getElementById('multiDayChip').classList.toggle('active', activeFilters.multiDayOnly);
       applyFilters();
     }
 
-    function clearAllFilters() {
+    function clearFilters() {
+      activeFilters = { text: '', minScore: null, maxScore: null, fromDate: '', toDate: '', multiDayOnly: false, toys: [] };
       document.getElementById('searchInput').value = '';
       document.getElementById('scoreMin').value = '';
       document.getElementById('scoreMax').value = '';
       document.getElementById('dateFrom').value = '';
       document.getElementById('dateTo').value = '';
-      
-      activeToyFilters = [];
-      filterMultiDayOnly = false;
       document.getElementById('multiDayChip').classList.remove('active');
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('#listScreen .chip').forEach(c => c.classList.remove('active'));
       applyFilters();
     }
 
-    function getCombinedSessions() {
-      // Fallback fallback mechanism ensures local user data pairs up with existing hardcoded historical files
-      const baseline = typeof IMPORTED_SESSIONS !== 'undefined' ? IMPORTED_SESSIONS : [];
-      return [...userSessions, ...baseline];
-    }
-
     function applyFilters() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const minS = parseFloat(document.getElementById('scoreMin').value) || -1;
-      const maxS = parseFloat(document.getElementById('scoreMax').value) || 999;
-      const dFrom = document.getElementById('dateFrom').value;
-      const dTo = document.getElementById('dateTo').value;
+      activeFilters.text = document.getElementById('searchInput').value.toLowerCase().trim();
+      activeFilters.minScore = document.getElementById('scoreMin').value ? parseFloat(document.getElementById('scoreMin').value) : null;
+      activeFilters.maxScore = document.getElementById('scoreMax').value ? parseFloat(document.getElementById('scoreMax').value) : null;
+      activeFilters.fromDate = document.getElementById('dateFrom').value;
+      activeFilters.toDate = document.getElementById('dateTo').value;
 
-      const items = getCombinedSessions();
-
-      // Trace internal multi-day recurrence occurrences
-      const occurrences = {};
-      items.forEach(i => { occurrences[i.dateISO] = (occurrences[i.dateISO] || 0) + 1; });
+      const items = allSessions();
+      const counts = {};
+      items.forEach(s => { counts[s.dateISO] = (counts[s.dateISO] || 0) + 1; });
 
       const filtered = items.filter(s => {
-        if (search) {
-          const matchText = (s.remarks || '') + ' ' + (s.lastLink || '') + ' ' + (metaCache[s.lastLink]?.title || '');
-          if (!matchText.toLowerCase().includes(search)) return false;
+        if(activeFilters.text) {
+          const matchText = (s.remarks || '').toLowerCase().includes(activeFilters.text) || 
+                            (s.lastLink || '').toLowerCase().includes(activeFilters.text);
+          if(!matchText) return false;
         }
-        if (s.score !== null && (s.score < minS || s.score > maxS)) return false;
-        if (dFrom && s.dateISO < dFrom) return false;
-        if (dTo && s.dateISO > dTo) return false;
-        
-        if (activeToyFilters.length > 0) {
-          const hasAll = activeToyFilters.every(f => s.toys.includes(f));
-          if (!hasAll) return false;
+        if(activeFilters.minScore !== null && (s.score === null || s.score < activeFilters.minScore)) return false;
+        if(activeFilters.maxScore !== null && (s.score === null || s.score > activeFilters.maxScore)) return false;
+        if(activeFilters.fromDate && s.dateISO < activeFilters.fromDate) return false;
+        if(activeFilters.toDate && s.dateISO > activeFilters.toDate) return false;
+        if(activeFilters.multiDayOnly && counts[s.dateISO] <= 1) return false;
+        if(activeFilters.toys.length > 0) {
+          const hasAll = activeFilters.toys.every(t => s.toys.includes(t));
+          if(!hasAll) return false;
         }
-        
-        if (filterMultiDayOnly && occurrences[s.dateISO] <= 1) return false;
-
         return true;
       });
 
-      document.getElementById('countPill').innerText = `${filtered.length} results`;
-      renderSessions(filtered, occurrences);
-    }
+      document.getElementById('countPill').innerText = `${filtered.length} session${filtered.length===1?'':'s'}`;
+      document.getElementById('resultsMeta').innerText = `Showing ${filtered.length} of ${items.length} records total`;
 
-    function renderSessions(list, counts) {
-      const container = document.getElementById('results');
-      if (list.length === 0) {
-        container.innerHTML = '<div class="empty">No matching records found.</div>';
+      const resDiv = document.getElementById('results');
+      if(filtered.length === 0) {
+        resDiv.innerHTML = '<div class="empty">No matching records found. Try resetting filters.</div>';
         return;
       }
 
-      container.innerHTML = list.map(s => {
-        const cached = s.lastLink ? metaCache[s.lastLink] : null;
-        const title = cached?.title || (s.lastLink ? cleanUrlText(s.lastLink) : 'No link saved');
-        const thumbnailHtml = cached?.thumb 
-          ? `<img src="${escapeHtml(cached.thumb)}" alt="Thumbnail">`
-          : `<div style="font-size: 24px;">🎬</div>`;
-
-        const toyTags = (s.toys || []).map(tid => {
-          const matching = TOYS.find(t => t.id === tid);
-          return `<span class="tag">${matching ? matching.emoji + ' ' + matching.name : tid}</span>`;
+      resDiv.innerHTML = filtered.map(s => {
+        const toyChips = s.toys.map(tid => {
+          const tObj = TOYS.find(t => t.id === tid);
+          return tObj ? `<span class="tag">${tObj.emoji} ${tObj.name}</span>` : '';
         }).join('');
+        const tags = toyChips ? `<div class="tags">${toyChips}</div>` : '';
+        const remarks = s.remarks ? `<div class="remarks">${escapeHtml(s.remarks)}</div>` : '';
 
-        const multiDayWarning = counts[s.dateISO] > 1 
-          ? `<span style="color:var(--rose2); font-weight:600;"> · Multi-Session Day</span>` 
-          : '';
+        let title = 'Session';
+        if(s.lastLink) {
+          try { title = new URL(s.lastLink).hostname.replace('www.',''); } catch(e) { title = 'Video Link'; }
+        }
+
+        const cache = metaCache[s.lastLink];
+        const titleMarkup = s.lastLink ? `<a href="${escapeHtml(s.lastLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(cache?.title || title)}</a>` : 'No link saved';
+        const thumbMarkup = cache?.thumb ? `<img src="${escapeHtml(cache.thumb)}" alt="Thumb">` : `<span>${s.lastLink?'▶':'—'}</span>`;
 
         return `
-          <article class="item">
+          <article class="item" data-id="${s.id}">
             <div class="item-top">
-              <div class="thumb">${thumbnailHtml}</div>
-              <div class="item-info">
-                <h3>
-                  ${s.lastLink 
-                    ? `<a href="${escapeHtml(s.lastLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a>` 
-                    : 'No Link Saved'}
-                </h3>
-                <div class="meta" style="margin-top: 4px;">
-                  ${escapeHtml(s.dateLabel)}${s.time ? ' · ' + escapeHtml(s.time) : ''} · Score: <strong>${s.score !== null ? s.score : '—'}</strong>${multiDayWarning}
-                </div>
+              <div class="thumb" id="thumb-${s.id}">${thumbMarkup}</div>
+              <div style="flex:1; min-width:0;">
+                <h3 id="title-${s.id}">${titleMarkup}</h3>
+                <div class="meta">${escapeHtml(s.dateLabel)}${s.time ? ' · ' + escapeHtml(s.time) : ''} · Score: ${s.score !== null ? escapeHtml(s.score) : '—'}${counts[s.dateISO] > 1 ? ' · <span style="color:var(--rose2);font-weight:600;">multi-session day</span>' : ''}</div>
+                <div class="meta" style="word-break:break-all; font-size:11px; margin-top:2px; opacity:0.6;">${s.lastLink ? escapeHtml(s.lastLink) : 'No URL stored'}</div>
               </div>
             </div>
-            ${toyTags ? `<div class="tags">${toyTags}</div>` : ''}
-            ${s.remarks ? `<div class="remarks">${escapeHtml(s.remarks)}</div>` : ''}
-          </article>
-        `;
+            ${tags}
+            ${remarks}
+          </article>`;
       }).join('');
     }
 
-    function cleanUrlText(url) {
-      try {
-        const obj = new URL(url);
-        if (obj.searchParams.has('viewkey')) {
-          return 'Video: ' + obj.searchParams.get('viewkey');
-        }
-        return obj.hostname + obj.pathname;
-      } catch(e) {
-        return url;
-      }
+    function saveManual() {
+      const link = document.getElementById('linkInput').value.trim();
+      const remarks = document.getElementById('remarksInput').value.trim();
+      const score = getSelectedScore();
+      
+      const now = new Date();
+      const dateISO = now.toISOString().split('T')[0];
+      const dateLabel = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+      const newSession = {
+        id: Date.now(),
+        dateISO,
+        dateLabel,
+        time,
+        links: link ? [link] : [],
+        lastLink: link,
+        toys: [...selectedToysManual],
+        remarks,
+        score,
+        source: 'local'
+      };
+
+      localSessions.unshift(newSession);
+      localStorage.setItem('nymph_sessions', JSON.stringify(localSessions));
+      
+      goHome();
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    // App Initialization Bootstrapping
-    window.addEventListener('DOMContentLoaded', () => {
-      initUI();
-    });
+    window.onload = init;
   </script>
 </body>
 </html>
