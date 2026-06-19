@@ -1,0 +1,10 @@
+{
+  "name": "Nymph",
+  "short_name": "Nymph",
+  "start_url": "./D5.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": []
+}
